@@ -1,0 +1,48 @@
+---
+kind: pipeline
+name: build-pipeline
+type: exec
+node:
+  runner_name: cn-build-02
+
+platform:
+  os: linux
+  arch: amd64
+
+trigger:
+  event:
+    - push
+
+steps:
+  - name: build portal app
+    commands:
+      - export APP_NAME=yaginx
+      - docker run --rm -v `pwd`/adminui:/workdir -v /data/build_share/pnpm_store:/pnpm_store --workdir /workdir
+        hub.feinian.net/feinian/node:20-alpine /bin/sh -c "node --version && pnpm install --store=/pnpm_store && pnpm run build"
+
+  - name: build_backend
+    commands:
+      - docker run -t --rm -v /data/build_share/dotnet:/root/.dotnet -v /data/build_share/nuget:/root/.nuget -v `pwd`:/workdir
+        --workdir /workdir hub.feinian.net/dotnet/sdk:8.0 bash -c "dotnet publish backend/Yaginx/Yaginx.csproj -c Release -o /workdir/publish"
+  - name: publish_full
+    environment:
+      HUB_HOST: 
+        from_secret: hub_host
+      HUB_USERNAME: 
+        from_secret: hub_username
+      HUB_PASSWORD: 
+        from_secret: hub_password 
+    commands:
+      - export ADMINUI_CLIENT_APP_FULLPATH=`pwd`/publish/ClientApp/AdminUI/
+      - rm -rf $ADMINUI_CLIENT_APP_FULLPATH
+      - mkdir -p $ADMINUI_CLIENT_APP_FULLPATH
+      - cp -R `pwd`/adminui/dist/* $ADMINUI_CLIENT_APP_FULLPATH
+
+      - export IMAGE_VERSION=$(date +'%y%m%d_%H%M%S')
+      - echo $${IMAGE_VERSION} > `pwd`/publish/version.txt
+      - echo "current version" && cat `pwd`/publish/version.txt
+
+      - echo "开始构建docker镜像"
+      - docker login --username $$HUB_USERNAME --password $$HUB_PASSWORD $$HUB_HOST
+      - docker build -t $HUB_HOST/yaginx/yaginx:$IMAGE_VERSION --file `pwd`/Yaginx/Dockerfile `pwd`/publish
+      - docker push $HUB_HOST/yaginx/yaginx:$IMAGE_VERSION

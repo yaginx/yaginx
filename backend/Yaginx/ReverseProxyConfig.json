@@ -1,0 +1,6 @@
+{
+  "ReverseProxy": {
+    "Routes": {},
+    "Clusters": {}
+  }
+}
