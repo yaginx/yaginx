@@ -1,24 +1,31 @@
 using AgileLabs;
 using AgileLabs.AppRegisters;
 using AgileLabs.AspNet.ClientAppServices;
-using AgileLabs.Diagnostics;
+using AgileLabs.AspNet.WebApis.Filters;
+using AgileLabs.Json;
 using AgileLabs.WebApp.Hosting;
 using Docker.DotNet;
 using Hangfire;
 using Hangfire.Console;
 using Hangfire.MemoryStorage;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using Yaginx.Configures.Hangfires;
 using Yaginx.Infrastructure;
 using Yaginx.Infrastructure.Configuration;
+using Yaginx.Infrastructure.Securities;
+using Yaginx.Services.Securities;
 using Yarp.ReverseProxy.Transforms;
 using Yarp.ReverseProxy.Transforms.Builder;
 
-public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEndpointConfig
+public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEndpointConfig, IMvcOptionsConfig, IMvcBuildConfig
 {
 	public int Order => 1;
 	public void ConfigureServices(IServiceCollection services, AppBuildContext buildContext)
 	{
+		services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "app_data")));
+
 		// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 		services.AddEndpointsApiExplorer();
 		services.AddSwaggerGen();
@@ -105,6 +112,13 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
 
 			options.ClientApps.Add(adminClientApp);
 		});
+
+		#region Authentication & Authorization
+		services.AddSingleton<IAuthenticateService, AuthenticateService>();
+		services.ConfigureSecurityServices(buildContext);
+		#endregion
+
+		services.ConfigureOpenTelementoryService(buildContext);
 	}
 
 	public RequestPiplineCollection Configure(RequestPiplineCollection piplineActions, AppBuildContext buildContext)
@@ -186,6 +200,28 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
 			//	requestTransformContext.ProxyRequest.Headers.Authorization = new AuthenticationHeaderValue("SessionKey", ssid);
 			//}
 			await Task.CompletedTask;
+		});
+	}
+
+	public void ConfigureMvcOptions(MvcOptions mvcOptions, AppBuildContext appBuildContext)
+	{
+		mvcOptions.Filters.Add<ExceptionHandlerFilter>();
+		mvcOptions.Filters.Add<EnvelopFilterAttribute>();
+	}
+
+	public void ConfigureMvcBuilder(IMvcBuilder mvcBuilder, AppBuildContext appBuildContext)
+	{
+		// Newtonsoft.Json
+		// 全局Json序列化的配置
+		// 放这里是因为网关也需要
+		mvcBuilder.AddNewtonsoftJson(jsonOptions =>
+		{
+			JsonNetSerializerSettings.DeconretCamelCaseSerializerSettings(jsonOptions.SerializerSettings);
+			//jsonOptions.SerializerSettings.Converters.Add(LongStringJsonConverter.Instance);
+			//jsonOptions.SerializerSettings.Converters.Add(BoolIntJsonConverter.Instance);
+			//jsonOptions.SerializerSettings.Converters.Add(DateTimeToTimestampJsonConverter.Instance);
+			//jsonOptions.SerializerSettings.Converters.Add(NullableDateTimeToTimestampJsonConverter.Instance);
+			JsonNetSerializerSettings.Instance = jsonOptions.SerializerSettings;
 		});
 	}
 }

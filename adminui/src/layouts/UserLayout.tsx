@@ -83,10 +83,6 @@ const UserLayout: React.FC = () => {
                     <Menu theme="dark" className='topNavMenu' mode="horizontal" items={topNavMenu(routes)} />
                 </div>
                 <Space className="layout_header_right" direction="horizontal" size="middle">
-                    <div className='project_selector'>
-                        <span >项目:</span>
-                        <SiteSelector />
-                    </div>
                     <Dropdown.Button className='user_info' menu={menuProps} icon={<Avatar shape="square" src={logo} size={24} />} onClick={handleButtonClick}>
                         <span className='user_name'> Hi {authInfo.name}</span>
                     </Dropdown.Button>

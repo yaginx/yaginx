@@ -12,7 +12,7 @@ export const VITE_BASE_PATH = '/adminui/';
 // 请求接口地址
 export const VITE_PROXY_HTTP = 'https://localhost:5266/';
 // 应用名称
-export const VITE_APP_TITLE = 'Yaginx AdminUI';
+export const VITE_APP_TITLE = 'YAGINX';
 // 开启 mock
 export const VITE_APP_MOCK: boolean = false;
 // 开启包依赖分析 可视化

@@ -54,6 +54,19 @@ const layouts: IRouteConfig[] = [
         element: React.lazy(async () => import('@/pages/System/NoFond')),
       },
     ],
+  },{
+    path: '/home',
+    element: React.lazy(async () => await import('@/layouts/UserLayout')),
+    title: '仪表盘',
+    redirect: '/home/dashboard',
+    icon: 'HomeOutlined',
+    children: [
+      {
+        path: 'dashboard',
+        element: React.lazy(async () => await import('@/pages/Home')),
+        title: '仪表盘',
+      }
+    ]
   },
   {
     path: '/reverse-proxies',

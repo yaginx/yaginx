@@ -398,3 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 **/app_data/applog
 **/app_data/bootlog
+**/app_data/*.xml

@@ -7,10 +7,10 @@ using System.Web;
 using Yaginx.Models;
 using Yaginx.Services.DockerServices;
 
-namespace Yaginx.Controllers;
+namespace Yaginx.ApiControllers;
 
 [ApiController, Route("api/docker/container")]
-public class ContainerController : Controller
+public class ContainerController : YaginxControllerBase
 {
 	private readonly IDockerClient _dockerClient;
 	private readonly ILogger<ContainerController> _logger;
@@ -45,7 +45,7 @@ public class ContainerController : Controller
 
 	[AllowAnonymous]
 	[HttpGet, Route("sample")]
-	public async Task<IActionResult> GetSample()
+	public async Task<ReplaceNewImageRequest> GetSample()
 	{
 		var newContainerJson = new ReplaceNewImageRequest();
 
@@ -55,15 +55,17 @@ public class ContainerController : Controller
 		newContainerJson.Volumns = new List<string>() { "/data:/data" };
 		newContainerJson.Ports = new List<KeyValuePair<string, List<string>>>();
 		newContainerJson.Ports.Add(new KeyValuePair<string, List<string>>("6379", new List<string> { "6379" }));
-		return Json(newContainerJson);
+		await Task.CompletedTask;
+		return newContainerJson;
 	}
 
 	[HttpPost, Route("replace")]
-	public async Task<IActionResult> ReplaceImage([FromBody] ReplaceNewImageRequest request)
+	public async Task<(string message, string jobId)> ReplaceImage([FromBody] ReplaceNewImageRequest request)
 	{
 		var queuedJobId = BackgroundJob.Enqueue<ContainerServcie>(service => service.ReplaceImage(request, null, default));
 		await Task.CompletedTask;
-		return Json(new { message = "queued", jobId = queuedJobId });
+		//return Json(new { message = "queued", jobId = queuedJobId });
+		return ("queued", queuedJobId);
 	}
 
 	private async Task<ContainerListResponse?> GetContainerByContainerId(string containerId)

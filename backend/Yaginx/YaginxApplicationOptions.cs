@@ -1,7 +1,5 @@
 using AgileLabs.WebApp;
 using AgileLabs.WebApp.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Yaginx;
 using Yaginx.Configures;
 
 public class YaginxApplicationOptions : DefaultMvcApplicationOptions
@@ -10,7 +8,7 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
 	{
 		//UseSerilogProvider = false;
 		TypeFinderAssemblyScanPattern = "^Yaginx|^AgileLabs";
-		MvcBuilderCreateFunc = (IServiceCollection serviceCollection, Action<MvcOptions> action) => serviceCollection.AddControllersWithViews(action);
+		//MvcBuilderCreateFunc = (IServiceCollection serviceCollection, Action<MvcOptions> action) => serviceCollection.add(action);
 
 		// 引入appsettings.global.json文件
 		// 现阶段所有应用部署在一台服务器上, 共享同样的目录/data/yaginx
@@ -31,13 +29,13 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
 			}
 		};
 
-		ConfigureLoggingBuilder += (ILoggingBuilder loggingBuilder, AppBuildContext context) =>
-		{
-			loggingBuilder.ClearProviders();
-			loggingBuilder.Configure(options =>
-			{
-				options.ActivityTrackingOptions = ActivityTrackingOptions.TraceId | ActivityTrackingOptions.SpanId | ActivityTrackingOptions.ParentId | ActivityTrackingOptions.Baggage | ActivityTrackingOptions.Tags;
-			});
-		};
+		//ConfigureLoggingBuilder += (ILoggingBuilder loggingBuilder, AppBuildContext context) =>
+		//{
+		//	loggingBuilder.ClearProviders();
+		//	loggingBuilder.Configure(options =>
+		//	{
+		//		options.ActivityTrackingOptions = ActivityTrackingOptions.TraceId | ActivityTrackingOptions.SpanId | ActivityTrackingOptions.ParentId | ActivityTrackingOptions.Baggage | ActivityTrackingOptions.Tags;
+		//	});
+		//};
 	}
 }
