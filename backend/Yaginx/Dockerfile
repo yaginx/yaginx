@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM hub.feinian.net/build/aspnet-quic:8.0.1
 ARG source
 
 ENV TZ=Asia/Shanghai LANG=zh_CN.UTF-8

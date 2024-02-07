@@ -3,7 +3,7 @@ using Yaginx.Infrastructure.Configuration;
 /// <summary>
 /// Represents hosting configuration parameters
 /// </summary>
-public partial class AuthenticationConfig : IConfig
+public partial class AuthenticationConfig : IFileConfig
 {
 	/// <summary>
 	/// Gets or sets a value indicating whether to use proxy servers and load balancers

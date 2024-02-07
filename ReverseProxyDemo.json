@@ -1,0 +1,95 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "route_niusys_net": {
+        "ClusterId": "culster_niusys_net",
+        "Match": {
+          "Hosts": ["xxx.niusys.net"]
+        },
+        "Transforms": [
+          {
+            "RequestHeadersCopy": "true"
+          },
+          {
+            "RequestHeaderOriginalHost": "false"
+          }
+        ]
+      },
+      "route_aocsoft_com": {
+        "ClusterId": "culster_aocsoft_com",
+        "Match": {
+          "Hosts": ["xxx.aocsoft.com"]
+        },
+        "Transforms": [
+          {
+            "RequestHeadersCopy": "true"
+          },
+          {
+            "RequestHeaderOriginalHost": "false"
+          }
+        ]
+      },
+      "route_esxi_feiniain_net": {
+        "ClusterId": "cluster_esxi_feiniain_net",
+        "Match": {
+          "Hosts": ["esxi.feinian.net"]
+        },
+        "Transforms": [
+          {
+            "RequestHeadersCopy": "true"
+          },
+          {
+            "RequestHeaderOriginalHost": "true"
+          }
+        ]
+      },
+      "route_drone_feiniain_net": {
+        "ClusterId": "cluster_drone_feiniain_net",
+        "Match": {
+          "Hosts": ["drone.feinian.net"]
+        },
+        "Transforms": [
+          {
+            "RequestHeadersCopy": "true"
+          },
+          {
+            "RequestHeaderOriginalHost": "true"
+          }
+        ]
+      }
+    },
+    "Clusters": {
+      "culster_niusys_net": {
+        "Destinations": {
+          "cluster1/destination1": {
+            "Address": "http://10.30.50.80/"
+          }
+        }
+      },
+      "culster_aocsoft_com": {
+        "Destinations": {
+          "cluster1/destination1": {
+            "Address": "http://10.30.50.80/"
+          }
+        }
+      },
+      "cluster_drone_feiniain_net": {
+        "Destinations": {
+          "cluster1/destination1": {
+            "Address": "http://192.168.8.80:10081/"
+          }
+        }
+      },
+      "cluster_esxi_feiniain_net": {
+        "HttpClient": {
+          "DangerousAcceptAnyServerCertificate": true
+        },
+        "Destinations": {
+          "cluster1/destination1": {
+            "Address": "https://192.168.8.2:443/"
+          }
+        }
+      }
+    }
+  }
+}

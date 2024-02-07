@@ -1,7 +1,7 @@
-import { useAuth } from '@/layouts/AuthProvider';
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { Button, Result } from 'antd';
+import { useAuth } from '@/layouts/RootAuthProvider';
 
 const AccessDenied: React.FC = () => {
   const { authInfo }: any = useAuth();

@@ -10,18 +10,18 @@ public partial class AppSettings
 {
 	#region Fields
 
-	private readonly Dictionary<Type, IConfig> _configurations = new();
+	private readonly Dictionary<Type, IFileConfig> _configurations = new();
 
 	#endregion
 
 	#region Ctor
 
-	public AppSettings(IList<IConfig> configurations = null)
+	public AppSettings(IList<IFileConfig> configurations = null)
 	{
 		_configurations = configurations
 			?.OrderBy(config => config.GetOrder())
 			?.ToDictionary(config => config.GetType(), config => config)
-			?? new Dictionary<Type, IConfig>();
+			?? new Dictionary<Type, IFileConfig>();
 	}
 
 	#endregion
@@ -43,7 +43,7 @@ public partial class AppSettings
 	/// </summary>
 	/// <typeparam name="TConfig">Configuration type</typeparam>
 	/// <returns>Configuration parameters</returns>
-	public TConfig Get<TConfig>() where TConfig : class, IConfig
+	public TConfig Get<TConfig>() where TConfig : class, IFileConfig
 	{
 		if (_configurations[typeof(TConfig)] is not TConfig config)
 			throw new Exception($"No configuration with type '{typeof(TConfig)}' found");
@@ -55,7 +55,7 @@ public partial class AppSettings
 	/// Update app settings
 	/// </summary>
 	/// <param name="configurations">Configurations to update</param>
-	public void Update(IList<IConfig> configurations)
+	public void Update(IList<IFileConfig> configurations)
 	{
 		foreach (var config in configurations)
 		{

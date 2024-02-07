@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using AgileLabs.FileProviders;
 using AgileLabs.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Text;
 using Yaginx.Configures;
-using Yaginx.Infrastructure;
 
 namespace Yaginx.Infrastructure.Configuration;
 
@@ -30,7 +27,7 @@ public partial class AppSettingsHelper
 	/// <param name="fileProvider">File provider</param>
 	/// <param name="overwrite">Whether to overwrite appsettings file</param>
 	/// <returns>App settings</returns>
-	public static AppSettings SaveAppSettings(IList<IConfig> configurations, IAppFileProvider fileProvider, bool overwrite = true)
+	public static AppSettings SaveAppSettings(IList<IFileConfig> configurations, IAppFileProvider fileProvider, bool overwrite = true)
 	{
 		if (configurations is null)
 			throw new ArgumentNullException(nameof(configurations));

@@ -5,6 +5,12 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yaginx", "Yaginx\Yaginx.csproj", "{7A0E50AF-2265-4C55-AD63-0A8614C3054E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yaginx.Core", "Yaginx.Core\Yaginx.Core.csproj", "{8A94F465-40C0-49F9-8909-2A3C5E7B9699}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LettuceEncrypt", "LettuceEncrypt\LettuceEncrypt.csproj", "{4071B4FD-0708-407E-99D3-13E250928D9D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McMaster.AspNetCore.Kestrel.Certificates", "Kestrel.Certificates\McMaster.AspNetCore.Kestrel.Certificates.csproj", "{2D50914A-28D7-40B8-8241-6738241440A2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +21,18 @@ Global
 		{7A0E50AF-2265-4C55-AD63-0A8614C3054E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A0E50AF-2265-4C55-AD63-0A8614C3054E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A0E50AF-2265-4C55-AD63-0A8614C3054E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A94F465-40C0-49F9-8909-2A3C5E7B9699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A94F465-40C0-49F9-8909-2A3C5E7B9699}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A94F465-40C0-49F9-8909-2A3C5E7B9699}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A94F465-40C0-49F9-8909-2A3C5E7B9699}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4071B4FD-0708-407E-99D3-13E250928D9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4071B4FD-0708-407E-99D3-13E250928D9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4071B4FD-0708-407E-99D3-13E250928D9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4071B4FD-0708-407E-99D3-13E250928D9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D50914A-28D7-40B8-8241-6738241440A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D50914A-28D7-40B8-8241-6738241440A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D50914A-28D7-40B8-8241-6738241440A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D50914A-28D7-40B8-8241-6738241440A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

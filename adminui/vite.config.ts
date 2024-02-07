@@ -24,7 +24,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
 
   console.log({ command, mode });
   return {
-    base: VITE_BASE_PATH,
+    base: './',
     // plugins: createVitePlugins(mode, isBuild),
     plugins: [react()],
     css: {
@@ -55,7 +55,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           drop_console: VITE_DROP_CONSOLE,
         },
       },
-      minify:"terser"
+      minify: "terser"
     },
     define: {
       // 设置应用信息

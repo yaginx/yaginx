@@ -54,7 +54,7 @@ public static class OpenTelementoryServiceRegister
 				//.AddHangfireInstrumentation()
 				//.AddRedisInstrumentation()
 				.AddOtlpExporter()
-				.AddConsoleExporter()
+				//.AddConsoleExporter()
 				)
 			.WithMetrics(metrics => metrics
 				.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(buildContext.HostEnvironment.ApplicationName))
