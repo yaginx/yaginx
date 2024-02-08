@@ -36,7 +36,8 @@ const List: React.FC = (props) => {
 
   const initTableColumn = (columnsArray: any[]) => {
     columnsArray.push(renderTableItem("name", "域名"));
-    columnsArray.push(renderTableItem("isUseFreeCert", "是否使用免费证书"));
+    columnsArray.push(renderTableItem("isUseFreeCert", "使用免费证书"));
+    columnsArray.push(renderTableItem("isHaveCert", "证书是否存在"));
     columnsArray.push(renderTableItem("isVerified", "是否已验证"));
   }
 

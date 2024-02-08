@@ -22,7 +22,7 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
 
         public void Upsert(HostTraffic hostTraffic)
         {
-            var currentPeriod = TimePeriod.GetCurrentPeriod(SeqNoResetPeriod.Hourly, DateTime.Now);
+            var currentPeriod = TimePeriod.GetCurrentPeriod(SeqNoResetPeriod.Hourly, DateTime.UtcNow);
 
             var old = _databaseRepository.Get<HostTraffic>(x => x.HostName == hostTraffic.HostName && x.Period == currentPeriod.PeriodTs);
             if (old == null)
