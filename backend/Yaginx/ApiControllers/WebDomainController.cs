@@ -14,7 +14,7 @@ public class WebDomainController : YaginxControllerBase
     }
 
     [HttpPost, Route("upsert")]
-    public async Task Upsert([FromBody] WebDomain webDomain)
+    public async Task<WebDomain> Upsert([FromBody] WebDomain webDomain)
     {
         webDomain.Name = webDomain.Name.ToLower();
         var oldDomain = _webDomainRepository.GetByName(webDomain.Name);
@@ -28,6 +28,7 @@ public class WebDomainController : YaginxControllerBase
             _webDomainRepository.Update(webDomain);
         }
         await Task.CompletedTask;
+        return webDomain;
     }
 
     [HttpGet, HttpPost, Route("search")]
@@ -38,6 +39,13 @@ public class WebDomainController : YaginxControllerBase
     }
 
     [HttpGet, Route("get")]
+    public async Task<WebDomain> Get(long id)
+    {
+        await Task.CompletedTask;
+        return _webDomainRepository.Get(id);
+    }
+
+    [HttpGet, Route("get_by_name")]
     public async Task<WebDomain> Get(string name)
     {
         await Task.CompletedTask;

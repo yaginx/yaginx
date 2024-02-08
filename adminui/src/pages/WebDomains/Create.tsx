@@ -3,7 +3,7 @@ import { Button, Space, notification } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '@ant-design/pro-layout';
 import { Form } from 'antd';
-import { EditForm } from './EditForm';
+import { CreateForm } from './CreateForm';
 import { webDomainUpsert, websiteUpsert } from '@/api/docker';
 
 export const Create: React.FC = (props) => {
@@ -13,13 +13,15 @@ export const Create: React.FC = (props) => {
   const onFinish = async (values: any) => {
     // console.log('Success:', values);
     // var rsp = await props.modelCreateSubmitApi({ ...values });
-    // notification.info({
-    //   message: `添加成功`,
-    //   description: `添加成功`
-    // });
-    // let id = (pkFieldName !== undefined && rsp.data && rsp.data.hasOwnProperty(pkFieldName)) ? rsp.data[pkFieldName] : rsp.data;
-    // navigate(`../edit/${id}`);
+
     var rsp = await webDomainUpsert({ ...values });
+    notification.info({
+      message: `添加成功`,
+      description: `添加成功`
+    });
+    const pkFieldName = "id";
+    let id = (rsp !== undefined && rsp.data && rsp.data.hasOwnProperty(pkFieldName)) ? rsp.data[pkFieldName] : rsp.data;
+    navigate(`../edit/${id}`);
   };
   return (
     <PageHeader title={`Create New One`} onBack={() => navigate("../")}
@@ -27,7 +29,7 @@ export const Create: React.FC = (props) => {
         <Button onClick={() => form.submit()}>Save</Button>
       </Space>}
     >
-      <EditForm form={form} onFinish={onFinish} values={initialValues} {...props} />
+      <CreateForm form={form} onFinish={onFinish} values={initialValues} {...props} />
     </PageHeader>
   );
 };

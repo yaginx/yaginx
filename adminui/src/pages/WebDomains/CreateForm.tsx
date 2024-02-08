@@ -3,7 +3,7 @@ import { Form, Input, Tabs } from 'antd';
 import { formItemDefaultLayout } from '@/componets/formItemDefaultLayout';
 import TextArea from 'antd/es/input/TextArea';
 
-export const EditForm: React.FC<any> = (props) => {
+export const CreateForm: React.FC<any> = (props) => {
   const [tabItems, setTabItems] = useState<any[]>([]);
 
   const buildTabItems = () => {
@@ -19,16 +19,12 @@ export const EditForm: React.FC<any> = (props) => {
         </>
       }
     ];
-    const tabHostInfo = {
-      label: '主机信息', key: 'tabHostInfo', forceRender: true, children: []
+    const tabExtraInfoItem = {
+      label: '扩展信息', key: 'tabExtraInfo', forceRender: true, children: []
     };
-    tabItems.push(tabHostInfo);
-
-    const tabProxyRuleInfo = {
-      label: '代理信息', key: 'tabProxyRuleInfo', forceRender: true, children: []
-    };
-    tabItems.push(tabProxyRuleInfo);
-
+    // if (props.values[pkFieldName] || props.values["id"]) {
+    //   tabItems.push(tabExtraInfoItem);
+    // }
     setTabItems(tabItems);
   }
 
@@ -47,9 +43,9 @@ export const EditForm: React.FC<any> = (props) => {
       initialValues={props.values}
       autoComplete="off"
     >
-      <Form.Item hidden name={"id"}>
+      {/* <Form.Item hidden name={pkFieldName}>
         <Input type={"hidden"} />
-      </Form.Item>
+      </Form.Item> */}
       <Form.Item hidden name="ts">
         <Input type={"hidden"} />
       </Form.Item>

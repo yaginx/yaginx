@@ -64,7 +64,7 @@ namespace Yaginx.YaginxAcmeLoaders
             //});
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(10));
+                await Task.Delay(TimeSpan.FromHours(1));
 
                 var domains = _domainRepsitory.Search();
                 foreach (var domain in domains)

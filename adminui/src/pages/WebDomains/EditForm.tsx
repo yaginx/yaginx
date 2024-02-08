@@ -19,12 +19,16 @@ export const EditForm: React.FC<any> = (props) => {
         </>
       }
     ];
-    const tabExtraInfoItem = {
-      label: '扩展信息', key: 'tabExtraInfo', forceRender: true, children: []
-    };
-    // if (props.values[pkFieldName] || props.values["id"]) {
-    //   tabItems.push(tabExtraInfoItem);
-    // }
+    // const tabHostInfo = {
+    //   label: '主机信息', key: 'tabHostInfo', forceRender: true, children: []
+    // };
+    // tabItems.push(tabHostInfo);
+
+    // const tabProxyRuleInfo = {
+    //   label: '代理信息', key: 'tabProxyRuleInfo', forceRender: true, children: []
+    // };
+    // tabItems.push(tabProxyRuleInfo);
+
     setTabItems(tabItems);
   }
 
@@ -43,9 +47,9 @@ export const EditForm: React.FC<any> = (props) => {
       initialValues={props.values}
       autoComplete="off"
     >
-      {/* <Form.Item hidden name={pkFieldName}>
+      <Form.Item hidden name={"id"}>
         <Input type={"hidden"} />
-      </Form.Item> */}
+      </Form.Item>
       <Form.Item hidden name="ts">
         <Input type={"hidden"} />
       </Form.Item>
