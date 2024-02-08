@@ -5,6 +5,7 @@ import { PageHeader } from '@ant-design/pro-layout';
 import { Form } from 'antd';
 import { EditForm } from './EditForm';
 import { websiteUpsert } from '@/api/docker';
+import { CreateForm } from './CreateForm';
 
 export const Create: React.FC = (props) => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export const Create: React.FC = (props) => {
         <Button onClick={() => form.submit()}>Save</Button>
       </Space>}
     >
-      <EditForm form={form} onFinish={onFinish} values={initialValues} {...props} />
+      <CreateForm form={form} onFinish={onFinish} values={initialValues} {...props} />
     </PageHeader>
   );
 };

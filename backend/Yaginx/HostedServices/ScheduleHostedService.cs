@@ -45,12 +45,19 @@ namespace Yaginx.HostedServices
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Timed Background Service is starting.");
-     
+
 
             using (var scope = AgileLabContexts.Context.CreateScopeWithWorkContext())
             {
                 var initService = scope.Resolve<InitService>();
-                await initService.Init();
+                try
+                {
+                    await initService.Init();
+                }
+                catch
+                {
+                }
+
             }
 
             if (_hostEnvironment.IsDevelopment())

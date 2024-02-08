@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
@@ -275,10 +276,50 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
         {
             JsonNetSerializerSettings.DeconretCamelCaseSerializerSettings(jsonOptions.SerializerSettings);
             jsonOptions.SerializerSettings.Converters.Add(LongStringJsonConverter.Instance);
+            jsonOptions.SerializerSettings.Converters.Add(CusNullableLongStringJsonConverter.Instance);
             jsonOptions.SerializerSettings.Converters.Add(BoolIntJsonConverter.Instance);
             jsonOptions.SerializerSettings.Converters.Add(DateTimeToTimestampJsonConverter.Instance);
             jsonOptions.SerializerSettings.Converters.Add(NullableDateTimeToTimestampJsonConverter.Instance);
             JsonNetSerializerSettings.Instance = jsonOptions.SerializerSettings;
         });
+    }
+}
+
+public class CusNullableLongStringJsonConverter : JsonConverter<long?>
+{
+    public static CusNullableLongStringJsonConverter Instance { get; private set; }
+
+    static CusNullableLongStringJsonConverter()
+    {
+        Instance = new CusNullableLongStringJsonConverter();
+    }
+
+    public override void WriteJson(JsonWriter writer, long? value, JsonSerializer serializer)
+    {
+        if (value.HasValue)
+        {
+            //if(value> 1717746363992772608)
+            if (value > 9007199254740992)//在js中number类型有个最大值(安全值)。为9007199254740992,是2的53次方
+            {
+                writer.WriteValue(value.ToString());
+            }
+            else
+            {
+                writer.WriteValue(value);
+            }
+        }
+        else
+        {
+            writer.WriteNull();
+        }
+    }
+
+    public override long? ReadJson(JsonReader reader, Type objectType, long? existingValue, bool hasExistingValue, JsonSerializer serializer)
+    {
+        if (long.TryParse(reader.Value?.ToString().ToLower() ?? string.Empty, out var result))
+        {
+            return result;
+        }
+        return existingValue;
     }
 }

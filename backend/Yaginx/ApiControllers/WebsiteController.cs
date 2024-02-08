@@ -19,6 +19,8 @@ public class WebsiteController : YaginxControllerBase
         if (!site.Id.HasValue)
         {
             site.Id = IdGenerator.NextId();
+            site.CreateTime = DateTime.Now;
+            site.UpdateTime = DateTime.Now;
             _websiteRepository.Add(site);
         }
         else
@@ -28,7 +30,9 @@ public class WebsiteController : YaginxControllerBase
             {
                 throw new Exception($"Site #{site.Id} not exist");
             }
-            _websiteRepository.Update(site);
+            oldSite.Name = site.Name;
+            oldSite.UpdateTime = DateTime.Now;
+            _websiteRepository.Update(oldSite);
         }
         await Task.CompletedTask;
         return site;

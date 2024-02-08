@@ -9,6 +9,8 @@
         public string Name { get; set; }
         public List<WebsiteHostItem> Hosts { get; set; }
         public List<WebsiteProxyRuleItem> ProxyRules { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime UpdateTime { get; set; }
     }
 
     public interface IWebsiteRepository
