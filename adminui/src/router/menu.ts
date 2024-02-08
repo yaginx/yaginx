@@ -27,6 +27,13 @@ export const menus: IMenuLink[] = [
     path: "/monitor/websites",
     title: "网站监控",
     icon: "DeploymentUnitOutlined",
+    children: [
+      {
+        path: "/monitor/hostTraffic/list",
+        title: "主机流量监控",
+        icon: "ProfileOutlined",
+      }
+    ],
   },
   {
     path: "/monitor/system",

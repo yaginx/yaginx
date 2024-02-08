@@ -68,8 +68,9 @@ const UserLayout: React.FC = () => {
   }));
   const topNavMenu = (data: Array<IMenuLink> | undefined) => data?.map(item => renderMenuItem(item, true, "/"));
   const renderMenuItem: any = (item: IMenuLink, isRenderChild: boolean = true, parentPath: string = "") => {
+    let targetPath = item.path.startsWith('/') ? item.path : `${parentPath}/${item.path}`
     return {
-      key: item.path, label: <Link to={`${parentPath}/${item.path}`}><span>{item.title}</span></Link>, icon: item.icon
+      key: item.path, label: <Link to={targetPath}><span>{item.title}</span></Link>, icon: item.icon
         ? <MenuIcon name={item.icon} />
         : <></>,
       children: isRenderChild && item.children

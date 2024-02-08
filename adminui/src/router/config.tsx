@@ -63,6 +63,12 @@ const layouts: IRouteConfig[] = [
             element: React.lazy(async () => await import('@/pages/WebDomains')),
           },
           {
+            routePath: 'monitor/*',
+            // title: '网站列表',
+            // icon: 'BankOutlined',
+            element: React.lazy(async () => await import('@/pages/Monitors')),
+          },
+          {
             routePath: 'docker/*',
             // navPath: "docker",
             // title: '容器管理',

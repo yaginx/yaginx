@@ -11,3 +11,5 @@ export const websiteUpsert = (data: any): Promise<IApiRspEnvelop<any>> => FetchJ
 export const webDomainSearch = (data: any): Promise<IApiRspEnvelop<any>> => FetchJson({ url: '/api/web_domain/search', method: 'POST', data });
 export const webDomainGet = (data: any): Promise<IApiRspEnvelop<any>> => FetchJson({ url: '/api/web_domain/get', method: 'GET', params: data });
 export const webDomainUpsert = (data: any): Promise<IApiRspEnvelop<any>> => FetchJson({ url: '/api/web_domain/upsert', method: 'POST', data });
+
+export const hostTrafficSearch = (data: any): Promise<IApiRspEnvelop<any>> => FetchJson({ url: '/api/host_traffic/search', method: 'POST', data });

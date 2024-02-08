@@ -32,4 +32,19 @@
         Website Get(long id);
         Website GetByName(string name);
     }
+
+    public class HostTraffic
+    {
+        public string HostName { get; set; }
+        public long RequestCounts { get; set; }
+        public long InboundBytes { get; set; }
+        public long OutboundBytes { get; set; }
+    }
+
+    public interface IHostTrafficRepository
+    {
+        void Upsert(HostTraffic hostTraffic);
+        List<HostTraffic> Search();
+        List<HostTraffic> Search(string hostName);
+    }
 }
