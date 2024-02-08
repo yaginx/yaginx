@@ -2,7 +2,7 @@
 using Yaginx.DataStore.LiteDBStore.Repositories;
 using Yaginx.DomainModels;
 using Yaginx.Infrastructure.ProxyConfigProviders;
-using Yaginx.Models;
+using Yaginx.Models.WebsiteModels;
 
 namespace Yaginx.ApiControllers;
 

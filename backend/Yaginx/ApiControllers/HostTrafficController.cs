@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Yaginx.DomainModels;
+using Yaginx.Models.TrafficModels;
 
 namespace Yaginx.ApiControllers;
 
@@ -14,9 +15,9 @@ public class HostTrafficController : YaginxControllerBase
     }
 
     [HttpGet, HttpPost, Route("search")]
-    public async Task<List<HostTraffic>> Search()
+    public async Task<List<HostTrafficListItem>> Search()
     {
         await Task.CompletedTask;
-        return _hostTrafficRepository.Search();
+        return _mapper.Map<List<HostTrafficListItem>>(_hostTrafficRepository.Search());
     }
 }

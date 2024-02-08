@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Yaginx.DomainModels;
 
-namespace Yaginx.Models
+namespace Yaginx.Models.WebDomainModels
 {
     public class WebDomainMapping : Profile
     {

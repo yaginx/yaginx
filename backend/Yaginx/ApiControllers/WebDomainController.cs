@@ -1,7 +1,7 @@
 ﻿using LettuceEncrypt.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Yaginx.DomainModels;
-using Yaginx.Models;
+using Yaginx.Models.WebDomainModels;
 
 namespace Yaginx.ApiControllers;
 

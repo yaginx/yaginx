@@ -1,4 +1,4 @@
-﻿namespace Yaginx.Models
+﻿namespace Yaginx.Models.WebDomainModels
 {
     public class WebDomainListItem
     {

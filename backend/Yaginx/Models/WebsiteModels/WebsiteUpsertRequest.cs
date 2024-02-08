@@ -1,6 +1,6 @@
 ﻿using Yaginx.DomainModels;
 
-namespace Yaginx.Models
+namespace Yaginx.Models.WebsiteModels
 {
     public class WebsiteUpsertRequest
     {

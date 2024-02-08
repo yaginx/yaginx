@@ -20,13 +20,18 @@ export const renderTableItem = (fieldName: string, title: string = fieldName) =>
       return {
         title: title, dataIndex: fieldName, key: fieldName, align: 'center', ...ColumnSearchProps(fieldName, fieldName),
         render: (text: any, record: any) => {
-          switch (typeof record[fieldName]) {
-            case "boolean":
-              return <Checkbox checked={record[fieldName]} disabled />;
-            case "string":
-              return record[fieldName];
-            default:
-              return record[fieldName].toString();
+          if (record[fieldName]) {
+            switch (typeof record[fieldName]) {
+              case "boolean":
+                return <Checkbox checked={record[fieldName]} disabled />;
+              case "string":
+                return record[fieldName];
+              default:
+                return record[fieldName].toString();
+            }
+          }
+          else {
+            return "NaN";
           }
         }
       };

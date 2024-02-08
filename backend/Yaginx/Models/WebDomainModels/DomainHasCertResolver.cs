@@ -2,7 +2,7 @@
 using LettuceEncrypt.Internal;
 using Yaginx.DomainModels;
 
-namespace Yaginx.Models
+namespace Yaginx.Models.WebDomainModels
 {
     public class DomainHasCertResolver : IMemberValueResolver<WebDomain, WebDomainListItem, string, bool>
     {

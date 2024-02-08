@@ -38,8 +38,8 @@ const List: React.FC = (props) => {
     columnsArray.push(renderTableItem("hostName", "主机头"));
     columnsArray.push({ title: "周期", key: "period", dataIndex: "period", render: (text: any, record: any) => <LocalTime timestamp={record["period"]} /> });
     columnsArray.push(renderTableItem("requestCounts", "请求次数"));
-    columnsArray.push(renderTableItem("inboundBytes", "流入流量"));
-    columnsArray.push(renderTableItem("outboundBytes", "流出流量"));
+    columnsArray.push(renderTableItem("inboundBytesHuman", "流入流量"));
+    columnsArray.push(renderTableItem("outboundBytesHuman", "流出流量"));
   }
 
   return (
