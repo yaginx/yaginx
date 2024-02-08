@@ -11,16 +11,19 @@ using AgileLabs.Securities;
 using AgileLabs.WebApp.Hosting;
 using AgileLabs.WorkContexts;
 using Docker.DotNet;
+using Hangfire;
+using Hangfire.Console;
+using Hangfire.MemoryStorage;
 using LettuceEncrypt;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
 using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using WoLabs.WorkContexts;
+using Yaginx.Configures.Hangfires;
 using Yaginx.HostedServices;
 using Yaginx.Infrastructure;
 using Yaginx.Infrastructure.Configuration;
@@ -118,24 +121,24 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
         services.AddSingleton(appSettings);
         #endregion
 
-        //#region Hangfire
-        //// Add Hangfire services.
-        //services.AddHangfire((provider, configuration) =>
-        //{
-        //    configuration
-        //       .UseSimpleAssemblyNameTypeSerializer()
-        //       .UseRecommendedSerializerSettings()
-        //       .UseSerilogLogProvider()
-        //       .UseConsole()
-        //       .UseMemoryStorage();
-        //});
+        #region Hangfire
+        // Add Hangfire services.
+        services.AddHangfire((provider, configuration) =>
+        {
+            configuration
+               .UseSimpleAssemblyNameTypeSerializer()
+               .UseRecommendedSerializerSettings()
+               .UseSerilogLogProvider()
+               .UseConsole()
+               .UseMemoryStorage();
+        });
 
-        //// Add the processing server as IHostedService
-        //services.AddSingleton<HangfireJobActivator>();
-        //services.AddSingleton<JobActivator>(serficeProvider => serficeProvider.GetRequiredService<HangfireJobActivator>());
-        //services.AddHangfireServer();
+        // Add the processing server as IHostedService
+        services.AddSingleton<HangfireJobActivator>();
+        services.AddSingleton<JobActivator>(serficeProvider => serficeProvider.GetRequiredService<HangfireJobActivator>());
+        services.AddHangfireServer();
 
-        //#endregion
+        #endregion
 
         services.AddClientApp(options =>
         {
@@ -215,14 +218,14 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
             app.UseSwaggerUI();
         });
 
-        //piplineActions.Register("HangfireDashboard", RequestPiplineStage.BeforeRouting, app =>
-        //{
-        //    app.UseHangfireDashboard(options: new DashboardOptions()
-        //    {
-        //        DashboardTitle = "Jobs",
-        //        Authorization = new[] { new HangfireAuthorizationFilter() }
-        //    });
-        //});
+        piplineActions.Register("HangfireDashboard", RequestPiplineStage.BeforeRouting, app =>
+        {
+            app.UseHangfireDashboard(options: new DashboardOptions()
+            {
+                DashboardTitle = "Jobs",
+                Authorization = new[] { new HangfireAuthorizationFilter() }
+            });
+        });
 
         piplineActions.Register("Security", RequestPiplineStage.BeforeEndpointConfig, app =>
         {
