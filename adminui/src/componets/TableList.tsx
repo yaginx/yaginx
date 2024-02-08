@@ -37,7 +37,12 @@ const TableList: React.FC<ITableListProps> = (props: ITableListProps) => {
     if (props.renderTableOperationMenu && props.onTableMenuClick)
       columnsArray.push({
         title: '操作', key: 'menuOperations', dataIndex: pkFieldName, width: 150,
-        render: (text: any, record: any) => <><TableOperations record={record} menuOptions={props.renderTableOperationMenu(record)} onMenuClick={props.onTableMenuClick} onComplete={() => forceRefreshTable(Math.random() + 1)} /></>
+        render: (text: any, record: any) => <>
+          <TableOperations record={record}
+            menuOptions={props.renderTableOperationMenu ? props.renderTableOperationMenu(record) : []}
+            onMenuClick={props.onTableMenuClick ? props.onTableMenuClick : () => { }}
+            onComplete={() => forceRefreshTable(Math.random() + 1)} />
+        </>
       })
     return columnsArray;
   }

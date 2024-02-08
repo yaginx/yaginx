@@ -1,5 +1,4 @@
-import { IApiRspEnvelop } from "@/api/apiTypes"
-import { TableOperationMenuItem, TableOperations } from "@/componets/TableOperationMenus"
+import { TableOperations } from "@/componets/TableOperationMenus"
 import { Table } from "antd"
 import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -34,7 +33,10 @@ const TablePagedList: React.FC<TablePagedListProps> = (props: TablePagedListProp
     if (props.renderTableOperationMenu && props.onTableMenuClick)
       columnsArray.push({
         title: '操作', key: 'menuOperations', dataIndex: pkFieldName, width: 150,
-        render: (text: any, record: any) => <><TableOperations record={record} menuOptions={props.renderTableOperationMenu(record)} onMenuClick={props.onTableMenuClick} onComplete={() => forceRefreshTable(Math.random() + 1)} /></>
+        render: (text: any, record: any) => <><TableOperations record={record}
+          menuOptions={props.renderTableOperationMenu ? props.renderTableOperationMenu(record) : []}
+          onMenuClick={props.onTableMenuClick ? props.onTableMenuClick : () => { }}
+          onComplete={() => forceRefreshTable(Math.random() + 1)} /></>
       })
     return columnsArray;
   }
