@@ -5,8 +5,8 @@ import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 export interface ITableListProps {
-  renderTableOperationMenu: (record: any) => TableOperationMenuItem[];
-  onTableMenuClick: (commandKey: string, record: any) => void;
+  renderTableOperationMenu?: (record: any) => TableOperationMenuItem[];
+  onTableMenuClick?: (commandKey: string, record: any) => void;
   initTableColumn: (columnsArray: any[]) => void;
   realodTableData: number;
   searchAction: (data: any) => Promise<IApiRspEnvelop<any>>
@@ -46,7 +46,7 @@ const TableList: React.FC<ITableListProps> = (props: ITableListProps) => {
     var rsp = await props.searchAction({ ...pagination, ...filterCondition })
     const records = rsp.data;
     let dataStoreArray: any = [];
-    records.forEach((item: any, index: number) => { dataStoreArray.push({ ...item, key: item[pkFieldName] }); });
+    records.forEach((item: any, index: number) => { dataStoreArray.push({ ...item, key: item[pkFieldName], rowIndex: index + 1 }); });
     setDataSource(dataStoreArray);
   }
 

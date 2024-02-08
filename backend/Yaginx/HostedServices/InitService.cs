@@ -17,21 +17,19 @@ namespace Yaginx.HostedServices
         internal async Task Init()
         {
             var userCount = _userRepository.Count();
-            if (userCount > 0)
+            if (userCount <1)
             {
-                throw new Exception("账户已存在");
+                var userInfo = new User
+                {
+                    Id = IdGenerator.NextId(),
+                    Email = "admin@yaginx.com",
+                    Password = "admin",
+                    PasswordSalt = _encryptionService.CreateSaltKey(16)
+                };
+                userInfo.PasswordHash = _encryptionService.CreatePasswordHash(userInfo.Password, userInfo.PasswordSalt, "SHA256");
+                _userRepository.Add(userInfo);
+                await Task.CompletedTask;
             }
-
-            var userInfo = new User
-            {
-                Id = IdGenerator.NextId(),
-                Email = "admin@yaginx.com",
-                Password = "admin",
-                PasswordSalt = _encryptionService.CreateSaltKey(16)
-            };
-            userInfo.PasswordHash = _encryptionService.CreatePasswordHash(userInfo.Password, userInfo.PasswordSalt, "SHA256");
-            _userRepository.Add(userInfo);
-            await Task.CompletedTask;
         }
     }
 }

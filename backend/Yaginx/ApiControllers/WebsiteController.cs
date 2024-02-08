@@ -14,7 +14,7 @@ public class WebsiteController : YaginxControllerBase
     }
 
     [HttpPost, Route("upsert")]
-    public async Task Add([FromBody] Website site)
+    public async Task<Website> Add([FromBody] Website site)
     {
         if (!site.Id.HasValue)
         {
@@ -31,6 +31,7 @@ public class WebsiteController : YaginxControllerBase
             _websiteRepository.Update(site);
         }
         await Task.CompletedTask;
+        return site;
     }
 
     [HttpGet, HttpPost, Route("search")]
@@ -41,6 +42,13 @@ public class WebsiteController : YaginxControllerBase
     }
 
     [HttpGet, Route("get")]
+    public async Task<Website> Get(long id)
+    {
+        await Task.CompletedTask;
+        return _websiteRepository.Get(id);
+    }
+
+    [HttpGet, Route("get_by_name")]
     public async Task<Website> Get(string name)
     {
         await Task.CompletedTask;

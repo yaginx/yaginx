@@ -6,6 +6,7 @@ using AgileLabs.AspNet.WebApis.Filters;
 using AgileLabs.Diagnostics;
 using AgileLabs.FileProviders;
 using AgileLabs.Json;
+using AgileLabs.Json.Converters;
 using AgileLabs.Securities;
 using AgileLabs.WebApp.Hosting;
 using AgileLabs.WorkContexts;
@@ -19,6 +20,7 @@ using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using WoLabs.WorkContexts;
+using Yaginx.HostedServices;
 using Yaginx.Infrastructure;
 using Yaginx.Infrastructure.Configuration;
 using Yaginx.Infrastructure.ProxyConfigProviders;
@@ -161,6 +163,8 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
         #endregion
 
         services.UseLiteDBDataStore(buildContext);
+
+        services.AddHostedService<ScheduleHostedService>();
     }
 
     public const string BasePath = "/yaginx";
@@ -270,10 +274,10 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
         mvcBuilder.AddNewtonsoftJson(jsonOptions =>
         {
             JsonNetSerializerSettings.DeconretCamelCaseSerializerSettings(jsonOptions.SerializerSettings);
-            //jsonOptions.SerializerSettings.Converters.Add(LongStringJsonConverter.Instance);
-            //jsonOptions.SerializerSettings.Converters.Add(BoolIntJsonConverter.Instance);
-            //jsonOptions.SerializerSettings.Converters.Add(DateTimeToTimestampJsonConverter.Instance);
-            //jsonOptions.SerializerSettings.Converters.Add(NullableDateTimeToTimestampJsonConverter.Instance);
+            jsonOptions.SerializerSettings.Converters.Add(LongStringJsonConverter.Instance);
+            jsonOptions.SerializerSettings.Converters.Add(BoolIntJsonConverter.Instance);
+            jsonOptions.SerializerSettings.Converters.Add(DateTimeToTimestampJsonConverter.Instance);
+            jsonOptions.SerializerSettings.Converters.Add(NullableDateTimeToTimestampJsonConverter.Instance);
             JsonNetSerializerSettings.Instance = jsonOptions.SerializerSettings;
         });
     }

@@ -41,7 +41,6 @@ public static class LiteDBRegisterExtensions
             return new LiteDbDatabaseRepository(string.Join(';', newDbParms.ToArray()));
         });
 
-        services.AddScoped<LiteDbDatabaseRepository>();
         services.AddScoped<IWebDomainRepository, WebDomainRepository>();
         services.AddScoped<IWebsiteRepository, WebsiteRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
