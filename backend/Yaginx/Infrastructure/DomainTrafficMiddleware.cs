@@ -24,7 +24,7 @@ namespace Yaginx.Infrastructure
             Next = next;
             _embeddedResourceQuery = embeddedResourceQuery;
             _hostApplicationLifetime = hostApplicationLifetime;
-            Task.Factory.StartNew(StaticitsTask);
+            Task.Factory.StartNew(FlushTask);
         }
 
         public async Task Invoke(HttpContext context)
@@ -34,27 +34,25 @@ namespace Yaginx.Infrastructure
             //开始请求处理计时器
             try
             {
+                var domain = context.Request.Host.Host;
+                if (!_requestTraffic.ContainsKey(domain))
+                {
+                    _requestTraffic.TryAdd(domain, new DomainTraffic());
+                }
+
+                var domainTraffic = _requestTraffic[domain];
+                domainTraffic.Requests += 1;
+                domainTraffic.Inbound += context.Request.ContentLength ?? 0;
+                _requestTraffic[domain] = domainTraffic;
+
+                await Next(context);
+
+                domainTraffic.Outbound += context.Response.ContentLength ?? 0;
+                _requestTraffic[domain] = domainTraffic;
+
                 if (context.Request.Path.HasValue && context.Request.Path.Value.StartsWith(STATS_PATH, StringComparison.OrdinalIgnoreCase))
                 {
                     await ProcessStatusPage(context);
-                }
-                else
-                {
-                    var domain = context.Request.Host.Host;
-                    if (!_requestTraffic.ContainsKey(domain))
-                    {
-                        _requestTraffic.TryAdd(domain, new DomainTraffic());
-                    }
-
-                    var domainTraffic = _requestTraffic[domain];
-                    domainTraffic.Requests += 1;
-                    domainTraffic.Inbound += context.Request.ContentLength ?? 0;
-                    _requestTraffic[domain] = domainTraffic;
-
-                    await Next(context);
-
-                    domainTraffic.Outbound += context.Response.ContentLength ?? 0;
-                    _requestTraffic[domain] = domainTraffic;
                 }
             }
             finally
@@ -99,9 +97,9 @@ namespace Yaginx.Infrastructure
             }
         }
 
-        private async Task StaticitsTask()
+        private async Task FlushTask()
         {
-            var staticitsPeriodInSeconds = 30;
+            var flushPeriodInSeconds = 5;
             while (true)
             {
                 if (_hostApplicationLifetime.ApplicationStopping.IsCancellationRequested)
@@ -109,7 +107,7 @@ namespace Yaginx.Infrastructure
                     break;
                 }
 
-                await Task.Delay(staticitsPeriodInSeconds);
+                await Task.Delay(TimeSpan.FromSeconds(flushPeriodInSeconds));
                 var lastPeriodData = Interlocked.Exchange(ref _requestTraffic, new ConcurrentDictionary<string, DomainTraffic>());
 
                 if (!lastPeriodData.Any())
@@ -123,6 +121,7 @@ namespace Yaginx.Infrastructure
                 {
                     trafficRepository.Upsert(new HostTraffic
                     {
+                        Id = IdGenerator.NextId(),
                         HostName = item.Key,
                         InboundBytes = item.Value.Inbound,
                         OutboundBytes = item.Value.Outbound,
