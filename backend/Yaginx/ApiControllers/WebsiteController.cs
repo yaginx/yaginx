@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Yaginx.DomainModels;
+using Yaginx.Infrastructure.ProxyConfigProviders;
+using Yaginx.Models;
 
 namespace Yaginx.ApiControllers;
 
@@ -7,35 +9,44 @@ namespace Yaginx.ApiControllers;
 public class WebsiteController : YaginxControllerBase
 {
     private readonly IWebsiteRepository _websiteRepository;
+    private readonly ProxyRuleChangeNotifyService _proxyRuleChangeNotifyService;
 
-    public WebsiteController(IWebsiteRepository websiteRepository)
+    public WebsiteController(IWebsiteRepository websiteRepository, ProxyRuleChangeNotifyService proxyRuleChangeNotifyService)
     {
         _websiteRepository = websiteRepository;
+        _proxyRuleChangeNotifyService = proxyRuleChangeNotifyService;
     }
 
     [HttpPost, Route("upsert")]
-    public async Task<Website> Add([FromBody] Website site)
+    public async Task<Website> Add([FromBody] WebsiteUpsertRequest request)
     {
-        if (!site.Id.HasValue)
+        Website returnValue = null;
+        if (!request.Id.HasValue)
         {
+            var site = _mapper.Map<Website>(request);
             site.Id = IdGenerator.NextId();
             site.CreateTime = DateTime.Now;
             site.UpdateTime = DateTime.Now;
             _websiteRepository.Add(site);
+            returnValue = site;
         }
         else
         {
-            var oldSite = _websiteRepository.Get(site.Id.Value);
+            var oldSite = _websiteRepository.Get(request.Id.Value);
             if (oldSite == null)
             {
-                throw new Exception($"Site #{site.Id} not exist");
+                throw new Exception($"Site #{request.Id} not exist");
             }
-            oldSite.Name = site.Name;
+
+            _mapper.Map(request, oldSite);
+
             oldSite.UpdateTime = DateTime.Now;
             _websiteRepository.Update(oldSite);
+            returnValue = oldSite;
         }
         await Task.CompletedTask;
-        return site;
+        _proxyRuleChangeNotifyService.ProxyRuleConfigChanged();
+        return returnValue;
     }
 
     [HttpGet, HttpPost, Route("search")]

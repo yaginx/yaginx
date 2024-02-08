@@ -25,7 +25,7 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
 			var subscriber = connection.GetSubscriber();
 			subscriber.Subscribe(new RedisChannel(ProxyRuleChangeNotifyService.GATEWAY_PROXY_RULE_EVENT_CHANNEL_NAME, RedisChannel.PatternMode.Literal), (channel, message) =>
 			{
-				_proxyRuleChangeNotifyService.RedisConfigChanged();
+				_proxyRuleChangeNotifyService.ProxyRuleConfigChanged();
 			});
 			await Task.CompletedTask;
 		}
