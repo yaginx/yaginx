@@ -9,8 +9,7 @@ using OpenTelemetry.Trace;
 using System.Diagnostics;
 using System.Security.Claims;
 using WoLabs.WorkContexts;
-using Yaginx.DataStores;
-using Yaginx.Entities;
+using Yaginx.DomainModels;
 using Yaginx.Infrastructure.Securities;
 using Yaginx.Models.LoginSessionModels;
 using Yaginx.Services.Securities;
@@ -23,15 +22,20 @@ public class AccountController : YaginxControllerBase
     private readonly IAuthenticateService _userService;
     private readonly ILogger<AccountController> _logger;
     private readonly IEncryptionService _encryptionService;
-    private readonly DatabaseRepository _databaseRepository;
+    private readonly IUserRepository _userRepository;
     private readonly TokenSettings _tokenSettings;
 
-    public AccountController(IAuthenticateService userService, ILogger<AccountController> logger, IOptions<TokenSettings> tokenSettings, IEncryptionService encryptionService, DatabaseRepository databaseRepository)
+    public AccountController(
+        IAuthenticateService userService,
+        ILogger<AccountController> logger,
+        IOptions<TokenSettings> tokenSettings,
+        IEncryptionService encryptionService,
+        IUserRepository userRepository)
     {
         _userService = userService;
         _logger = logger;
         _encryptionService = encryptionService;
-        _databaseRepository = databaseRepository;
+        _userRepository = userRepository;
         _tokenSettings = tokenSettings.Value;
     }
 
@@ -48,7 +52,7 @@ public class AccountController : YaginxControllerBase
     public async Task<LoginResult> Login([FromBody] LoginRequest request, [FromServices] IWorkContextCore workContext)
     {
         using var activity = _activitySource.StartActivity("Login");
-        var userInfo = _databaseRepository.Get<User>(x => x.Email == request.Email);
+        var userInfo = _userRepository.GetByEmail(request.Email);
         if (userInfo == null)
         {
             throw new Exception("账户不存在");
@@ -59,7 +63,7 @@ public class AccountController : YaginxControllerBase
             // 如果未设置密码, 直接使用当前的密码
             userInfo.PasswordSalt = _encryptionService.CreateSaltKey(16);
             userInfo.PasswordHash = _encryptionService.CreatePasswordHash(request.Password, userInfo.PasswordSalt, "SHA256");
-            _databaseRepository.Update(userInfo);
+            _userRepository.Update(userInfo);
         }
 
         string pwd = _encryptionService.CreatePasswordHash(request.Password, userInfo.PasswordSalt, "SHA256");
@@ -106,7 +110,7 @@ public class AccountController : YaginxControllerBase
     [HttpPost, Route("register"), Authorize]
     public async Task Register([FromBody] UserCreateRequest request)
     {
-        var userInfo = _databaseRepository.Get<User>(x => x.Email == request.Email);
+        var userInfo = _userRepository.GetByEmail(request.Email);
         if (userInfo != null)
         {
             throw new Exception("账户已存在");
@@ -120,30 +124,30 @@ public class AccountController : YaginxControllerBase
             PasswordSalt = _encryptionService.CreateSaltKey(16)
         };
         userInfo.PasswordHash = _encryptionService.CreatePasswordHash(request.Password, userInfo.PasswordSalt, "SHA256");
-        _databaseRepository.Insert(userInfo);
+        _userRepository.Add(userInfo);
         await Task.CompletedTask;
     }
 
-    [HttpPost, Route("init")]
-    public async Task Init()
-    {
-        var userInfo = _databaseRepository.Get<User>(x => true);
-        if (userInfo != null)
-        {
-            throw new Exception("系统已初始化");
-        }
+    //[HttpPost, Route("init")]
+    //public async Task Init()
+    //{
+    //    var userCount = _userRepository.Count();
+    //    if (userCount > 0)
+    //    {
+    //        throw new Exception("账户已存在");
+    //    }
 
-        userInfo = new User
-        {
-            Id = IdGenerator.NextId(),
-            Email = "admin@yaginx.com",
-            Password = "admin",
-            PasswordSalt = _encryptionService.CreateSaltKey(16)
-        };
-        userInfo.PasswordHash = _encryptionService.CreatePasswordHash(userInfo.Password, userInfo.PasswordSalt, "SHA256");
-        _databaseRepository.Insert(userInfo);
-        await Task.CompletedTask;
-    }
+    //    var userInfo = new User
+    //    {
+    //        Id = IdGenerator.NextId(),
+    //        Email = "admin@yaginx.com",
+    //        Password = "admin",
+    //        PasswordSalt = _encryptionService.CreateSaltKey(16)
+    //    };
+    //    userInfo.PasswordHash = _encryptionService.CreatePasswordHash(userInfo.Password, userInfo.PasswordSalt, "SHA256");
+    //    _userRepository.Add(userInfo);
+    //    await Task.CompletedTask;
+    //}
 
     [HttpGet, Route("log_test"), AllowAnonymous]
     public object LogTest([FromServices] ActivitySource activitySource, [FromServices] ILoggerProvider loggerProviders)
@@ -183,7 +187,7 @@ public class AccountController : YaginxControllerBase
 
     private async Task<LoginResult> RefreshSessionCacheAndResponseLoginInfo(string uniqueId, string uniqueName, string email, string ssid, TimeSpan expiration)
     {
-        (long expiresIn, string token) = await JwtHelper.GenerateToken( DateTime.Now, expiration, _tokenSettings, claims =>
+        (long expiresIn, string token) = await JwtHelper.GenerateToken(DateTime.Now, expiration, _tokenSettings, claims =>
         {
             if (uniqueId.IsNotNullOrWhitespace())
                 claims.TryAdd(new Claim(ClaimNames.UniqueId, uniqueId));

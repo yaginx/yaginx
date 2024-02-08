@@ -3,7 +3,6 @@ using LettuceEncrypt.Internal.AcmeStates;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
-
 namespace Yaginx.YaginxAcmeLoaders
 {
     /// <summary>
@@ -17,19 +16,20 @@ namespace Yaginx.YaginxAcmeLoaders
 
         private readonly IServer _server;
         private readonly IConfiguration _config;
+        private readonly ICertificateDomainRepsitory _domainRepsitory;
 
         public YaginxAcmeCertificateLoader(
             IServiceScopeFactory serviceScopeFactory,
-            IOptions<LettuceEncryptOptions> options,
             ILogger<YaginxAcmeCertificateLoader> logger,
             IServer server,
-            IConfiguration config)
+            IConfiguration config,
+            ICertificateDomainRepsitory domainRepsitory)
         {
             _serviceScopeFactory = serviceScopeFactory;
-            _options = options;
             _logger = logger;
             _server = server;
             _config = config;
+            _domainRepsitory = domainRepsitory;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -66,7 +66,7 @@ namespace Yaginx.YaginxAcmeLoaders
             {
                 await Task.Delay(TimeSpan.FromSeconds(10));
 
-                var domains = _options.Value.DomainNames;
+                var domains = _domainRepsitory.Search();
                 foreach (var domain in domains)
                 {
                     using var acmeStateMachineScope = _serviceScopeFactory.CreateScope();

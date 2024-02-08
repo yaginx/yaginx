@@ -7,13 +7,16 @@
     {
         public long? Id { get; set; }
         public string Name { get; set; }
-        public List<WebsiteDomain> Hosts { get; set; }
-        public List<WebsiteProxyRule> ProxyRules { get; set; }
+        public List<WebsiteHostItem> Hosts { get; set; }
+        public List<WebsiteProxyRuleItem> ProxyRules { get; set; }
     }
 
-    public class WebsiteDomain
+    public interface IWebsiteRepository
     {
-        public string Domain { get; set; }
-        public string Certificate { get; set; }
+        List<Website> Search();
+        void Add(Website website);
+        void Update(Website website);
+        Website Get(long id);
+        Website GetByName(string name);
     }
 }

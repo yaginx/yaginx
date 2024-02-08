@@ -19,7 +19,7 @@ const App: React.FC = () => {
   const RouteElement = () => useRoutes(buildRouteData(routes));
   return (
     <Suspense fallback={<Loading />}>
-      <BrowserRouter>
+      <BrowserRouter basename={VITE_BASE_PATH}>
         <RootAuthProvider>
           <RouteElement />
         </RootAuthProvider>

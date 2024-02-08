@@ -15,4 +15,13 @@ namespace Yaginx.DomainModels
         public string Name { get; set; }
         public bool IsVerified { get; set; }
     }
+
+    public interface IWebDomainRepository
+    {
+        List<WebDomain> Search();
+        void Add(WebDomain webDomain);
+        void Update(WebDomain webDomain);
+        WebDomain Get(long id);
+        WebDomain GetByName(string name);
+    }
 }

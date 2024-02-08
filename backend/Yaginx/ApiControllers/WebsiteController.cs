@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Yaginx.DataStores;
 using Yaginx.DomainModels;
 
 namespace Yaginx.ApiControllers;
@@ -7,22 +6,29 @@ namespace Yaginx.ApiControllers;
 [ApiController, Route("api/website")]
 public class WebsiteController : YaginxControllerBase
 {
+    private readonly IWebsiteRepository _websiteRepository;
+
+    public WebsiteController(IWebsiteRepository websiteRepository)
+    {
+        _websiteRepository = websiteRepository;
+    }
+
     [HttpPost, Route("upsert")]
     public async Task Add([FromBody] Website site)
     {
         if (!site.Id.HasValue)
         {
             site.Id = IdGenerator.NextId();
-            _databaseRepository.Insert(site);
+            _websiteRepository.Add(site);
         }
         else
         {
-            var oldSite = _databaseRepository.Get<Website>(x => x.Id == site.Id);
+            var oldSite = _websiteRepository.Get(site.Id.Value);
             if (oldSite == null)
             {
                 throw new Exception($"Site #{site.Id} not exist");
             }
-            _databaseRepository.Update(site);
+            _websiteRepository.Update(site);
         }
         await Task.CompletedTask;
     }
@@ -31,13 +37,13 @@ public class WebsiteController : YaginxControllerBase
     public async Task<List<Website>> Search()
     {
         await Task.CompletedTask;
-        return _databaseRepository.Search<Website>().ToList();
+        return _websiteRepository.Search();
     }
 
     [HttpGet, Route("get")]
     public async Task<Website> Get(string name)
     {
         await Task.CompletedTask;
-        return _databaseRepository.Get<Website>(x => x.Name == name);
+        return _websiteRepository.GetByName(name);
     }
 }

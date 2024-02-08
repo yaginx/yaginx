@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<Nullable>enable</Nullable>
+		<Nullable>disable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<InvariantGlobalization>true</InvariantGlobalization>
 	</PropertyGroup>
@@ -40,6 +40,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\LettuceEncrypt\LettuceEncrypt.csproj" />
 		<ProjectReference Include="..\Yaginx.Core\Yaginx.Core.csproj" />
+		<ProjectReference Include="..\Yaginx.DataStore.LiteDBStore\Yaginx.DataStore.LiteDBStore.csproj" />
 	</ItemGroup>
 
 </Project>

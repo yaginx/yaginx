@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Yaginx.DataStores;
 using Yaginx.DomainModels;
 
 namespace Yaginx.ApiControllers;
@@ -7,22 +6,26 @@ namespace Yaginx.ApiControllers;
 [ApiController, Route("api/web_domain")]
 public class WebDomainController : YaginxControllerBase
 {
+    private readonly IWebDomainRepository _webDomainRepository;
+
+    public WebDomainController(IWebDomainRepository webDomainRepository)
+    {
+        _webDomainRepository = webDomainRepository;
+    }
+
     [HttpPost, Route("upsert")]
     public async Task Upsert([FromBody] WebDomain webDomain)
     {
-        if (!webDomain.Id.HasValue)
+        webDomain.Name = webDomain.Name.ToLower();
+        var oldDomain = _webDomainRepository.GetByName(webDomain.Name);
+        if (oldDomain == null)
         {
             webDomain.Id = IdGenerator.NextId();
-            _databaseRepository.Insert(webDomain);
+            _webDomainRepository.Add(webDomain);
         }
         else
         {
-            var oldDomain = _databaseRepository.Get<WebDomain>(x => x.Id == webDomain.Id);
-            if (oldDomain == null)
-            {
-                throw new Exception($"Site #{webDomain.Id} not exist");
-            }
-            _databaseRepository.Update(webDomain);
+            _webDomainRepository.Update(webDomain);
         }
         await Task.CompletedTask;
     }
@@ -31,13 +34,13 @@ public class WebDomainController : YaginxControllerBase
     public async Task<List<WebDomain>> Search()
     {
         await Task.CompletedTask;
-        return _databaseRepository.Search<WebDomain>().ToList();
+        return _webDomainRepository.Search().ToList();
     }
 
     [HttpGet, Route("get")]
     public async Task<WebDomain> Get(string name)
     {
         await Task.CompletedTask;
-        return _databaseRepository.Get<WebDomain>(x => x.Name == name);
+        return _webDomainRepository.GetByName(name);
     }
 }

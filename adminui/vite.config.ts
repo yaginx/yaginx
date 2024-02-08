@@ -24,7 +24,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
 
   console.log({ command, mode });
   return {
-    base: './',
+    base: VITE_BASE_PATH,
     // plugins: createVitePlugins(mode, isBuild),
     plugins: [react()],
     css: {

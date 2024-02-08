@@ -1,9 +1,8 @@
 ﻿namespace Yaginx.DomainModels
 {
-    public class WebsiteProxyRule
+    public class WebsiteProxyRuleItem
     {
         public string PathPattern { get; set; }
         public List<WebsiteDestination> Destinations { get; set; }
-
     }
 }

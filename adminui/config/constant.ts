@@ -8,7 +8,7 @@ export const BASE_URL = {
 // 开发端口
 export const PORT = 1314;
 // 基本路径
-export const VITE_BASE_PATH = '/adminui/';
+export const VITE_BASE_PATH = '/yaginx/adminui/';
 // 请求接口地址
 export const VITE_PROXY_HTTP = 'https://sh01.vm.niusys.net/';
 // 应用名称

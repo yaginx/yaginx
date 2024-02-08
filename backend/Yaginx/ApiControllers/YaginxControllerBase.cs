@@ -3,7 +3,6 @@ using AgileLabs.WorkContexts.Extensions;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using Yaginx.DataStores;
 
 namespace Yaginx.ApiControllers;
 
@@ -13,6 +12,4 @@ public abstract class YaginxControllerBase : ControllerBase
     protected IWorkContextCore _workContext => AgileLabContexts.Context.CurrentWorkContext;
     protected IMapper _mapper => AgileLabContexts.Context.Mapper;
     protected ActivitySource _activitySource => _workContext.Resolve<ActivitySource>();
-
-    protected DatabaseRepository _databaseRepository => _workContext.Resolve<DatabaseRepository>();
 }
