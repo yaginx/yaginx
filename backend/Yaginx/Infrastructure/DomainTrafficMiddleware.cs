@@ -13,17 +13,23 @@ namespace Yaginx.Infrastructure
         public const string STATS_PATH = "/traffic";
         private readonly IEmbeddedResourceQuery _embeddedResourceQuery;
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
+        private readonly ILogger<DomainTrafficMiddleware> _logger;
 
         /// <summary>
         /// 处理中请求地址Cache
         /// </summary>
         private ConcurrentDictionary<string, DomainTraffic> _requestTraffic = new ConcurrentDictionary<string, DomainTraffic>();
 
-        public DomainTrafficMiddleware(RequestDelegate next, IEmbeddedResourceQuery embeddedResourceQuery, IHostApplicationLifetime hostApplicationLifetime)
+        public DomainTrafficMiddleware(
+            RequestDelegate next,
+            IEmbeddedResourceQuery embeddedResourceQuery,
+            IHostApplicationLifetime hostApplicationLifetime,
+            ILogger<DomainTrafficMiddleware> logger)
         {
             Next = next;
             _embeddedResourceQuery = embeddedResourceQuery;
             _hostApplicationLifetime = hostApplicationLifetime;
+            _logger = logger;
             Task.Factory.StartNew(FlushTask);
         }
 
@@ -35,25 +41,41 @@ namespace Yaginx.Infrastructure
             try
             {
                 var domain = context.Request.Host.Host;
-                if (!_requestTraffic.ContainsKey(domain))
                 {
-                    _requestTraffic.TryAdd(domain, new DomainTraffic());
+                    if (!_requestTraffic.TryGetValue(domain, out var domainTraffic))
+                    {
+                        domainTraffic = new DomainTraffic();
+                    }
+                    domainTraffic.Requests += 1;
+                    domainTraffic.Inbound += context.Request.ContentLength ?? 0;
+                    _requestTraffic.AddOrUpdate(domain, domainTraffic, (hostDomain, oldValue) =>
+                    {
+                        oldValue.Inbound += context.Request.ContentLength ?? 0;
+                        oldValue.Requests += 1;
+                        return oldValue;
+                    });
                 }
-
-                var domainTraffic = _requestTraffic[domain];
-                domainTraffic.Requests += 1;
-                domainTraffic.Inbound += context.Request.ContentLength ?? 0;
-                _requestTraffic[domain] = domainTraffic;
-
                 await Next(context);
-
-                domainTraffic.Outbound += context.Response.ContentLength ?? 0;
-                _requestTraffic[domain] = domainTraffic;
-
+                {
+                    if (!_requestTraffic.TryGetValue(domain, out var domainTraffic))
+                    {
+                        domainTraffic = new DomainTraffic();
+                    }
+                    domainTraffic.Outbound += context.Response.ContentLength ?? 0;
+                    _requestTraffic.AddOrUpdate(domain, domainTraffic, (hostDomain, oldValue) =>
+                    {
+                        oldValue.Outbound += context.Response.ContentLength ?? 0;
+                        return oldValue;
+                    });
+                }
                 if (context.Request.Path.HasValue && context.Request.Path.Value.StartsWith(STATS_PATH, StringComparison.OrdinalIgnoreCase))
                 {
                     await ProcessStatusPage(context);
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "统计异常");
             }
             finally
             {
@@ -116,17 +138,24 @@ namespace Yaginx.Infrastructure
                 }
 
                 using var scope = AgileLabContexts.Context.CreateScopeWithWorkContext();
-                var trafficRepository = scope.WorkContext.ServiceProvider.GetRequiredService<IHostTrafficRepository>();
-                foreach (var item in lastPeriodData)
+                try
                 {
-                    trafficRepository.Upsert(new HostTraffic
+                    var trafficRepository = scope.WorkContext.ServiceProvider.GetRequiredService<IHostTrafficRepository>();
+                    foreach (var item in lastPeriodData)
                     {
-                        Id = IdGenerator.NextId(),
-                        HostName = item.Key,
-                        InboundBytes = item.Value.Inbound,
-                        OutboundBytes = item.Value.Outbound,
-                        RequestCounts = item.Value.Requests,
-                    });
+                        trafficRepository.Upsert(new HostTraffic
+                        {
+                            Id = IdGenerator.NextId(),
+                            HostName = item.Key,
+                            InboundBytes = item.Value.Inbound,
+                            OutboundBytes = item.Value.Outbound,
+                            RequestCounts = item.Value.Requests,
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "写数据库异常");
                 }
             }
         }

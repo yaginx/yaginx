@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LettuceEncrypt.Internal;
+using Microsoft.AspNetCore.Mvc;
 using Yaginx.DomainModels;
+using Yaginx.Models;
 
 namespace Yaginx.ApiControllers;
 
@@ -7,10 +9,12 @@ namespace Yaginx.ApiControllers;
 public class WebDomainController : YaginxControllerBase
 {
     private readonly IWebDomainRepository _webDomainRepository;
+    private readonly CertificateSelector _certificateSelector;
 
-    public WebDomainController(IWebDomainRepository webDomainRepository)
+    public WebDomainController(IWebDomainRepository webDomainRepository, CertificateSelector certificateSelector)
     {
         _webDomainRepository = webDomainRepository;
+        _certificateSelector = certificateSelector;
     }
 
     [HttpPost, Route("upsert")]
@@ -32,23 +36,23 @@ public class WebDomainController : YaginxControllerBase
     }
 
     [HttpGet, HttpPost, Route("search")]
-    public async Task<List<WebDomain>> Search()
+    public async Task<List<WebDomainListItem>> Search()
     {
         await Task.CompletedTask;
-        return _webDomainRepository.Search().ToList();
+        return _mapper.Map<List<WebDomainListItem>>(_webDomainRepository.Search().ToList());
     }
 
     [HttpGet, Route("get")]
-    public async Task<WebDomain> Get(long id)
+    public async Task<WebDomainListItem> Get(long id)
     {
         await Task.CompletedTask;
-        return _webDomainRepository.Get(id);
+        return _mapper.Map<WebDomainListItem>(_webDomainRepository.Get(id));
     }
 
     [HttpGet, Route("get_by_name")]
-    public async Task<WebDomain> Get(string name)
+    public async Task<WebDomainListItem> Get(string name)
     {
         await Task.CompletedTask;
-        return _webDomainRepository.GetByName(name);
+        return _mapper.Map<WebDomainListItem>(_webDomainRepository.GetByName(name));
     }
 }

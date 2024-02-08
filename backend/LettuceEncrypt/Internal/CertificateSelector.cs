@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 
 namespace LettuceEncrypt.Internal;
 
-internal class CertificateSelector : IServerCertificateSelector
+public class CertificateSelector : IServerCertificateSelector
 {
     private readonly ConcurrentDictionary<string, X509Certificate2> _certs =
         new(StringComparer.OrdinalIgnoreCase);

@@ -51,21 +51,9 @@ namespace Yaginx.YaginxAcmeLoaders
                 return;
             }
 
-            // load certificates in the background
-            //if (!LettuceEncryptDomainNamesWereConfigured())
-            //{
-            //    _logger.LogInformation("No domain names were configured");
-            //    return;
-            //}
-
-            //_ = Task.Factory.StartNew(async () =>
-            //{
-
-            //});
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromHours(1));
-
+                await Task.Delay(TimeSpan.FromSeconds(30));
                 var domains = _domainRepsitory.GetFreeCertDomain();
                 foreach (var domain in domains)
                 {
@@ -99,11 +87,7 @@ namespace Yaginx.YaginxAcmeLoaders
                         _logger.LogError(0, ex, "ACME state machine encountered unhandled error");
                     }
                 }
-
-                // 执行一次之后跳出
-                //break;
             }
-            await Task.CompletedTask;
         }
     }
 }

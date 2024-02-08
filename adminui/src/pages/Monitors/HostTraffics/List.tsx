@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { hostTrafficSearch, webDomainSearch, websiteSearch } from "@/api/docker"
 import TableList from "@/componets/TableList"
 import { renderTableItem } from "@/componets/ModelCrudViews/renderTableItem"
+import { LocalTime } from "@/componets/LocalTime"
 
 const List: React.FC = (props) => {
   const pkFieldName = "host";
@@ -35,6 +36,7 @@ const List: React.FC = (props) => {
 
   const initTableColumn = (columnsArray: any[]) => {
     columnsArray.push(renderTableItem("hostName", "主机头"));
+    columnsArray.push({ title: "周期", key: "period", dataIndex: "period", render: (text: any, record: any) => <LocalTime timestamp={record["period"]} /> });
     columnsArray.push(renderTableItem("requestCounts", "请求次数"));
     columnsArray.push(renderTableItem("inboundBytes", "流入流量"));
     columnsArray.push(renderTableItem("outboundBytes", "流出流量"));
@@ -49,9 +51,9 @@ const List: React.FC = (props) => {
     }>
       <TableList searchAction={hostTrafficSearch} realodTableData={refreshTable}
         initTableColumn={initTableColumn}
-        // renderTableOperationMenu={renderTableOperationMenu}
-        // onTableMenuClick={onTableMenuClick}
-        />
+      // renderTableOperationMenu={renderTableOperationMenu}
+      // onTableMenuClick={onTableMenuClick}
+      />
     </PageHeader>
   )
 }

@@ -36,37 +36,4 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
             _databaseRepository.Update(website);
         }
     }
-
-    public class HostTrafficRepository : IHostTrafficRepository
-    {
-        private readonly LiteDbDatabaseRepository _databaseRepository;
-
-        public HostTrafficRepository(LiteDbDatabaseRepository databaseRepository)
-        {
-            _databaseRepository = databaseRepository;
-        }
-        public List<HostTraffic> Search()
-        {
-            return _databaseRepository.Search<HostTraffic>().ToList();
-        }
-
-        public List<HostTraffic> Search(string hostName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Upsert(HostTraffic hostTraffic)
-        {
-            var old = _databaseRepository.Get<HostTraffic>(x => x.HostName == hostTraffic.HostName);
-            if (old == null)
-                _databaseRepository.Insert(hostTraffic);
-            else
-            {
-                old.InboundBytes += hostTraffic.InboundBytes;
-                old.OutboundBytes += hostTraffic.OutboundBytes;
-                old.RequestCounts += hostTraffic.RequestCounts;
-                _databaseRepository.Update(hostTraffic);
-            }
-        }
-    }
 }
