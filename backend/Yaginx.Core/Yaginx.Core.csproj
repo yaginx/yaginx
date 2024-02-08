@@ -8,8 +8,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AgileLabs" Version="8.1.35" />
-		<PackageReference Include="AgileLabs.WebApp" Version="8.1.86" />
+		<PackageReference Include="AgileLabs" Version="8.1.36" />
+		<PackageReference Include="AgileLabs.WebApp" Version="8.1.87" />
 		<PackageReference Include="LiteDB" Version="5.0.17" />
 		<PackageReference Include="LiteDB.Async" Version="0.1.7" />
 		<PackageReference Include="Snowflake.Core" Version="2.0.0" />
