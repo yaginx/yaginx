@@ -37,9 +37,9 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
             _databaseRepository.Update(webDomain);
         }
 
-        IEnumerable<string> ICertificateDomainRepsitory.Search()
+        IEnumerable<string> ICertificateDomainRepsitory.GetFreeCertDomain()
         {
-            return Search().Select(x => x.Name);
+            return _databaseRepository.Search<WebDomain>(x => x.IsUseFreeCert).Select(x => x.Name);
         }
     }
 }

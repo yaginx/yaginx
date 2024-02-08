@@ -2,6 +2,6 @@
 {
     public interface ICertificateDomainRepsitory
     {
-        IEnumerable<string> Search();
+        IEnumerable<string> GetFreeCertDomain();
     }
 }

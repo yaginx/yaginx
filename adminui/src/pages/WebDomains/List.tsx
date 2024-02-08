@@ -5,6 +5,7 @@ import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { webDomainSearch, websiteSearch } from "@/api/docker"
 import TableList from "@/componets/TableList"
+import { renderTableItem } from "@/componets/ModelCrudViews/renderTableItem"
 
 const List: React.FC = (props) => {
   const pkFieldName = "id";
@@ -34,12 +35,13 @@ const List: React.FC = (props) => {
   }
 
   const initTableColumn = (columnsArray: any[]) => {
-    columnsArray.push({ title: 'name', key: 'name', dataIndex: "name", width: 150 })
-    columnsArray.push({ title: 'isVerified', key: 'isVerified', dataIndex: "isVerified", width: 150 })
+    columnsArray.push(renderTableItem("name", "域名"));
+    columnsArray.push(renderTableItem("isUseFreeCert", "是否使用免费证书"));
+    columnsArray.push(renderTableItem("isVerified", "是否已验证"));
   }
 
   return (
-    <PageHeader title={"Domains"} tags={
+    <PageHeader title={"域名"} tags={
       <Space size="middle">
         <Button key="refresh" onClick={() => forceRefreshTable(Math.random() + 1)} >Refresh</Button>
         <Button key="create" onClick={() => navigate("../create")} >Create</Button>

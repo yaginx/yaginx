@@ -66,7 +66,7 @@ namespace Yaginx.YaginxAcmeLoaders
             {
                 await Task.Delay(TimeSpan.FromHours(1));
 
-                var domains = _domainRepsitory.Search();
+                var domains = _domainRepsitory.GetFreeCertDomain();
                 foreach (var domain in domains)
                 {
                     using var acmeStateMachineScope = _serviceScopeFactory.CreateScope();

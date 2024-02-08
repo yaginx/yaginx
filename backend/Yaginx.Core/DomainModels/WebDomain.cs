@@ -13,6 +13,7 @@ namespace Yaginx.DomainModels
     {
         public long? Id { get; set; }
         public string Name { get; set; }
+        public bool IsUseFreeCert { get; set; }
         public bool IsVerified { get; set; }
     }
 
