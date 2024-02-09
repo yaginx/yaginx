@@ -2,6 +2,8 @@
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
+using Yaginx.DataStore.MongoStore.Abstracted;
+using Yaginx.DomainModels.MonitorModels;
 
 namespace Yaginx.DataStore.MongoStore.Entities
 {

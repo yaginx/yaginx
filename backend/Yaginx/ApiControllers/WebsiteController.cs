@@ -5,7 +5,6 @@ using Yaginx.Infrastructure.ProxyConfigProviders;
 using Yaginx.Models.WebsiteModels;
 
 namespace Yaginx.ApiControllers;
-
 [ApiController, Route("api/website")]
 public class WebsiteController : YaginxControllerBase
 {

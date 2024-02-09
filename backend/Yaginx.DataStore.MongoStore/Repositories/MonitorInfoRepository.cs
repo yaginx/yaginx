@@ -1,12 +1,14 @@
 ﻿using AgileLabs.Storage.Mongo;
+using Amazon.Runtime.Internal;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using Org.BouncyCastle.Asn1.Ocsp;
 using Yaginx.DataStore.MongoStore.Entities;
 using Yaginx.DomainModels.MonitorModels;
 
-namespace Yaginx.DataStore.MongoStore
+namespace Yaginx.DataStore.MongoStore.Repositories
 {
-    public class MonitorInfoRepository : YaginxNoSqlBaseRepository<ResourceMonitorInfoEntity>, IMonitorInfoRepository, IAppNoSqlBaseRepository<ResourceMonitorInfoEntity>
+    internal class MonitorInfoRepository : YaginxNoSqlBaseRepository<ResourceMonitorInfoEntity>, IMonitorInfoRepository
     {
         private readonly IMapper _mapper;
 
@@ -19,16 +21,6 @@ namespace Yaginx.DataStore.MongoStore
         {
             var entity = _mapper.Map<ResourceMonitorInfoEntity>(monitorInfoEntity);
             await base.AddAsync(entity);
-        }
-    }
-
-    public class Mapping : Profile
-    {
-        public Mapping()
-        {
-            CreateMap<ResourceMonitorInfo, ResourceMonitorInfoEntity>()
-                .ForMember(d => d.ResourceUuid, mo => mo.MapFrom(s => "yaginx"));
-            CreateMap<MonitorInfo, MonitorInfoEntity>();
         }
     }
 }

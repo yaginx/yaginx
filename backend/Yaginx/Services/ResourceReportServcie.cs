@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
-using Yaginx.DataStore.MongoStore;
+using Yaginx.DataStore.MongoStore.Abstracted;
 using Yaginx.DataStore.MongoStore.Entities;
+using Yaginx.DomainModels.MonitorModels;
 
 namespace Yaginx.Services
 {
@@ -20,6 +21,15 @@ namespace Yaginx.Services
             _monitorInfoRep = monitorInfoRep;
             _reportRep = reportRep;
         }
+
+        public async Task MinutelyCheckAsync(DateTime nowTime)
+        {
+            var beginTime = nowTime.AddSeconds(-nowTime.Second).AddMicroseconds(-nowTime.Microsecond);
+            var endTime = beginTime.AddMinutes(1);
+            await CycleReportStatisticAsync(ReportCycleType.Minutely, beginTime, endTime);
+            await Task.CompletedTask;
+        }
+
         public async Task HourlyCheckAsync(DateTime nowTime)
         {
             var beginTime = nowTime.Date.AddHours(nowTime.Hour);
@@ -40,8 +50,9 @@ namespace Yaginx.Services
         {
             switch (cycleType)
             {
+                case ReportCycleType.Minutely:
                 case ReportCycleType.Hourly:
-                    await HourlyReportStatisticAsync(beginTime, endTime);
+                    await HourlyReportStatisticAsync(cycleType, beginTime, endTime);
                     break;
                 case ReportCycleType.Daily:
                     await DailyReportStatisticAsync(beginTime, endTime);
@@ -129,7 +140,7 @@ namespace Yaginx.Services
             return result;
         }
 
-        private async Task HourlyReportStatisticAsync(DateTime beginTime, DateTime endTime)
+        private async Task HourlyReportStatisticAsync(ReportCycleType reportCycleType, DateTime beginTime, DateTime endTime)
         {
             var monitorInfoList = await ResourceMonitorInfoSearchCycleRangeRecords(beginTime, endTime);
             var hosts = monitorInfoList.SelectMany(x => x.Data).Select(x => x.Host).Distinct();
@@ -146,7 +157,7 @@ namespace Yaginx.Services
                 var resourceReport = new ResourceReportEntity()
                 {
                     ResourceUuid = host,
-                    CycleType = ReportCycleType.Hourly,
+                    CycleType = reportCycleType,
                     ReportTime = beginTime,
                     RequestQty = currentRegionMonitorInfos.LongCount(),
                     CreateTime = DateTime.Now

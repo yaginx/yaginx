@@ -4,6 +4,7 @@ import { Card, Space, theme } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Col, Row } from 'antd';
 import { Line } from '@ant-design/plots';
+import { RequestQtyDiagram } from './RequestQty';
 
 // 组件绑定
 function BearCounter() {
@@ -102,6 +103,13 @@ const Home: React.FC = () => {
         <Col span={6}>
           <Card title="Default size card" extra={<a href="#">More</a>} >
             Card content
+          </Card>
+        </Col>
+      </Row>
+      <Row style={{ marginBottom: "24px" }}>
+        <Col span={24}>
+          <Card title="请求量图" extra={<a href="#">More</a>} >
+            <RequestQtyDiagram />
           </Card>
         </Col>
       </Row>

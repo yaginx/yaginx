@@ -1,5 +1,6 @@
 ﻿using AgileLabs.Storage.Mongo;
 using Microsoft.Extensions.Logging;
+using Yaginx.DataStore.MongoStore.Abstracted;
 
 namespace Yaginx.DataStore.MongoStore
 {

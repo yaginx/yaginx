@@ -1,5 +1,7 @@
 ﻿using AgileLabs.Storage.Mongo;
 using Microsoft.Extensions.DependencyInjection;
+using Yaginx.DataStore.MongoStore.Abstracted;
+using Yaginx.DataStore.MongoStore.Repositories;
 using Yaginx.DomainModels.MonitorModels;
 
 namespace Yaginx.DataStore.MongoStore;
@@ -16,5 +18,6 @@ public static class MongoServiceCoolectionExtensions
 
         // 注册仓储
         services.AddScoped<IMonitorInfoRepository, MonitorInfoRepository>();
+        services.AddScoped<IResourceReportRepository, ResourceReportRepository>();
     }
 }

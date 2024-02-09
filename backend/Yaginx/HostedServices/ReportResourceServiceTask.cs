@@ -23,6 +23,18 @@ namespace Yaginx.HostedServices
                 try
                 {
                     var nowTime = DateTime.Now;
+
+                    #region 分钟级
+                    if (nowTime <= nowTime.AddMinutes(-nowTime.Minute).Add(checkTimeSpan * 2))
+                    {
+                        await _resourceReportServcie.HourlyCheckAsync(DateTime.Now.AddMinutes(-1));// 再次统计上一分钟的数据
+                    }
+
+                    await _resourceReportServcie.MinutelyCheckAsync(DateTime.Now);
+                    #endregion
+
+
+                    #region Houly
                     if (nowTime <= nowTime.Date.AddHours(nowTime.Hour).Add(checkTimeSpan * 2))
                     {
                         await _resourceReportServcie.HourlyCheckAsync(DateTime.Now.AddHours(-1));// 再次统计上一小时的数据
@@ -30,12 +42,17 @@ namespace Yaginx.HostedServices
 
                     await _resourceReportServcie.HourlyCheckAsync(DateTime.Now);
 
+                    #endregion
+
+                    #region Daily
                     if (nowTime <= nowTime.Date.Add(checkTimeSpan * 2))
                     {
                         await _resourceReportServcie.DailyCheckAsync(DateTime.Now.Date.AddDays(-1));// 再次统计上一小时的数据
                     }
 
                     await _resourceReportServcie.DailyCheckAsync(DateTime.Now.Date);
+
+                    #endregion
                 }
                 catch (Exception ex)
                 {

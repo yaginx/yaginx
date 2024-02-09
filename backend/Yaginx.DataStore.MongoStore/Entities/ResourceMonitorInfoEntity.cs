@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Yaginx.DataStore.MongoStore;
+using Yaginx.DataStore.MongoStore.Abstracted;
 
 namespace Yaginx.DataStore.MongoStore.Entities
 {
