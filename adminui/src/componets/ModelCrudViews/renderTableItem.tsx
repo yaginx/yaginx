@@ -20,7 +20,7 @@ export const renderTableItem = (fieldName: string, title: string = fieldName) =>
       return {
         title: title, dataIndex: fieldName, key: fieldName, align: 'center', ...ColumnSearchProps(fieldName, fieldName),
         render: (text: any, record: any) => {
-          if (record[fieldName]) {
+          if (record[fieldName] !== undefined && record[fieldName] !== null) {
             switch (typeof record[fieldName]) {
               case "boolean":
                 return <Checkbox checked={record[fieldName]} disabled />;
