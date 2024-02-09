@@ -17,12 +17,25 @@ namespace Yaginx.HostedServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            var checkTimeSpan = TimeSpan.FromSeconds(15);
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    await _resourceReportServcie.HourlyCheckAsync();
-                    await _resourceReportServcie.DailyCheckAsync();
+                    var nowTime = DateTime.Now;
+                    if (nowTime <= nowTime.Date.AddHours(nowTime.Hour).Add(checkTimeSpan * 2))
+                    {
+                        await _resourceReportServcie.HourlyCheckAsync(DateTime.Now.AddHours(-1));// 再次统计上一小时的数据
+                    }
+
+                    await _resourceReportServcie.HourlyCheckAsync(DateTime.Now);
+
+                    if (nowTime <= nowTime.Date.Add(checkTimeSpan * 2))
+                    {
+                        await _resourceReportServcie.DailyCheckAsync(DateTime.Now.Date.AddDays(-1));// 再次统计上一小时的数据
+                    }
+
+                    await _resourceReportServcie.DailyCheckAsync(DateTime.Now.Date);
                 }
                 catch (Exception ex)
                 {

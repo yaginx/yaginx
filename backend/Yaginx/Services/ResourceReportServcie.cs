@@ -9,59 +9,42 @@ namespace Yaginx.Services
     /// </summary>
     public class ResourceReportServcie
     {
-        private readonly IAppNoSqlBaseRepository<ResourceEntity> _resourceRep;
-        private readonly IAppNoSqlBaseRepository<ResourceSessionEntity> _sessionRep;
         private readonly IAppNoSqlBaseRepository<ResourceMonitorInfoEntity> _monitorInfoRep;
         private readonly IAppNoSqlBaseRepository<ResourceReportEntity> _reportRep;
 
-        public ResourceReportServcie(IAppNoSqlBaseRepository<ResourceEntity> resourceRep,
-            IAppNoSqlBaseRepository<ResourceSessionEntity> sessionRep,
+        public ResourceReportServcie(
             IAppNoSqlBaseRepository<ResourceMonitorInfoEntity> monitorInfoRep,
             IAppNoSqlBaseRepository<ResourceReportEntity> reportRep
             )
         {
-            _resourceRep = resourceRep;
-            _sessionRep = sessionRep;
             _monitorInfoRep = monitorInfoRep;
             _reportRep = reportRep;
         }
-        public async Task HourlyCheckAsync()
+        public async Task HourlyCheckAsync(DateTime nowTime)
         {
-            var nowTime = DateTime.Now;
-            var beginTime = nowTime.Date.AddHours(nowTime.Hour - 1);
+            var beginTime = nowTime.Date.AddHours(nowTime.Hour);
             var endTime = beginTime.AddHours(1);
-            //var allResources = await _resourceRep.SearchAsync(Builders<ResourceEntity>.Filter.Empty);
-            //foreach (var resource in allResources)
-            //{
-
-            //}
-            await CycleReportStatisticAsync("yaginx", ReportCycleType.Hourly, beginTime, endTime);
+            await CycleReportStatisticAsync(ReportCycleType.Hourly, beginTime, endTime);
             await Task.CompletedTask;
         }
 
-        public async Task DailyCheckAsync()
+        public async Task DailyCheckAsync(DateTime nowTime)
         {
-            var nowTime = DateTime.Now;
-            var beginTime = nowTime.AddHours(-1).Date;
+            var beginTime = nowTime.Date;
             var endTime = beginTime.AddDays(1);
-            var allResources = await _resourceRep.SearchAsync(Builders<ResourceEntity>.Filter.Empty);
-            //foreach (var resource in allResources)
-            //{
-            //    await CycleReportStatisticAsync(resource.ResourceUuid, ReportCycleType.Daily, beginTime, endTime);
-            //}
-            await CycleReportStatisticAsync("yaginx", ReportCycleType.Daily, beginTime, endTime);
+            await CycleReportStatisticAsync(ReportCycleType.Daily, beginTime, endTime);
             await Task.CompletedTask;
         }
 
-        public async Task CycleReportStatisticAsync(string resourceUuid, ReportCycleType cycleType, DateTime beginTime, DateTime endTime)
+        public async Task CycleReportStatisticAsync(ReportCycleType cycleType, DateTime beginTime, DateTime endTime)
         {
             switch (cycleType)
             {
                 case ReportCycleType.Hourly:
-                    await HourlyReportStatisticAsync(resourceUuid, beginTime, endTime);
+                    await HourlyReportStatisticAsync(beginTime, endTime);
                     break;
                 case ReportCycleType.Daily:
-                    await DailyReportStatisticAsync(resourceUuid, beginTime, endTime);
+                    await DailyReportStatisticAsync(beginTime, endTime);
                     break;
                 default:
                     break;
@@ -75,20 +58,20 @@ namespace Yaginx.Services
         /// <param name="beginTime"></param>
         /// <param name="endTime"></param>
         /// <returns></returns>
-        private async Task DailyReportStatisticAsync(string resourceUuid, DateTime beginTime, DateTime endTime)
+        private async Task DailyReportStatisticAsync(DateTime beginTime, DateTime endTime)
         {
             var monitorInfoFilterBuilder = Builders<ResourceReportEntity>.Filter;
-            var monitorInfoFilter = monitorInfoFilterBuilder.Eq(x => x.ResourceUuid, resourceUuid);
+            var monitorInfoFilter = monitorInfoFilterBuilder.Empty;
             monitorInfoFilter &= monitorInfoFilterBuilder.Eq(x => x.CycleType, ReportCycleType.Hourly);
             monitorInfoFilter &= monitorInfoFilterBuilder.Gte(x => x.ReportTime, beginTime);
             monitorInfoFilter &= monitorInfoFilterBuilder.Lt(x => x.ReportTime, endTime);
 
             var houlyDataList = await _reportRep.SearchAsync(monitorInfoFilter);
 
-            var regionAndEnvList = houlyDataList.GroupBy(x => new { x.RegionCode, x.Environment }).Select(x => new { x.Key.RegionCode, x.Key.Environment });
-            foreach (var item in regionAndEnvList)
+            var resourceIds = houlyDataList.GroupBy(x => x.ResourceUuid).Select(x => x.Key);
+            foreach (var item in resourceIds)
             {
-                var currentRegionDatas = houlyDataList.Where(x => x.RegionCode == item.RegionCode && x.Environment == item.Environment);
+                var currentRegionDatas = houlyDataList.Where(x => x.ResourceUuid == item);
                 if (!currentRegionDatas.Any())
                 {
                     continue;
@@ -96,9 +79,7 @@ namespace Yaginx.Services
 
                 var resourceReport = new ResourceReportEntity()
                 {
-                    ResourceUuid = resourceUuid,
-                    RegionCode = item.RegionCode,
-                    Environment = item.Environment,
+                    ResourceUuid = item,
                     CycleType = ReportCycleType.Daily,
                     ReportTime = beginTime,
                     RequestQty = currentRegionDatas.Sum(x => x.RequestQty),
@@ -148,17 +129,14 @@ namespace Yaginx.Services
             return result;
         }
 
-        private async Task HourlyReportStatisticAsync(string resourceUuid, DateTime beginTime, DateTime endTime)
+        private async Task HourlyReportStatisticAsync(DateTime beginTime, DateTime endTime)
         {
-            var monitorInfoList = await ResourceMonitorInfoSearchCycleRangeRecords(resourceUuid, beginTime, endTime);
-            var allSessionKey = monitorInfoList.Select(x => x.SessionKey).Distinct();
-            var allSessions = await _sessionRep.SearchAsync(Builders<ResourceSessionEntity>.Filter.In(x => x.SessionKey, allSessionKey));
-            var regionAndEnvList = allSessions.GroupBy(c => new { c.RegionCode, c.Environment }).Select(x => new { x.Key.RegionCode, x.Key.Environment });
+            var monitorInfoList = await ResourceMonitorInfoSearchCycleRangeRecords(beginTime, endTime);
+            var hosts = monitorInfoList.SelectMany(x => x.Data).Select(x => x.Host).Distinct();
 
-            foreach (var item in regionAndEnvList)
+            foreach (var host in hosts)
             {
-                var currentRegionSession = allSessions.Where(x => x.RegionCode == item.RegionCode && x.Environment == item.Environment).Select(x => x.SessionKey);
-                var currentRegionMonitorInfos = monitorInfoList.Where(x => currentRegionSession.Contains(x.SessionKey)).SelectMany(x => x.Data);
+                var currentRegionMonitorInfos = monitorInfoList.Where(x => x.Data.Select(y => y.Host).Contains(host)).SelectMany(x => x.Data);
 
                 if (!currentRegionMonitorInfos.Any())
                 {
@@ -167,9 +145,7 @@ namespace Yaginx.Services
 
                 var resourceReport = new ResourceReportEntity()
                 {
-                    ResourceUuid = resourceUuid,
-                    RegionCode = item.RegionCode,
-                    Environment = item.Environment,
+                    ResourceUuid = host,
                     CycleType = ReportCycleType.Hourly,
                     ReportTime = beginTime,
                     RequestQty = currentRegionMonitorInfos.LongCount(),
@@ -189,14 +165,10 @@ namespace Yaginx.Services
         private async Task InsertOrUpdateResourceReport(ResourceReportEntity resourceReport)
         {
             var filter = Builders<ResourceReportEntity>.Filter.Where(x => x.ResourceUuid == resourceReport.ResourceUuid
-            && x.RegionCode == resourceReport.RegionCode
-            && x.Environment == resourceReport.Environment
             && x.CycleType == resourceReport.CycleType
             && x.ReportTime == resourceReport.ReportTime);
             var update = Builders<ResourceReportEntity>.Update
                 .SetOnInsert(x => x.ResourceUuid, resourceReport.ResourceUuid)
-                .SetOnInsert(x => x.RegionCode, resourceReport.RegionCode)
-                .SetOnInsert(x => x.Environment, resourceReport.Environment)
                 .SetOnInsert(x => x.CycleType, resourceReport.CycleType)
                 .SetOnInsert(x => x.ReportTime, resourceReport.ReportTime)
                 .Set(x => x.RequestQty, resourceReport.RequestQty)
@@ -287,10 +259,10 @@ namespace Yaginx.Services
             return result;
         }
 
-        private async Task<IList<ResourceMonitorInfoEntity>> ResourceMonitorInfoSearchCycleRangeRecords(string resourceUuid, DateTime beginTime, DateTime endTime)
+        private async Task<IList<ResourceMonitorInfoEntity>> ResourceMonitorInfoSearchCycleRangeRecords(DateTime beginTime, DateTime endTime)
         {
             var monitorInfoFilterBuilder = Builders<ResourceMonitorInfoEntity>.Filter;
-            var monitorInfoFilter = monitorInfoFilterBuilder.Eq(x => x.ResourceUuid, resourceUuid);
+            var monitorInfoFilter = monitorInfoFilterBuilder.Empty;
             monitorInfoFilter &= monitorInfoFilterBuilder.Gte(x => x.Timestamp, beginTime);
             monitorInfoFilter &= monitorInfoFilterBuilder.Lt(x => x.Timestamp, endTime);
             var monitorInfos = await _monitorInfoRep.SearchAsync(monitorInfoFilter);

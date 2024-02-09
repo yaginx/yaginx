@@ -10,8 +10,6 @@ namespace Yaginx.DataStore.MongoStore.Entities
     {
         [BsonElement(elementName: "ResId")]
         public string ResourceUuid { get; set; }
-        public string RegionCode { get; set; }
-        public string Environment { get; set; }
         public ReportCycleType CycleType { get; set; }
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         public DateTime ReportTime { get; set; }

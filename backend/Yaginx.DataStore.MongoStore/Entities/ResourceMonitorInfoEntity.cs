@@ -15,8 +15,6 @@ namespace Yaginx.DataStore.MongoStore.Entities
     {
         [BsonElement(elementName: "res_id")]
         public string ResourceUuid { get; set; }
-        [BsonElement(elementName: "sess_key")]
-        public string SessionKey { get; set; }
         [BsonElement(elementName: "ts")]
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         public DateTime Timestamp { get; set; }
