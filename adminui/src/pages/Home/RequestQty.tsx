@@ -4,11 +4,15 @@ import { Card, Space, theme } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Col, Row } from 'antd';
 import { Line } from '@ant-design/plots';
-
-export const RequestQtyDiagram: React.FC = () => {
+interface RequestQtyDiagramProps {
+  cycleType: number
+}
+export const RequestQtyDiagram: React.FC<RequestQtyDiagramProps> = (props) => {
   const [data, setData] = useState([]);
+  // const { cycleType } = props;
+  const [cycleType, setCycleType] = useState(props.cycleType);
   const asyncFetch = () => {
-    fetch('/api/resource/report/all_report_data?cycleType=5')
+    fetch('/api/resource/report/all_report_data?cycleType=' + cycleType)
       .then((response) => response.json())
       .then((json) => setData(json.data))
       .catch((error) => {
@@ -17,7 +21,11 @@ export const RequestQtyDiagram: React.FC = () => {
   };
   useEffect(() => {
     asyncFetch();
-  }, []);
+  }, [cycleType]);
+
+  useEffect(() => {
+    setCycleType(props.cycleType);
+  }, [props]);
 
   const config = {
     data,

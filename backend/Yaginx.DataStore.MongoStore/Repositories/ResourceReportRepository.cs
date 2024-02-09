@@ -27,7 +27,7 @@ namespace Yaginx.DataStore.MongoStore.Repositories
             }
             filter &= filterBuilder.Eq(x => x.CycleType, request.CycleType);
             filter &= filterBuilder.Gte(x => x.ReportTime, request.BeginTime.FromEpochSeconds().ToLocalTime());
-            filter &= filterBuilder.Lt(x => x.ReportTime, request.EndTime.FromEpochSeconds().ToLocalTime());
+            filter &= filterBuilder.Lte(x => x.ReportTime, request.EndTime.FromEpochSeconds().ToLocalTime());
             var resultList = await SearchAsync(filter);
             return _mapper.Map<List<ResourceReportModel>>(resultList);
         }

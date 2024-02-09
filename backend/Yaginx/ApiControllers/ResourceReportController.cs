@@ -76,27 +76,31 @@ public class ResourceReportController : YaginxControllerBase
         };
 
         var nowTime = DateTime.Now;
-        nowTime = nowTime.Date.AddHours(nowTime.Hour).AddMinutes(nowTime.Minute);
-        requestData.EndTime = nowTime.GetEpochSeconds();
+
 
         int period = 60;
         switch (cycleType)
         {
             case ReportCycleType.Minutely:
+                nowTime = nowTime.Date.AddHours(nowTime.Hour).AddMinutes(nowTime.Minute);
                 requestData.BeginTime = nowTime.AddMinutes(-period).GetEpochSeconds();
                 break;
             case ReportCycleType.Hourly:
+                nowTime = nowTime.Date.AddHours(nowTime.Hour);
                 requestData.BeginTime = nowTime.AddHours(-period).GetEpochSeconds();
                 break;
             case ReportCycleType.Daily:
+                nowTime = nowTime.Date;
                 requestData.BeginTime = nowTime.AddDays(-period).GetEpochSeconds();
                 break;
             case ReportCycleType.Weekly:
-                requestData.BeginTime = nowTime.AddWeeks(-period).GetEpochSeconds();
+                throw new Exception("暂不支持");
+                //requestData.BeginTime = nowTime.AddWeeks(-period).GetEpochSeconds();
                 break;
             default:
                 break;
         }
+        requestData.EndTime = nowTime.GetEpochSeconds();
 
         var result = await _resourceReportRepository.Search(requestData);
 
@@ -113,16 +117,20 @@ public class ResourceReportController : YaginxControllerBase
 
         var xAxis = new List<long>();// combinedResult.Select(x => x.ReportTime).OrderBy(x => x).ToList();
         long step = 60;
+        string timeFormat = "HH:mm";
         switch (cycleType)
         {
             case ReportCycleType.Minutely:
                 step = 60;
+                timeFormat = "HH:mm";
                 break;
             case ReportCycleType.Hourly:
                 step = 3600;
+                timeFormat = "dd-HH";
                 break;
             case ReportCycleType.Daily:
                 step = 3600 * 24;
+                timeFormat = "MM-dd";
                 break;
             case ReportCycleType.Weekly:
                 step = 3600 * 24 * 7;
@@ -135,7 +143,7 @@ public class ResourceReportController : YaginxControllerBase
         for (var i = requestData.BeginTime; i <= requestData.EndTime; i += step)
         {
             var qty = combinedResult.FirstOrDefault(x => x.ReportTime == i)?.RequestQty ?? 0;
-            dataList.Add(new ReportItem(i.FromEpochSeconds().ToLocalTime().ToString("HH:mm"), qty) { TimeTs = i });
+            dataList.Add(new ReportItem(i.FromEpochSeconds().ToLocalTime().ToString(timeFormat), qty) { TimeTs = i });
         }
         return dataList;
     }
