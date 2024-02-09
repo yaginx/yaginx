@@ -1,6 +1,8 @@
 using AgileLabs.Diagnostics;
 using AgileLabs.Sessions;
 using AgileLabs.WebApp.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;

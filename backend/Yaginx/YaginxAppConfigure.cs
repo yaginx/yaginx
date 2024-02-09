@@ -22,14 +22,17 @@ using Microsoft.OpenApi.Models;
 using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
-using WoLabs.WorkContexts;
 using Yaginx.Configures.Hangfires;
+using Yaginx.DataStore.MongoStore;
 using Yaginx.HostedServices;
 using Yaginx.Infrastructure;
 using Yaginx.Infrastructure.Configuration;
 using Yaginx.Infrastructure.ProxyConfigProviders;
 using Yaginx.Infrastructure.Securities;
+using Yaginx.MemoryBuses;
+using Yaginx.Services;
 using Yaginx.Services.Securities;
+using Yaginx.WorkContexts;
 using Yaginx.YaginxAcmeLoaders;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
@@ -166,16 +169,29 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
         services.AddHostedService<YaginxAcmeCertificateLoader>();
         #endregion
 
+
         services.UseLiteDBDataStore(buildContext);
 
         services.AddHostedService<ScheduleHostedService>();
+
+        #region Resource Monitor
+        services.AddScoped<ResourceReportServcie>();
+        services.AddScoped<TrafficMonitorInfoEventSubscriber>();
+        services.AddHostedService<ReportResourceServiceTask>();
+        services.AddMemoryBus();
+
+        services.RegisterMongo(options =>
+        {
+            buildContext.Configuration.GetSection("MongoSetting:Default").Bind(options);
+        });
+        #endregion
     }
 
     public const string BasePath = "/yaginx";
     public RequestPiplineCollection Configure(RequestPiplineCollection piplineActions, AppBuildContext buildContext)
     {
         piplineActions.Register("UseBasePath", RequestPiplineStage.BeforeRouting, app => app.UsePathBase(BasePath));
-
+        piplineActions.Register("TrafficMonitorMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<TrafficMonitorMiddleware>());
         piplineActions.Register("DomainTrafficMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<DomainTrafficMiddleware>());
         piplineActions.Register("ProcessDurationMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<TraceInfoHeaderOutputMiddleware>());
         piplineActions.Register("RequestStatisticsMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<RequestStatisticsMiddleware>());

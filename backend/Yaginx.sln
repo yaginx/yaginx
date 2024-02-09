@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McMaster.AspNetCore.Kestrel
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yaginx.DataStore.LiteDBStore", "Yaginx.DataStore.LiteDBStore\Yaginx.DataStore.LiteDBStore.csproj", "{CDEC2358-B1A0-4843-B227-5EAAFB7AEE4B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yaginx.DataStore.MongoStore", "Yaginx.DataStore.MongoStore\Yaginx.DataStore.MongoStore.csproj", "{5F974B65-638F-465D-881A-E605400AB4EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{CDEC2358-B1A0-4843-B227-5EAAFB7AEE4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDEC2358-B1A0-4843-B227-5EAAFB7AEE4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDEC2358-B1A0-4843-B227-5EAAFB7AEE4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F974B65-638F-465D-881A-E605400AB4EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F974B65-638F-465D-881A-E605400AB4EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F974B65-638F-465D-881A-E605400AB4EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F974B65-638F-465D-881A-E605400AB4EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

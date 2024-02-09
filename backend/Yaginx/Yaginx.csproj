@@ -24,23 +24,13 @@
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.1" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 		<PackageReference Include="Yarp.ReverseProxy" Version="2.1.0" />
-
-		<PackageReference Include="OpenTelemetry" Version="1.7.0" />
-		<PackageReference Include="OpenTelemetry.Api.ProviderBuilderExtensions" Version="1.7.0" />
-		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.7.0" />
-		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.7.0" />
-		<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.7.0" />
-		<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.7.0" />
-		<PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.0.0-beta.8" />
-		<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.7.0" />
-		<PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.6.0-beta.3" />
-		<PackageReference Include="OpenTelemetry.Instrumentation.StackExchangeRedis" Version="1.0.0-rc9.12" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\LettuceEncrypt\LettuceEncrypt.csproj" />
 		<ProjectReference Include="..\Yaginx.Core\Yaginx.Core.csproj" />
 		<ProjectReference Include="..\Yaginx.DataStore.LiteDBStore\Yaginx.DataStore.LiteDBStore.csproj" />
+		<ProjectReference Include="..\Yaginx.DataStore.MongoStore\Yaginx.DataStore.MongoStore.csproj" />
 	</ItemGroup>
 
 </Project>

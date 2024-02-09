@@ -1,13 +1,12 @@
 ﻿using Snowflake.Core;
 
-namespace Yaginx
+namespace Yaginx;
+
+public class IdGenerator
 {
-    public class IdGenerator
+    private static IdWorker worker = new IdWorker(1, 1);
+    public static long NextId()
     {
-        private static IdWorker worker = new IdWorker(1, 1);
-        public static long NextId()
-        {
-            return worker.NextId();
-        }
+        return worker.NextId();
     }
 }

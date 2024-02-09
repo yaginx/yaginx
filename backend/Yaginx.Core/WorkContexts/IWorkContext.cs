@@ -1,9 +1,8 @@
 using AgileLabs;
 
-namespace WoLabs.WorkContexts
-{
-    public interface IWorkContext : IWorkContextCore
-    {
+namespace Yaginx.WorkContexts;
 
-    }
+public interface IWorkContext : IWorkContextCore
+{
+
 }

@@ -1,5 +1,5 @@
 using AgileLabs.FileProviders;
-
+namespace Yaginx.Infrastructure;
 public static class CommonHelper
 {
 	#region Properties
