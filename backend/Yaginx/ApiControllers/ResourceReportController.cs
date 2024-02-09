@@ -76,7 +76,7 @@ public class ResourceReportController : YaginxControllerBase
         };
 
         var nowTime = DateTime.Now;
-        nowTime = nowTime.AddMicroseconds(nowTime.Microsecond);
+        nowTime = nowTime.Date.AddHours(nowTime.Hour).AddMinutes(nowTime.Minute);
         requestData.EndTime = nowTime.GetEpochSeconds();
 
         int period = 60;
