@@ -27,7 +27,7 @@ public class TrafficMonitorInfoEventSubscriber : IEventSubscriber<MonitorMessage
 
         var monitorInfoEntity = new ResourceMonitorInfo()
         {
-            Timestamp = message.ts.FromEpochMilliseconds(),
+            Timestamp = message.ts.FromEpochSeconds(),
             Data = dataInfo
         };
         await _monitorInfoRepository.AddAsync(monitorInfoEntity);

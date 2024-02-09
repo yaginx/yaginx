@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AgileLabs;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
@@ -56,7 +57,7 @@ public class TrafficMonitorMiddleware
             try
             {
                 if (lastPeriodData.Any())
-                    await _memoryBus.SendAsync(new MonitorMessage() { ts = DateTime.Now.GetEpochMilliseconds(), data = lastPeriodData.ToList() });
+                    await _memoryBus.SendAsync(new MonitorMessage() { ts = DateTime.Now.GetEpochSeconds(), data = lastPeriodData.ToList() });
             }
             catch (Exception ex)
             {

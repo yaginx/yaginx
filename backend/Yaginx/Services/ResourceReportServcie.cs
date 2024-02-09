@@ -24,7 +24,7 @@ namespace Yaginx.Services
 
         public async Task MinutelyCheckAsync(DateTime nowTime)
         {
-            var beginTime = nowTime.AddSeconds(-nowTime.Second).AddMicroseconds(-nowTime.Microsecond);
+            var beginTime = nowTime.Date.AddHours(nowTime.Hour).AddMinutes(nowTime.Minute);
             var endTime = beginTime.AddMinutes(1);
             await CycleReportStatisticAsync(ReportCycleType.Minutely, beginTime, endTime);
             await Task.CompletedTask;
