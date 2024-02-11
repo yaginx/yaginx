@@ -31,6 +31,7 @@ using Yaginx.Infrastructure.ProxyConfigProviders;
 using Yaginx.Infrastructure.Securities;
 using Yaginx.MemoryBuses;
 using Yaginx.Services;
+using Yaginx.Services.DockerServices;
 using Yaginx.Services.Securities;
 using Yaginx.WorkContexts;
 using Yaginx.YaginxAcmeLoaders;
@@ -173,6 +174,8 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
         services.UseLiteDBDataStore(buildContext);
 
         services.AddHostedService<ScheduleHostedService>();
+
+        services.AddScoped<ContainerServcie>();
 
         #region Resource Monitor
         services.AddScoped<ResourceReportServcie>();
