@@ -74,7 +74,7 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
                     listenOptions.Protocols = HttpProtocols.Http1;
                 });
 
-                if (!buildContext.HostEnvironment.IsDevelopment())
+                if (!buildContext.HostEnvironment.IsDevelopment() && ((RunningModes.RunningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode))
                 {
                     serverOptions.ListenAnyIP(8443, listenOptions =>
                     {
