@@ -20,13 +20,13 @@ steps:
   - name: build_backend
     commands:
       - docker run -t --rm -v /data/build_share/dotnet:/root/.dotnet -v /data/build_share/nuget:/root/.nuget -v `pwd`:/workdir
-        --workdir /workdir hub.feinian.net/dotnet/sdk:8.0 bash -c "dotnet publish backend/Yaginx/Yaginx.csproj --runtime linux-x64 -c Release -o /workdir/publish"
+        --workdir /workdir cnhub.feinian.net/dotnet/sdk:8.0 bash -c "dotnet publish backend/Yaginx/Yaginx.csproj --runtime linux-x64 -c Release -o /workdir/publish"
 
   - name: build portal app
     commands:
       - export APP_NAME=yaginx
       - docker run --rm -v `pwd`/adminui:/workdir -v /data/build_share/pnpm_store:/pnpm_store --workdir /workdir
-        hub.feinian.net/build/node:20-alpine /bin/sh -c "node --version && pnpm install --store=/pnpm_store && pnpm run build"
+        cnhub.feinian.net/build/node:20-alpine /bin/sh -c "node --version && pnpm install --store=/pnpm_store && pnpm run build"
       - export ADMINUI_CLIENT_APP_FULLPATH=`pwd`/publish/ClientApp/AdminUI/
       - rm -rf $ADMINUI_CLIENT_APP_FULLPATH
       - mkdir -p $ADMINUI_CLIENT_APP_FULLPATH
@@ -35,7 +35,7 @@ steps:
   - name: build docs site
     commands:
       - docker run --rm -v `pwd`/yaginx-docs-site:/workdir --workdir /workdir -v /data/build_share/pnpm_store:/pnpm_store 
-        hub.feinian.net/build/node:20-alpine /bin/sh -c "node --version && pnpm install --store=/pnpm_store && pnpm run build"
+        cnhub.feinian.net/build/node:20-alpine /bin/sh -c "node --version && pnpm install --store=/pnpm_store && pnpm run build"
       - export DOCS_FULLPATH=`pwd`/publish/ClientApp/HelpDocs/
       - rm -rf $DOCS_FULLPATH
       - mkdir -p $DOCS_FULLPATH 

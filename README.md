@@ -15,10 +15,10 @@ Replacement for nginx's HTTP reverse proxy, but more power feature than nginx.
 
 ```bash
 mkdir -p /data/yaginx
-docker pull hub.feinian.net/yaginx/yaginx:latest
+docker pull cnhub.feinian.net/yaginx/yaginx:latest
 docker rm yaginx -f || true
 docker run -d -it --name yaginx -p 80:8080 -p 443:8443 \
--v /data/yaginx:/app_data -v /run/docker.sock:/var/run/docker.sock --link redis:redis hub.feinian.net/yaginx/yaginx:latest
+-v /data/yaginx:/app_data -v /run/docker.sock:/var/run/docker.sock --link redis:redis cnhub.feinian.net/yaginx/yaginx:latest
 ```
 
 ## ReverseProxy Config
