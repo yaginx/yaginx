@@ -1,8 +1,8 @@
+using AgileLabs;
 using AgileLabs.WebApp;
 using AgileLabs.WebApp.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Yaginx.Configures;
-
 public class YaginxApplicationOptions : DefaultMvcApplicationOptions
 {
     public YaginxApplicationOptions()
@@ -13,6 +13,27 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
         // 现阶段所有应用部署在一台服务器上, 共享同样的目录/data/yaginx
         ConfigureWebApplicationBuilder += (WebApplicationBuilder builder, AppBuildContext buildContext) =>
         {
+            RunningMode runningMode = RunningMode.All;
+            var runningModeEnv = Environment.GetEnvironmentVariable(RunningModes.Key);
+            if (runningModeEnv.IsNotNullOrWhitespace())
+            {
+                switch (runningModeEnv.ToUpper())
+                {
+                    case "GW":
+                    case "GATEWAY":
+                        runningMode = RunningMode.GatewayMode;
+                        break;
+                    case "DP":
+                    case "DOCKERPANEL":
+                        runningMode = RunningMode.DockerPanelMode;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            buildContext.Items.Add("RUNNING_MODE", runningMode);
+
             builder.Configuration.AddJsonFile(AppData.GetPath(ConfigurationDefaults.AppSettingsFilePath), true, true);
             if (!string.IsNullOrEmpty(builder.Environment?.EnvironmentName))
             {

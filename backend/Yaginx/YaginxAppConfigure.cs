@@ -38,11 +38,13 @@ using Yaginx.YaginxAcmeLoaders;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
 using Yarp.ReverseProxy.Transforms.Builder;
+
 public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEndpointConfig, IMvcOptionsConfig, IMvcBuildConfig
 {
     public int Order => 1;
     public void ConfigureServices(IServiceCollection services, AppBuildContext buildContext)
     {
+        buildContext.Items.Add("AppConfigure", this);
         services.AddNiusysSecurity(options =>
         {
             options.EncryptionKey = "2218EF6E-7D95-442F-B967-3979B00E9226";
@@ -70,32 +72,35 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
 
         services.AddCustomWorkContext<IWorkContext, IWorkContextSetter, DefaultWorkContextFactory>();
 
-        // Add the reverse proxy capability to the server
-        #region ReverseProxy
-        services.AddScoped<ProxyRuleRedisStorageService>();
-        services.AddSingleton<ProxyRuleChangeNotifyService>();
-        services.AddHostedService<ProxyRuleChangeReceiveService>();
+        var runningMode = RunningModes.RunningMode;
+        if ((runningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
+        {
+            // Add the reverse proxy capability to the server
+            #region ReverseProxy
+            services.AddScoped<ProxyRuleRedisStorageService>();
+            services.AddSingleton<ProxyRuleChangeNotifyService>();
+            services.AddHostedService<ProxyRuleChangeReceiveService>();
 
-        services.AddSingleton<IProxyConfigProvider, FileProxyConfigProvider>();
-        services.AddHttpForwarder();
-        services.AddReverseProxy()
-            .LoadFromConfig(buildContext.Configuration.GetSection("ReverseProxy"))
-            .AddTransforms(builderContext =>
-            {
-                /*
-				 Append: 在上游的基础上带上当前节点信息传给下游
-				 Set: 忽略上游信息, 使用当前节点信息往下传
-				 Off:直接把上游信息传给下游,忽略当前节点
-				 Remove: 不往下传该信息
-				 */
-                builderContext.AddXForwardedFor(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
-                builderContext.AddXForwardedHost(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
-                builderContext.AddXForwardedProto(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
-                builderContext.AddXForwardedPrefix(action: ForwardedTransformActions.Append);
-            })
-            .AddTransforms(DefaultRouteTransform);
-        #endregion
-
+            services.AddSingleton<IProxyConfigProvider, FileProxyConfigProvider>();
+            services.AddHttpForwarder();
+            services.AddReverseProxy()
+                .LoadFromConfig(buildContext.Configuration.GetSection("ReverseProxy"))
+                .AddTransforms(builderContext =>
+                {
+                    /*
+                     Append: 在上游的基础上带上当前节点信息传给下游
+                     Set: 忽略上游信息, 使用当前节点信息往下传
+                     Off:直接把上游信息传给下游,忽略当前节点
+                     Remove: 不往下传该信息
+                     */
+                    builderContext.AddXForwardedFor(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
+                    builderContext.AddXForwardedHost(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
+                    builderContext.AddXForwardedProto(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
+                    builderContext.AddXForwardedPrefix(action: ForwardedTransformActions.Append);
+                })
+                .AddTransforms(DefaultRouteTransform);
+            #endregion
+        }
         #region DockerEgnine
         services.AddSingleton<IDockerClient>(serviceProvider =>
         {
@@ -144,12 +149,15 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
 
         #endregion
 
-        services.AddClientApp(options =>
+        if ((runningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
         {
-            options.RootPath = "ClientApp";
-            options.ClientApps.Add(ClientAppConfig.Create("/adminui", "AdminUI"));
-            options.ClientApps.Add(ClientAppConfig.Create("/helps", "HelpDocs"));
-        });
+            services.AddClientApp(options =>
+            {
+                options.RootPath = "ClientApp";
+                options.ClientApps.Add(ClientAppConfig.Create("/adminui", "AdminUI"));
+                options.ClientApps.Add(ClientAppConfig.Create("/helps", "HelpDocs"));
+            });
+        }
 
         #region Authentication & Authorization
         services.AddSingleton<IAuthenticateService, AuthenticateService>();
@@ -157,37 +165,41 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
         #endregion
 
         services.ConfigureOpenTelementoryService(buildContext);
+        if ((runningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
+        {
+            #region Certificates
+            services.AddLettuceEncrypt().PersistDataToDirectory(new DirectoryInfo(AppData.Path), string.Empty);
+            services.AddScoped<YaginxAcmeCertificateFactory>()
+                .AddScoped<YaginxBeginCertificateCreationState>()
+                .AddScoped<YaginxServerStartupState>()
+                .AddScoped<YaginxTlsAlpnChallengeResponder>()
+                .AddScoped<YaginxTlsAlpn01DomainValidator>()
+                .AddScoped<YaginxCheckForRenewalState>();
 
-        #region Certificates
-        services.AddLettuceEncrypt().PersistDataToDirectory(new DirectoryInfo(AppData.Path), string.Empty);
-        services.AddScoped<YaginxAcmeCertificateFactory>()
-            .AddScoped<YaginxBeginCertificateCreationState>()
-            .AddScoped<YaginxServerStartupState>()
-            .AddScoped<YaginxTlsAlpnChallengeResponder>()
-            .AddScoped<YaginxTlsAlpn01DomainValidator>()
-            .AddScoped<YaginxCheckForRenewalState>();
-
-        services.AddHostedService<YaginxAcmeCertificateLoader>();
-        #endregion
+            services.AddHostedService<YaginxAcmeCertificateLoader>();
+            #endregion
 
 
-        services.UseLiteDBDataStore(buildContext);
+            services.UseLiteDBDataStore(buildContext);
 
-        services.AddHostedService<ScheduleHostedService>();
-
+            services.AddHostedService<ScheduleHostedService>();
+        }
         services.AddScoped<ContainerServcie>();
 
-        #region Resource Monitor
-        services.AddScoped<ResourceReportServcie>();
-        services.AddScoped<TrafficMonitorInfoEventSubscriber>();
-        services.AddHostedService<ReportResourceServiceTask>();
-        services.AddMemoryBus();
-
-        services.RegisterMongo(options =>
+        if ((runningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
         {
-            buildContext.Configuration.GetSection("MongoSetting:Default").Bind(options);
-        });
-        #endregion
+            #region Resource Monitor
+            services.AddScoped<ResourceReportServcie>();
+            services.AddScoped<TrafficMonitorInfoEventSubscriber>();
+            services.AddHostedService<ReportResourceServiceTask>();
+            services.AddMemoryBus();
+
+            services.RegisterMongo(options =>
+            {
+                buildContext.Configuration.GetSection("MongoSetting:Default").Bind(options);
+            });
+            #endregion
+        }
     }
 
     public const string BasePath = "/yaginx";
