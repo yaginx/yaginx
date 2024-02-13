@@ -205,50 +205,55 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
     public const string BasePath = "/yaginx";
     public RequestPiplineCollection Configure(RequestPiplineCollection piplineActions, AppBuildContext buildContext)
     {
+        var runningMode = RunningModes.RunningMode;
+
         piplineActions.Register("UseBasePath", RequestPiplineStage.BeforeRouting, app => app.UsePathBase(BasePath));
-        piplineActions.Register("TrafficMonitorMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<TrafficMonitorMiddleware>());
-        piplineActions.Register("DomainTrafficMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<DomainTrafficMiddleware>());
-        piplineActions.Register("ProcessDurationMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<TraceInfoHeaderOutputMiddleware>());
-        piplineActions.Register("RequestStatisticsMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<RequestStatisticsMiddleware>());
-        piplineActions.Register("MapDiagnositicRequest", RequestPiplineStage.BeforeRouting, app => app.MapDiagnositicRequest());
-        piplineActions.Register("DiagnositicMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<DiagnositicMiddleware>());
-
-        piplineActions.Register("Static Resource", RequestPiplineStage.BeforeRouting, app =>
+        if ((runningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
         {
-            app.UseDeveloperExceptionPage();
+            piplineActions.Register("TrafficMonitorMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<TrafficMonitorMiddleware>());
+            piplineActions.Register("DomainTrafficMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<DomainTrafficMiddleware>());
+            piplineActions.Register("ProcessDurationMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<TraceInfoHeaderOutputMiddleware>());
+            piplineActions.Register("RequestStatisticsMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<RequestStatisticsMiddleware>());
+            piplineActions.Register("MapDiagnositicRequest", RequestPiplineStage.BeforeRouting, app => app.MapDiagnositicRequest());
+            piplineActions.Register("DiagnositicMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<DiagnositicMiddleware>());
 
-            if (!buildContext.HostEnvironment.IsDevelopment())
+
+            piplineActions.Register("Static Resource", RequestPiplineStage.BeforeRouting, app =>
             {
-                app.UseResponseCompression();
-            }
+                app.UseDeveloperExceptionPage();
 
-            app.UseResponseCaching();
-
-            app.UseClientApp();
-
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                OnPrepareResponse = ctx =>
+                if (!buildContext.HostEnvironment.IsDevelopment())
                 {
-                    // Cache static files for 12 hours
-                    ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=31536000, immutable");
-                    ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddHours(12).ToString("R", CultureInfo.InvariantCulture));
+                    app.UseResponseCompression();
                 }
-            });
-        });
 
-        piplineActions.Register("OpenApi Docs", RequestPiplineStage.BeforeRouting, app =>
-        {
-            app.UseSwagger(optons =>
-            {
-                optons.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+                app.UseResponseCaching();
+
+                app.UseClientApp();
+
+                app.UseStaticFiles(new StaticFileOptions
                 {
-                    swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}{BasePath}" } };
+                    OnPrepareResponse = ctx =>
+                    {
+                        // Cache static files for 12 hours
+                        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=31536000, immutable");
+                        ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddHours(12).ToString("R", CultureInfo.InvariantCulture));
+                    }
                 });
             });
-            app.UseSwaggerUI();
-        });
 
+            piplineActions.Register("OpenApi Docs", RequestPiplineStage.BeforeRouting, app =>
+            {
+                app.UseSwagger(optons =>
+                {
+                    optons.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+                    {
+                        swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}{BasePath}" } };
+                    });
+                });
+                app.UseSwaggerUI();
+            });
+        }
         piplineActions.Register("HangfireDashboard", RequestPiplineStage.BeforeRouting, app =>
         {
             app.UseHangfireDashboard(options: new DashboardOptions()
@@ -269,7 +274,11 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
 
     public void ConfigureEndpoints(IEndpointRouteBuilder endpoints, AppBuildContext appBuildContext)
     {
-        endpoints.MapReverseProxy();
+        var runningMode = RunningModes.RunningMode;
+        if ((runningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
+        {
+            endpoints.MapReverseProxy();
+        }
         //endpoints.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}");
 
         endpoints.MapDefaultControllerRoute();

@@ -1,5 +1,4 @@
 ﻿using AgileLabs;
-using AgileLabs.WebApp.Hosting;
 using AgileLabs.WorkContexts.Extensions;
 using Hangfire;
 using Yaginx.DomainModels;
@@ -22,15 +21,7 @@ namespace Yaginx.HostedServices
 
         }
     }
-    public class HostServiceRegister : IServiceRegister
-    {
-        public int Order => 100;
 
-        public void ConfigureServices(IServiceCollection services, AppBuildContext buildContext)
-        {
-            services.AddHostedService<ScheduleHostedService>();
-        }
-    }
     internal class ScheduleHostedService : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
