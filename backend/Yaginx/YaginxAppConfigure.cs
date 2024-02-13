@@ -154,6 +154,7 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
             services.AddClientApp(options =>
             {
                 options.RootPath = "ClientApp";
+                options.PathBase = BasePath;
                 options.ClientApps.Add(ClientAppConfig.Create("/adminui", "AdminUI"));
                 options.ClientApps.Add(ClientAppConfig.Create("/helps", "HelpDocs"));
             });
@@ -216,6 +217,11 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
             piplineActions.Register("RequestStatisticsMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<RequestStatisticsMiddleware>());
             piplineActions.Register("MapDiagnositicRequest", RequestPiplineStage.BeforeRouting, app => app.MapDiagnositicRequest());
             piplineActions.Register("DiagnositicMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<DiagnositicMiddleware>());
+
+            piplineActions.Register("AutoRedirect", RequestPiplineStage.BeforeRouting, app =>
+            {
+
+            });
 
 
             piplineActions.Register("Static Resource", RequestPiplineStage.BeforeRouting, app =>
