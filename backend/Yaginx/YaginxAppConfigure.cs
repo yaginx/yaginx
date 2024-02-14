@@ -206,10 +206,8 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
     public const string BasePath = "/yaginx";
     public RequestPiplineCollection Configure(RequestPiplineCollection piplineActions, AppBuildContext buildContext)
     {
-        var runningMode = RunningModes.RunningMode;
-
         piplineActions.Register("UseBasePath", RequestPiplineStage.BeforeRouting, app => app.UsePathBase(BasePath));
-        if ((runningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
+        if ((RunningModes.RunningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
         {
             piplineActions.Register("TrafficMonitorMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<TrafficMonitorMiddleware>());
             piplineActions.Register("DomainTrafficMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<DomainTrafficMiddleware>());

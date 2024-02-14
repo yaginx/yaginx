@@ -66,7 +66,8 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
         {
             webHostBuilder.ConfigureKestrel(serverOptions =>
             {
-                serverOptions.Limits.MaxRequestBodySize = 500 * 1024 * 1024;//500M
+                //serverOptions.Limits.MaxRequestBodySize = 500 * 1024 * 1024;//500M
+                serverOptions.Limits.MaxRequestBodySize = null;                
                 serverOptions.Limits.MaxRequestBufferSize = 5 * 1024 * 1024;//5M
 
                 serverOptions.ListenAnyIP(8080, listenOptions =>
