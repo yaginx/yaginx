@@ -5,10 +5,6 @@ using LettuceEncrypt.Accounts;
 using LettuceEncrypt.Acme;
 using LettuceEncrypt.Internal;
 using LettuceEncrypt.Internal.PfxBuilder;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using KeyAlgorithm = LettuceEncrypt.KeyAlgorithm;
 
 namespace Yaginx.YaginxAcmeLoaders
@@ -20,8 +16,7 @@ namespace Yaginx.YaginxAcmeLoaders
         private readonly IHttpChallengeResponseStore _challengeStore;
         private readonly IAccountStore _accountRepository;
         private readonly ILogger _logger;
-        private readonly IHostApplicationLifetime _appLifetime;
-        private readonly YaginxTlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
+        private readonly IHostApplicationLifetime _appLifetime;        
         private readonly IDnsChallengeProvider _dnsChallengeProvider;
         private readonly ICertificateAuthorityConfiguration _certificateAuthority;
         private readonly IPfxBuilderFactory _pfxBuilderFactory;
@@ -35,7 +30,6 @@ namespace Yaginx.YaginxAcmeLoaders
             IHttpChallengeResponseStore challengeStore,
             ILogger<YaginxAcmeCertificateFactory> logger,
             IHostApplicationLifetime appLifetime,
-            YaginxTlsAlpnChallengeResponder tlsAlpnChallengeResponder,
             ICertificateAuthorityConfiguration certificateAuthority,
             IDnsChallengeProvider dnsChallengeProvider,
             IPfxBuilderFactory pfxBuilderFactory,
@@ -46,7 +40,6 @@ namespace Yaginx.YaginxAcmeLoaders
             _challengeStore = challengeStore;
             _logger = logger;
             _appLifetime = appLifetime;
-            _tlsAlpnChallengeResponder = tlsAlpnChallengeResponder;
             _dnsChallengeProvider = dnsChallengeProvider;
             _certificateAuthority = certificateAuthority;
             _pfxBuilderFactory = pfxBuilderFactory;
@@ -231,23 +224,23 @@ namespace Yaginx.YaginxAcmeLoaders
 
             var validators = new List<DomainOwnershipValidator>();
 
-            if (allowedChallengeTypes.HasFlag(ChallengeType.TlsAlpn01))
-            {
-                validators.Add(new YaginxTlsAlpn01DomainValidator(
-                    _tlsAlpnChallengeResponder, _appLifetime, _client, _logger, domainName));
-            }
+            //if (allowedChallengeTypes.HasFlag(ChallengeType.TlsAlpn01))
+            //{
+            //    validators.Add(new YaginxTlsAlpn01DomainValidator(
+            //        _tlsAlpnChallengeResponder, _appLifetime, _client, _logger, domainName));
+            //}
 
             if (allowedChallengeTypes.HasFlag(ChallengeType.Http01))
             {
-                validators.Add(new Http01DomainValidator(
+                validators.Add(new YaginxHttp01DomainValidator(
                     _challengeStore, _appLifetime, _client, _logger, domainName));
             }
 
-            if (allowedChallengeTypes.HasFlag(ChallengeType.Dns01))
-            {
-                validators.Add(new Dns01DomainValidator(
-                    _dnsChallengeProvider, _appLifetime, _client, _logger, domainName));
-            }
+            //if (allowedChallengeTypes.HasFlag(ChallengeType.Dns01))
+            //{
+            //    validators.Add(new Dns01DomainValidator(
+            //        _dnsChallengeProvider, _appLifetime, _client, _logger, domainName));
+            //}
 
             if (validators.Count == 0)
             {

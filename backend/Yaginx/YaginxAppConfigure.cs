@@ -15,6 +15,8 @@ using Hangfire;
 using Hangfire.Console;
 using Hangfire.MemoryStorage;
 using LettuceEncrypt;
+using LettuceEncrypt.Internal;
+using LettuceEncrypt.YaginxAcmeLoaders;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.WebEncoders;
@@ -173,9 +175,11 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
             services.AddScoped<YaginxAcmeCertificateFactory>()
                 .AddScoped<YaginxBeginCertificateCreationState>()
                 .AddScoped<YaginxServerStartupState>()
-                .AddScoped<YaginxTlsAlpnChallengeResponder>()
-                .AddScoped<YaginxTlsAlpn01DomainValidator>()
-                .AddScoped<YaginxCheckForRenewalState>();
+                .AddScoped<YaginxHttp01DomainValidator>()
+                //.AddScoped<YaginxTlsAlpnChallengeResponder>()
+                //.AddScoped<YaginxTlsAlpn01DomainValidator>()
+                .AddScoped<YaginxCheckForRenewalState>()
+                .AddSingleton<IHttpChallengeResponseStore, YaginxGlobalHttpChallengeResponseStore>();
 
             services.AddHostedService<YaginxAcmeCertificateLoader>();
             #endregion

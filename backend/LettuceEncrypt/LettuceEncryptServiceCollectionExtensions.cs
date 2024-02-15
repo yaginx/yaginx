@@ -59,7 +59,7 @@ public static class LettuceEncryptServiceCollectionExtensions
             //.AddSingleton<IHostedService, AcmeCertificateLoader>()
             .AddSingleton<AcmeCertificateFactory>()
             .AddSingleton<AcmeClientFactory>()
-            .AddSingleton<IHttpChallengeResponseStore, InMemoryHttpChallengeResponseStore>()
+            //.AddSingleton<IHttpChallengeResponseStore, InMemoryHttpChallengeResponseStore>()
             .AddSingleton<X509CertStore>()
             .AddSingleton<ICertificateSource>(x => x.GetRequiredService<X509CertStore>())
             .AddSingleton<ICertificateRepository>(x => x.GetRequiredService<X509CertStore>())

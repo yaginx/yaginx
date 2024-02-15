@@ -1,26 +1,9 @@
 ﻿using AgileLabs;
 using AgileLabs.WorkContexts.Extensions;
 using Hangfire;
-using Yaginx.DomainModels;
 
 namespace Yaginx.HostedServices
 {
-    public class CodeAutoGenerateService : IScoped
-    {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IWebDomainRepository _webDomainRepository;
-
-        public CodeAutoGenerateService(IServiceProvider serviceProvider, IWebDomainRepository webDomainRepository)
-        {
-            _serviceProvider = serviceProvider;
-            _webDomainRepository = webDomainRepository;
-        }
-
-        public async Task UserCodeGenerateAsync()
-        {
-
-        }
-    }
 
     internal class ScheduleHostedService : IHostedService, IDisposable
     {
