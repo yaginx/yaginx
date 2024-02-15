@@ -34,7 +34,7 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
 
         public void Update(WebDomain webDomain)
         {
-            _databaseRepository.Update(webDomain);
+            _databaseRepository.Update(webDomain.Id, webDomain);
         }
 
         public void UpdateDomainStatus(string domain, string message)

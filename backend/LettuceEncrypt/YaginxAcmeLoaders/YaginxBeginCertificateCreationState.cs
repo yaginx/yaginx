@@ -6,13 +6,13 @@ namespace Yaginx.YaginxAcmeLoaders
 {
     internal class YaginxBeginCertificateCreationState : AcmeState
     {
-        private readonly ILogger<ServerStartupState> _logger;
+        private readonly ILogger<YaginxServerStartupState> _logger;
         private readonly YaginxAcmeCertificateFactory _acmeCertificateFactory;
         private readonly CertificateSelector _selector;
         private readonly IEnumerable<ICertificateRepository> _certificateRepositories;
 
         public YaginxBeginCertificateCreationState(
-            AcmeStateMachineContext context, ILogger<ServerStartupState> logger,
+            AcmeStateMachineContext context, ILogger<YaginxServerStartupState> logger,
             YaginxAcmeCertificateFactory acmeCertificateFactory,
             CertificateSelector selector, IEnumerable<ICertificateRepository> certificateRepositories)
             : base(context)

@@ -27,7 +27,7 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
 
         public void Update(User user)
         {
-            _databaseRepository.Update(user);
+            _databaseRepository.Update(user.Id, user);
         }
     }
 }

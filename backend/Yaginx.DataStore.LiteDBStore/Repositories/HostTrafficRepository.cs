@@ -35,7 +35,7 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
                 old.InboundBytes += hostTraffic.InboundBytes;
                 old.OutboundBytes += hostTraffic.OutboundBytes;
                 old.RequestCounts += hostTraffic.RequestCounts;
-                _databaseRepository.Update(old);
+                _databaseRepository.Update(old.Id, old);
             }
         }
     }

@@ -54,7 +54,7 @@ namespace Yaginx.DataStore.LiteDBStore
             return DatabaseAction(db => db.GetCollection<T>(typeof(T).Name).FindById(id));
         }
 
-        public void Update<T>(T item) => DatabaseAction(db => db.GetCollection<T>(typeof(T).Name).Update(item));
+        public void Update<T>(BsonValue id, T item) => DatabaseAction(db => db.GetCollection<T>(typeof(T).Name).Update(id, item));
 
         public void Insert<T>(T item) => DatabaseAction(db => db.GetCollection<T>(typeof(T).Name).Insert(item));
         public void Insert<T>(List<T> items, int batchSize = 5000) => DatabaseAction(db => db.GetCollection<T>(typeof(T).Name).InsertBulk(items, batchSize));

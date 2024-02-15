@@ -85,6 +85,7 @@ namespace Yaginx.YaginxAcmeLoaders
                     }
                     catch (Exception ex)
                     {
+                        _domainRepsitory.UpdateDomainStatus(domain, ex.Message);
                         _logger.LogError(0, ex, "ACME state machine encountered unhandled error");
                     }
                 }

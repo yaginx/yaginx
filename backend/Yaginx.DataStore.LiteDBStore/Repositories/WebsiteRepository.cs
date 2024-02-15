@@ -33,7 +33,7 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
 
         public void Update(Website website)
         {
-            _databaseRepository.Update(website);
+            _databaseRepository.Update(website.Id, website);
         }
     }
 }
