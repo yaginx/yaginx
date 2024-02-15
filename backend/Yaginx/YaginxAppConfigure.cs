@@ -224,10 +224,10 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             piplineActions.Register("MapDiagnositicRequest", RequestPiplineStage.BeforeRouting, app => app.MapDiagnositicRequest());
             piplineActions.Register("DiagnositicMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<DiagnositicMiddleware>());
 
-            piplineActions.Register("AutoRedirect", RequestPiplineStage.BeforeRouting, app =>
-            {
+            //piplineActions.Register("AutoRedirect", RequestPiplineStage.BeforeRouting, app =>
+            //{
 
-            });
+            //});
 
 
             piplineActions.Register("Static Resource", RequestPiplineStage.BeforeRouting, app =>

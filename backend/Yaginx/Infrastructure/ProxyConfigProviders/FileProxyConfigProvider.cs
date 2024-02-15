@@ -53,25 +53,35 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
         {
             _config = new ProxyConfig();
 
-            var RuleConfigs = LoadDyamicRules();
-            _config.Routes.AddRange(RuleConfigs.Select(x => x.Item1));
-            _config.Clusters.AddRange(RuleConfigs.Select(x => x.Item2));
+            try
+            {
+                _Logger.LogInformation(0, "Start load ReverseProxy Config");
+                var RuleConfigs = LoadDyamicRules();
+                _config.Routes.AddRange(RuleConfigs.Select(x => x.Item1));
+                _config.Clusters.AddRange(RuleConfigs.Select(x => x.Item2));
 
-            var databaseConfigs = LoadDatabaseRules();
+                var databaseConfigs = LoadDatabaseRules().ToList();
 
-            _config.Routes.AddRange(databaseConfigs.Select(x => x.Item1));
-            _config.Clusters.AddRange(databaseConfigs.Select(x => x.Item2));
+                _config.Routes.AddRange(databaseConfigs.Select(x => x.Item1));
+                _config.Clusters.AddRange(databaseConfigs.Select(x => x.Item2));
 
-            CancellationTokenSource mOldChangeToken = _changeToken;
-            _changeToken = new CancellationTokenSource();
-            _config.ChangeToken = new CancellationChangeToken(_changeToken.Token);
-            mOldChangeToken?.Cancel(throwOnFirstException: false);
+                CancellationTokenSource mOldChangeToken = _changeToken;
+                _changeToken = new CancellationTokenSource();
+                _config.ChangeToken = new CancellationChangeToken(_changeToken.Token);
+                mOldChangeToken?.Cancel(throwOnFirstException: false);
+                _Logger.LogInformation(0, "Success load ReverseProxy Config");
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError(0, ex, "UpdateConfig Error");
+            }
+         
         }
 
         private IEnumerable<(RouteConfig, ClusterConfig)> LoadDyamicRules()
         {
-            var Rules = _proxyRuleRedisStorageService.GetRules().Result;
-            foreach (var rule in Rules)
+            var rules = _proxyRuleRedisStorageService.GetRules().Result;
+            foreach (var rule in rules)
             {
                 if (string.IsNullOrEmpty(rule.RequestPattern))
                     continue;

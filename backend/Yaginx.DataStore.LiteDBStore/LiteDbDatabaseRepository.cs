@@ -56,10 +56,10 @@ namespace Yaginx.DataStore.LiteDBStore
             return DatabaseActionAsync(db => db.GetCollection<T>(typeof(T).Name).FindByIdAsync(id));
         }
 
-        public Task<bool> UpdateAsync<T>(BsonValue id, T item) => DatabaseActionAsync(db => db.GetCollection<T>(typeof(T).Name).UpdateAsync(id, item));
+        public Task<bool> UpdateAsync<T>(BsonValue id, T item) => DatabaseActionAsync(db => db.GetCollection<T>(typeof(T).Name).UpdateAsync(id, item), OperationMode.Write);
 
-        public Task<BsonValue> InsertAsync<T>(T item) => DatabaseActionAsync(db => db.GetCollection<T>(typeof(T).Name).InsertAsync(item));
-        public Task<int> InsertAsync<T>(List<T> items, int batchSize = 5000) => DatabaseActionAsync(db => db.GetCollection<T>(typeof(T).Name).InsertBulkAsync(items, batchSize));
+        public Task<BsonValue> InsertAsync<T>(T item) => DatabaseActionAsync(db => db.GetCollection<T>(typeof(T).Name).InsertAsync(item), OperationMode.Write);
+        public Task<int> InsertAsync<T>(List<T> items, int batchSize = 5000) => DatabaseActionAsync(db => db.GetCollection<T>(typeof(T).Name).InsertBulkAsync(items, batchSize), OperationMode.Write);
 
         public Task DeleteAsync<T>(BsonValue id)
         {
@@ -68,7 +68,7 @@ namespace Yaginx.DataStore.LiteDBStore
                 throw new ArgumentNullException(nameof(id));
             }
 
-            return DatabaseActionAsync(db => db.GetCollection<T>(typeof(T).Name).DeleteAsync(id));
+            return DatabaseActionAsync(db => db.GetCollection<T>(typeof(T).Name).DeleteAsync(id), OperationMode.Write);
         }
         public Task DeleteAsync<T>(Expression<Func<T, bool>> predicate = null)
         {
@@ -77,15 +77,15 @@ namespace Yaginx.DataStore.LiteDBStore
                 throw new ArgumentNullException(nameof(predicate));
             }
 
-            return DatabaseActionAsync(db => db.GetCollection<T>(typeof(T).Name).DeleteManyAsync(predicate));
+            return DatabaseActionAsync(db => db.GetCollection<T>(typeof(T).Name).DeleteManyAsync(predicate), OperationMode.Write);
         }
         public Task<int> TruncateAsync<T>()
         {
-            return DatabaseActionAsync(db => db.GetCollection<T>(typeof(T).Name).DeleteAllAsync());
+            return DatabaseActionAsync(db => db.GetCollection<T>(typeof(T).Name).DeleteAllAsync(), OperationMode.Write);
         }
 
         #region Utils
-        private Task<TResult> DatabaseActionAsync<TResult>(Func<ILiteDatabaseAsync, Task<TResult>> action, OperationMode operationMode = OperationMode.Write)
+        private async Task<TResult> DatabaseActionAsync<TResult>(Func<ILiteDatabaseAsync, Task<TResult>> action, OperationMode operationMode = OperationMode.Read)
         {
             if (operationMode == OperationMode.Write)
             {
@@ -95,14 +95,14 @@ namespace Yaginx.DataStore.LiteDBStore
             var connectionString = new ConnectionString(_connString);
             connectionString.Connection = ConnectionType.Shared;
             using var database = new LiteDatabaseAsync(connectionString);
-            var result = action(database);
+            var result = await action(database);
             if (operationMode == OperationMode.Write)
             {
                 _writeLocker.Set();
             }
             return result;
         }
-        private Task DatabaseActionAsync(Func<ILiteDatabaseAsync, Task> action, OperationMode operationMode = OperationMode.Write) => DatabaseActionAsync(db => action(db), operationMode);
+        private Task DatabaseActionAsync(Func<ILiteDatabaseAsync, Task> action, OperationMode operationMode = OperationMode.Read) => DatabaseActionAsync(async db => await action(db), operationMode);
         #endregion
     }
 }
