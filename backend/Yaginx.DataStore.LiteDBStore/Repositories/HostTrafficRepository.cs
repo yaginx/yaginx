@@ -10,18 +10,18 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
         {
             _databaseRepository = databaseRepository;
         }
-        public async Task<List<HostTraffic>> Search()
+        public async Task<List<HostTraffic>> SearchAsync()
         {
             var result = await _databaseRepository.SearchAsync<HostTraffic>();
             return result.OrderByDescending(x => x.Period).ThenBy(x => x.HostName).ToList();
         }
 
-        public Task<List<HostTraffic>> Search(string hostName)
+        public Task<List<HostTraffic>> SearchAsync(string hostName)
         {
             throw new NotImplementedException();
         }
 
-        public async Task Upsert(HostTraffic hostTraffic)
+        public async Task UpsertAsync(HostTraffic hostTraffic)
         {
             var currentPeriod = TimePeriod.GetCurrentPeriod(SeqNoResetPeriod.Hourly, DateTime.UtcNow);
 

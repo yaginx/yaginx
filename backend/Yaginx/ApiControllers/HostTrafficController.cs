@@ -17,7 +17,7 @@ public class HostTrafficController : YaginxControllerBase
     [HttpGet, HttpPost, Route("search")]
     public async Task<List<HostTrafficListItem>> Search()
     {
-        var result = await _hostTrafficRepository.Search();
+        var result = await _hostTrafficRepository.SearchAsync();
         return _mapper.Map<List<HostTrafficListItem>>(result);
     }
 }

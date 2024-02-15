@@ -2,7 +2,7 @@
 
 public interface IHostTrafficRepository
 {
-    Task Upsert(HostTraffic hostTraffic);
-    Task<List<HostTraffic>> Search();
-    Task<List<HostTraffic>> Search(string hostName);
+    Task UpsertAsync(HostTraffic hostTraffic);
+    Task<List<HostTraffic>> SearchAsync();
+    Task<List<HostTraffic>> SearchAsync(string hostName);
 }
