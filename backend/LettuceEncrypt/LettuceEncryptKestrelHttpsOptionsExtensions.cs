@@ -53,12 +53,12 @@ public static class LettuceEncryptKestrelHttpsOptionsExtensions
         TlsAlpnChallengeResponder tlsAlpnChallengeResponder)
     {
         // Check if this handler is already set. If so, chain our handler before it.
-        var otherHandler = httpsOptions.OnAuthenticate;
-        httpsOptions.OnAuthenticate = (ctx, options) =>
-        {
-            tlsAlpnChallengeResponder.OnSslAuthenticate(ctx, options);
-            otherHandler?.Invoke(ctx, options);
-        };
+        //var otherHandler = httpsOptions.OnAuthenticate;
+        //httpsOptions.OnAuthenticate = (ctx, options) =>
+        //{
+        //    tlsAlpnChallengeResponder.OnSslAuthenticate(ctx, options);
+        //    otherHandler?.Invoke(ctx, options);
+        //};
 
         httpsOptions.UseServerCertificateSelector(selector);
         return httpsOptions;
