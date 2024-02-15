@@ -16,6 +16,8 @@ trigger:
 steps:
   - name: submodules
     commands:
+    - whoami
+    - hostname
     - git submodule update --init --recursive
   - name: build_backend
     commands:
