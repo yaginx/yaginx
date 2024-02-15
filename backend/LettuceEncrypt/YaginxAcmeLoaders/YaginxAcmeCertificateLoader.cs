@@ -80,6 +80,7 @@ namespace Yaginx.YaginxAcmeLoaders
                     }
                     catch (AggregateException ex) when (ex.InnerException != null)
                     {
+                        _domainRepsitory.UpdateDomainStatus(domain, ex.InnerException.Message);
                         _logger.LogError(0, ex.InnerException, "ACME state machine encountered unhandled error");
                     }
                     catch (Exception ex)

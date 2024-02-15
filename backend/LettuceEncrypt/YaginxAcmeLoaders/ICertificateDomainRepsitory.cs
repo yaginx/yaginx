@@ -3,5 +3,6 @@
     public interface ICertificateDomainRepsitory
     {
         IEnumerable<string> GetFreeCertDomain();
+        void UpdateDomainStatus(string domain, string message);
     }
 }

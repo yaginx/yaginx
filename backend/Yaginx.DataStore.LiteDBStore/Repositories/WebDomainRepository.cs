@@ -37,6 +37,14 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
             _databaseRepository.Update(webDomain);
         }
 
+        public void UpdateDomainStatus(string domain, string message)
+        {
+            var webDomain = GetByName(domain);
+            webDomain.IsUseFreeCert = false;
+            webDomain.FreeCertMessage = message;
+            Update(webDomain);
+        }
+
         IEnumerable<string> ICertificateDomainRepsitory.GetFreeCertDomain()
         {
             return _databaseRepository.Search<WebDomain>(x => x.IsUseFreeCert).Select(x => x.Name);

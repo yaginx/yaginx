@@ -9,6 +9,7 @@ public class WebDomain
     public string Name { get; set; }
     public bool IsUseFreeCert { get; set; }
     public bool IsVerified { get; set; }
+    public string FreeCertMessage { get; set; }
 }
 
 public interface IWebDomainRepository
