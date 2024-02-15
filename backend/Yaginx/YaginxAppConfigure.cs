@@ -40,8 +40,7 @@ using Yaginx.YaginxAcmeLoaders;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
 using Yarp.ReverseProxy.Transforms.Builder;
-
-public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEndpointConfig, IMvcOptionsConfig, IMvcBuildConfig
+public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEndpointConfig, IMvcOptionsConfig, IMvcBuildConfig
 {
     public int Order => 1;
     public void ConfigureServices(IServiceCollection services, AppBuildContext buildContext)
@@ -285,7 +284,7 @@ public class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEn
         var runningMode = RunningModes.RunningMode;
         if ((runningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
         {
-            endpoints.MapReverseProxy();
+            endpoints.MapReverseProxy(ReverseProxyBuilder.ProxyBuilder);
         }
         //endpoints.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}");
 
