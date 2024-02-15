@@ -19,12 +19,13 @@ steps:
     - whoami
     - hostname
     - git submodule update --init --recursive
-  - name: build_backend
+    
+  - name: backend
     commands:
       - docker run -t --rm -v /data/build_share/dotnet:/root/.dotnet -v /data/build_share/nuget:/root/.nuget -v `pwd`:/workdir
         --workdir /workdir cnhub.feinian.net/dotnet/sdk:8.0 bash -c "dotnet publish backend/Yaginx/Yaginx.csproj --runtime linux-x64 -c Release -o /workdir/publish"
 
-  - name: build portal app
+  - name: adminui
     commands:
       - export APP_NAME=yaginx
       - docker run --rm -v `pwd`/adminui:/workdir -v /data/build_share/pnpm_store:/pnpm_store --workdir /workdir
@@ -34,7 +35,7 @@ steps:
       - mkdir -p $ADMINUI_CLIENT_APP_FULLPATH
       - cp -R `pwd`/adminui/dist/* $ADMINUI_CLIENT_APP_FULLPATH        
 
-  - name: build docs site
+  - name: helpdocs
     commands:
       - docker run --rm -v `pwd`/yaginx-docs-site:/workdir --workdir /workdir -v /data/build_share/pnpm_store:/pnpm_store 
         cnhub.feinian.net/build/node:20-alpine /bin/sh -c "node --version && pnpm install --store=/pnpm_store && pnpm run build"
@@ -43,8 +44,11 @@ steps:
       - mkdir -p $DOCS_FULLPATH 
       - cp -r `pwd`/yaginx-docs-site/build/* $DOCS_FULLPATH
 
-
   - name: publish_full
+    depends_on:
+    - adminui
+    - helpdocs
+    - backend  
     environment:
       HUB_HOST: 
         from_secret: hub_host
