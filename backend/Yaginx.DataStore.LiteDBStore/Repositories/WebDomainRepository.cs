@@ -12,42 +12,48 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
             _databaseRepository = databaseRepository;
         }
 
-        public void Add(WebDomain webDomain)
+        public async Task AddAsync(WebDomain webDomain)
         {
-            _databaseRepository.Insert(webDomain);
+            await _databaseRepository.InsertAsync(webDomain);
         }
 
-        public WebDomain Get(long id)
+        public async Task DeleteAsync(long id)
         {
-            return _databaseRepository.Get<WebDomain>(id);
+            await _databaseRepository.DeleteAsync<WebDomain>(id);
         }
 
-        public WebDomain GetByName(string name)
+        public Task<WebDomain> GetAsync(long id)
         {
-            return _databaseRepository.Get<WebDomain>(x => x.Name == name);
+            return _databaseRepository.GetAsync<WebDomain>(id);
         }
 
-        public List<WebDomain> Search()
+        public Task<WebDomain> GetByNameAsync(string name)
         {
-            return _databaseRepository.Search<WebDomain>().ToList();
+            return _databaseRepository.GetAsync<WebDomain>(x => x.Name == name);
         }
 
-        public void Update(WebDomain webDomain)
+        public async Task<IEnumerable<WebDomain>> SearchAsync()
         {
-            _databaseRepository.Update(webDomain.Id, webDomain);
+            return await _databaseRepository.SearchAsync<WebDomain>();
         }
 
-        public void UpdateDomainStatus(string domain, string message)
+        public async Task UpdateAsync(WebDomain webDomain)
         {
-            var webDomain = GetByName(domain);
+            await _databaseRepository.UpdateAsync(webDomain.Id, webDomain);
+        }
+
+        public async Task UnFreeDomainAsync(string domain, string message)
+        {
+            var webDomain = await GetByNameAsync(domain);
             webDomain.IsUseFreeCert = false;
             webDomain.FreeCertMessage = message;
-            Update(webDomain);
+            await UpdateAsync(webDomain);
         }
 
-        IEnumerable<string> ICertificateDomainRepsitory.GetFreeCertDomain()
+        async Task<IEnumerable<string>> ICertificateDomainRepsitory.GetFreeCertDomainAsync()
         {
-            return _databaseRepository.Search<WebDomain>(x => x.IsUseFreeCert).Select(x => x.Name);
+            var result = await _databaseRepository.SearchAsync<WebDomain>(x => x.IsUseFreeCert);
+            return result.Select(x => x.Name);
         }
     }
 }

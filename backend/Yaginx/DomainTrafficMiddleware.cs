@@ -146,7 +146,7 @@ namespace Yaginx.Infrastructure
                     var trafficRepository = scope.WorkContext.ServiceProvider.GetRequiredService<IHostTrafficRepository>();
                     foreach (var item in lastPeriodData)
                     {
-                        trafficRepository.Upsert(new HostTraffic
+                       await trafficRepository.Upsert(new HostTraffic
                         {
                             Id = IdGenerator.NextId(),
                             HostName = item.Key,

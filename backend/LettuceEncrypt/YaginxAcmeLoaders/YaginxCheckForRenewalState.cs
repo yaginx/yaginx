@@ -1,9 +1,6 @@
-﻿using LettuceEncrypt;
-using LettuceEncrypt.Internal;
+﻿using LettuceEncrypt.Internal;
 using LettuceEncrypt.Internal.AcmeStates;
 using LettuceEncrypt.Internal.IO;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Yaginx.YaginxAcmeLoaders
 {
@@ -26,6 +23,7 @@ namespace Yaginx.YaginxAcmeLoaders
 
         public override async Task<IAcmeState> MoveNextAsync(CancellationToken cancellationToken)
         {
+            await Task.CompletedTask;
             if (!cancellationToken.IsCancellationRequested)
             {
                 var checkPeriod = Context.RenewalCheckPeriod;
@@ -37,7 +35,7 @@ namespace Yaginx.YaginxAcmeLoaders
                     return MoveTo<TerminalState>();
                 }
 
-                var domainNames = new string[] { Context.CurrentDomain };
+                var domainNames = new string[] { Context.CurrentDomain! };
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug("Checking certificates' renewals for {hostname}",

@@ -16,7 +16,7 @@ namespace Yaginx.HostedServices
 
         public async Task UserCodeGenerateAsync()
         {
-
+            await Task.CompletedTask;
         }
     }
 }

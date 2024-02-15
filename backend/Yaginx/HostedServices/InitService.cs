@@ -16,8 +16,8 @@ namespace Yaginx.HostedServices
         }
         internal async Task Init()
         {
-            var userCount = _userRepository.Count();
-            if (userCount <1)
+            var userCount = await _userRepository.CountAsync();
+            if (userCount < 1)
             {
                 var userInfo = new User
                 {
@@ -27,7 +27,7 @@ namespace Yaginx.HostedServices
                     PasswordSalt = _encryptionService.CreateSaltKey(16)
                 };
                 userInfo.PasswordHash = _encryptionService.CreatePasswordHash(userInfo.Password, userInfo.PasswordSalt, "SHA256");
-                _userRepository.Add(userInfo);
+                await _userRepository.AddAsync(userInfo);
                 await Task.CompletedTask;
             }
         }

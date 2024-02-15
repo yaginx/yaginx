@@ -25,8 +25,8 @@ namespace Yaginx.YaginxAcmeLoaders
 
         public override async Task<IAcmeState> MoveNextAsync(CancellationToken cancellationToken)
         {
-            var domainNames = new string[] { Context.CurrentDomain };
-            var accountEmailAddress = Context.EmailAddress;
+            var domainNames = new string[] { Context.CurrentDomain! };
+            var accountEmailAddress = Context.EmailAddress!;
             try
             {
                 var account = await _acmeCertificateFactory.GetOrCreateAccountAsync(accountEmailAddress, cancellationToken);

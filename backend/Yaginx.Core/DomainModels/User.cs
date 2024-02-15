@@ -8,11 +8,3 @@ public class User
     public string PasswordHash { get; set; }
     public string PasswordSalt { get; set; }
 }
-
-public interface IUserRepository
-{
-    int Count();
-    User GetByEmail(string email);
-    void Add(User user);
-    void Update(User user);
-}

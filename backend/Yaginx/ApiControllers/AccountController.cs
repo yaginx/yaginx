@@ -52,7 +52,7 @@ public class AccountController : YaginxControllerBase
     public async Task<LoginResult> Login([FromBody] LoginRequest request, [FromServices] IWorkContextCore workContext)
     {
         using var activity = _activitySource.StartActivity("Login");
-        var userInfo = _userRepository.GetByEmail(request.Email);
+        var userInfo = await _userRepository.GetByEmailAsync(request.Email);
         if (userInfo == null)
         {
             throw new Exception("账户不存在");
@@ -63,7 +63,7 @@ public class AccountController : YaginxControllerBase
             // 如果未设置密码, 直接使用当前的密码
             userInfo.PasswordSalt = _encryptionService.CreateSaltKey(16);
             userInfo.PasswordHash = _encryptionService.CreatePasswordHash(request.Password, userInfo.PasswordSalt, "SHA256");
-            _userRepository.Update(userInfo);
+            await _userRepository.UpdateAsync(userInfo);
         }
 
         string pwd = _encryptionService.CreatePasswordHash(request.Password, userInfo.PasswordSalt, "SHA256");
@@ -110,7 +110,7 @@ public class AccountController : YaginxControllerBase
     [HttpPost, Route("register"), Authorize]
     public async Task Register([FromBody] UserCreateRequest request)
     {
-        var userInfo = _userRepository.GetByEmail(request.Email);
+        var userInfo = await _userRepository.GetByEmailAsync(request.Email);
         if (userInfo != null)
         {
             throw new Exception("账户已存在");
@@ -124,7 +124,7 @@ public class AccountController : YaginxControllerBase
             PasswordSalt = _encryptionService.CreateSaltKey(16)
         };
         userInfo.PasswordHash = _encryptionService.CreatePasswordHash(request.Password, userInfo.PasswordSalt, "SHA256");
-        _userRepository.Add(userInfo);
+        await _userRepository.AddAsync(userInfo);
         await Task.CompletedTask;
     }
 

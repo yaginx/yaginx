@@ -14,15 +14,10 @@ namespace Yaginx.ApiControllers;
 public class ResourceReportController : YaginxControllerBase
 {
     private readonly IResourceReportRepository _resourceReportRepository;
-    private readonly IMapper _mapper;
 
-    public ResourceReportController(
-        IResourceReportRepository resourceReportRepository,
-        IMapper mapper
-        )
+    public ResourceReportController(IResourceReportRepository resourceReportRepository)
     {
         _resourceReportRepository = resourceReportRepository;
-        _mapper = mapper;
     }
 
     [HttpPost, Route("search")]
@@ -92,10 +87,6 @@ public class ResourceReportController : YaginxControllerBase
             case ReportCycleType.Daily:
                 nowTime = nowTime.Date;
                 requestData.BeginTime = nowTime.AddDays(-period).GetEpochSeconds();
-                break;
-            case ReportCycleType.Weekly:
-                throw new Exception("暂不支持");
-                //requestData.BeginTime = nowTime.AddWeeks(-period).GetEpochSeconds();
                 break;
             default:
                 break;

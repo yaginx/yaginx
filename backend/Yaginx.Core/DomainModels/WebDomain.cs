@@ -1,4 +1,6 @@
-﻿namespace Yaginx.DomainModels;
+﻿using System.Threading.Tasks;
+
+namespace Yaginx.DomainModels;
 
 /// <summary>
 /// 网站域名
@@ -10,13 +12,4 @@ public class WebDomain
     public bool IsUseFreeCert { get; set; }
     public bool IsVerified { get; set; }
     public string FreeCertMessage { get; set; }
-}
-
-public interface IWebDomainRepository
-{
-    List<WebDomain> Search();
-    void Add(WebDomain webDomain);
-    void Update(WebDomain webDomain);
-    WebDomain Get(long id);
-    WebDomain GetByName(string name);
 }

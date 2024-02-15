@@ -20,19 +20,19 @@ public class WebsiteController : YaginxControllerBase
     [HttpPost, Route("upsert")]
     public async Task<Website> Add([FromBody] WebsiteUpsertRequest request)
     {
-        Website returnValue = null;
+        Website returnValue;
         if (!request.Id.HasValue)
         {
             var site = _mapper.Map<Website>(request);
             site.Id = IdGenerator.NextId();
             site.CreateTime = DateTime.Now;
             site.UpdateTime = DateTime.Now;
-            _websiteRepository.Add(site);
+            await _websiteRepository.AddAsync(site);
             returnValue = site;
         }
         else
         {
-            var oldSite = _websiteRepository.Get(request.Id.Value);
+            var oldSite = await _websiteRepository.GetAsync(request.Id.Value);
             if (oldSite == null)
             {
                 throw new Exception($"Site #{request.Id} not exist");
@@ -41,7 +41,7 @@ public class WebsiteController : YaginxControllerBase
             _mapper.Map(request, oldSite);
 
             oldSite.UpdateTime = DateTime.Now;
-            _websiteRepository.Update(oldSite);
+            await _websiteRepository.UpdateAsync(oldSite);
             returnValue = oldSite;
         }
         await Task.CompletedTask;
@@ -49,24 +49,31 @@ public class WebsiteController : YaginxControllerBase
         return returnValue;
     }
 
+    [HttpDelete, Route("delete")]
+    public async Task Delete(long id)
+    {
+        await _websiteRepository.DeleteAsync(id);
+    }
+
     [HttpGet, HttpPost, Route("search")]
     public async Task<List<Website>> Search()
     {
         await Task.CompletedTask;
-        return _websiteRepository.Search();
+        var result = await _websiteRepository.SearchAsync();
+        return result.ToList();
     }
 
     [HttpGet, Route("get")]
     public async Task<Website> Get(long id)
     {
         await Task.CompletedTask;
-        return _websiteRepository.Get(id);
+        return await _websiteRepository.GetAsync(id);
     }
 
     [HttpGet, Route("get_by_name")]
     public async Task<Website> Get(string name)
     {
         await Task.CompletedTask;
-        return _websiteRepository.GetByName(name);
+        return await _websiteRepository.GetByNameAsync(name);
     }
 }

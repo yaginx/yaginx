@@ -11,29 +11,34 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
             _databaseRepository = databaseRepository;
         }
 
-        public void Add(Website website)
+        public async Task AddAsync(Website website)
         {
-            _databaseRepository.Insert(website);
+            await _databaseRepository.InsertAsync(website);
         }
 
-        public Website Get(long id)
+        public async Task DeleteAsync(long id)
         {
-            return _databaseRepository.Get<Website>(id);
+            await _databaseRepository.DeleteAsync<Website>(id);
         }
 
-        public Website GetByName(string name)
+        public Task<Website> GetAsync(long id)
         {
-            return _databaseRepository.Get<Website>(x => x.Name == name);
+            return _databaseRepository.GetAsync<Website>(id);
         }
 
-        public List<Website> Search()
+        public async Task<Website> GetByNameAsync(string name)
         {
-            return _databaseRepository.Search<Website>().ToList();
+            return await _databaseRepository.GetAsync<Website>(x => x.Name == name);
         }
 
-        public void Update(Website website)
+        public Task<IEnumerable<Website>> SearchAsync()
         {
-            _databaseRepository.Update(website.Id, website);
+            return _databaseRepository.SearchAsync<Website>();
+        }
+
+        public async Task UpdateAsync(Website website)
+        {
+            await _databaseRepository.UpdateAsync(website.Id, website);
         }
     }
 }

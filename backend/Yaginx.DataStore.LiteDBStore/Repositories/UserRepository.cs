@@ -10,24 +10,25 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
         {
             _databaseRepository = databaseRepository;
         }
-        public void Add(User user)
+        public async Task AddAsync(User user)
         {
-            _databaseRepository.Insert(user);
+            await _databaseRepository.InsertAsync(user);
         }
 
-        public int Count()
+        public async Task<int> CountAsync()
         {
-            return _databaseRepository.Search<User>().Count();
+            var result = await _databaseRepository.SearchAsync<User>();
+            return result.Count();
         }
 
-        public User GetByEmail(string email)
+        public async Task<User> GetByEmailAsync(string email)
         {
-            return _databaseRepository.Get<User>(x => x.Email == email);
+            return await _databaseRepository.GetAsync<User>(x => x.Email == email);
         }
 
-        public void Update(User user)
+        public async Task UpdateAsync(User user)
         {
-            _databaseRepository.Update(user.Id, user);
+            await _databaseRepository.UpdateAsync(user.Id, user);
         }
     }
 }

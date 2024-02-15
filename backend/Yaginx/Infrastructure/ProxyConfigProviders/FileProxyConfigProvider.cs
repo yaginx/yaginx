@@ -87,7 +87,7 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
 
         private IEnumerable<(RouteConfig, ClusterConfig)> LoadDatabaseRules()
         {
-            var websites = _websiteRepository.Search();
+            var websites = _websiteRepository.SearchAsync().Result;
             foreach (var website in websites)
             {
                 if (string.IsNullOrEmpty(website.DefaultHost) || string.IsNullOrEmpty(website.DefaultDestination))

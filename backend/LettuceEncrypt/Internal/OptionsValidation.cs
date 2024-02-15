@@ -8,7 +8,7 @@ namespace LettuceEncrypt.Internal;
 
 internal class OptionsValidation : IValidateOptions<LettuceEncryptOptions>
 {
-    public ValidateOptionsResult Validate(string name, LettuceEncryptOptions options)
+    public ValidateOptionsResult Validate(string? name, LettuceEncryptOptions options)
     {
         if (options.AllowedChallengeTypes == ChallengeType.Dns01)
             return ValidateOptionsResult.Success;

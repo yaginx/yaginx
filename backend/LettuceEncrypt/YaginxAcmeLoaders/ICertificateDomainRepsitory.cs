@@ -2,7 +2,7 @@
 {
     public interface ICertificateDomainRepsitory
     {
-        IEnumerable<string> GetFreeCertDomain();
-        void UpdateDomainStatus(string domain, string message);
+        Task<IEnumerable<string>> GetFreeCertDomainAsync();
+        Task UnFreeDomainAsync(string domain, string message);
     }
 }
