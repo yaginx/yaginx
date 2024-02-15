@@ -204,6 +204,11 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             });
             #endregion
         }
+
+        services.Configure((Action<MonitorInterafceOption>)(options =>
+        {
+            options.MatchPattern = buildContext.Configuration.GetSection("MonitorInterfacePattern").Value;
+        }));
     }
 
     public const string BasePath = "/yaginx";
