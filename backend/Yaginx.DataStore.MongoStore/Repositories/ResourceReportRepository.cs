@@ -17,7 +17,7 @@ namespace Yaginx.DataStore.MongoStore.Repositories
             _mapper = mapper;
         }
 
-        public async Task<List<ResourceReportModel>> Search(ReportSearchRequest request)
+        public async Task<List<ResourceReportModel>> SearchAsync(ReportSearchRequest request)
         {
             var filterBuilder = Builders<ResourceReportEntity>.Filter;
             var filter = filterBuilder.Empty;

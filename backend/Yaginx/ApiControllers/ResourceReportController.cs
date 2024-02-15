@@ -23,7 +23,7 @@ public class ResourceReportController : YaginxControllerBase
     [HttpPost, Route("search")]
     public async Task<List<ResourceReportModel>> ReportSearch([FromBody] ReportSearchRequest request)
     {
-        return await _resourceReportRepository.Search(request);
+        return await _resourceReportRepository.SearchAsync(request);
     }
 
     ///// <summary>
@@ -93,7 +93,7 @@ public class ResourceReportController : YaginxControllerBase
         }
         requestData.EndTime = nowTime.GetEpochSeconds();
 
-        var result = await _resourceReportRepository.Search(requestData);
+        var result = await _resourceReportRepository.SearchAsync(requestData);
 
         var combinedResult = result.GroupBy(x => new { x.ReportTime }).Select(n => new ResourceReportModel
         {
@@ -155,7 +155,7 @@ public class ResourceReportController : YaginxControllerBase
         requestData.EndTime = DateTime.Now.GetEpochSeconds();
         requestData.BeginTime = DateTime.Now.AddDays(-90).GetEpochSeconds();
 
-        var result = await _resourceReportRepository.Search(requestData);
+        var result = await _resourceReportRepository.SearchAsync(requestData);
         var xAxis = result.Select(x => x.ReportTime).Distinct().OrderBy(x => x).ToList();
 
         //var series = new List<Tuple<string, List<long>>>();

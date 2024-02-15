@@ -44,7 +44,6 @@ public class WebsiteController : YaginxControllerBase
             await _websiteRepository.UpdateAsync(oldSite);
             returnValue = oldSite;
         }
-        await Task.CompletedTask;
         _proxyRuleChangeNotifyService.ProxyRuleConfigChanged();
         return returnValue;
     }
@@ -58,7 +57,6 @@ public class WebsiteController : YaginxControllerBase
     [HttpGet, HttpPost, Route("search")]
     public async Task<List<Website>> Search()
     {
-        await Task.CompletedTask;
         var result = await _websiteRepository.SearchAsync();
         return result.ToList();
     }
@@ -66,14 +64,12 @@ public class WebsiteController : YaginxControllerBase
     [HttpGet, Route("get")]
     public async Task<Website> Get(long id)
     {
-        await Task.CompletedTask;
         return await _websiteRepository.GetAsync(id);
     }
 
     [HttpGet, Route("get_by_name")]
     public async Task<Website> Get(string name)
     {
-        await Task.CompletedTask;
         return await _websiteRepository.GetByNameAsync(name);
     }
 }

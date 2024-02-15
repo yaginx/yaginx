@@ -1,5 +1,4 @@
-﻿using LettuceEncrypt.Internal;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Yaginx.DomainModels;
 using Yaginx.Models.WebDomainModels;
 
@@ -19,18 +18,20 @@ public class WebDomainController : YaginxControllerBase
     public async Task<WebDomain> Upsert([FromBody] WebDomain webDomain)
     {
         webDomain.Name = webDomain.Name.ToLower();
-        var oldDomain = _webDomainRepository.GetByNameAsync(webDomain.Name);
+        var oldDomain = await _webDomainRepository.GetByNameAsync(webDomain.Name);
         if (oldDomain == null)
         {
             webDomain.Id = IdGenerator.NextId();
             await _webDomainRepository.AddAsync(webDomain);
+            return webDomain;
         }
         else
         {
-            await _webDomainRepository.UpdateAsync(webDomain);
+            oldDomain.IsUseFreeCert = webDomain.IsUseFreeCert;
+            oldDomain.IsVerified = webDomain.IsVerified;
+            await _webDomainRepository.UpdateAsync(oldDomain);
+            return oldDomain;
         }
-        await Task.CompletedTask;
-        return webDomain;
     }
 
     [HttpDelete, Route("delete")]
@@ -50,14 +51,14 @@ public class WebDomainController : YaginxControllerBase
     [HttpGet, Route("get")]
     public async Task<WebDomainListItem> Get(long id)
     {
-        await Task.CompletedTask;
-        return _mapper.Map<WebDomainListItem>(_webDomainRepository.GetAsync(id));
+        var result = await _webDomainRepository.GetAsync(id);
+        return _mapper.Map<WebDomainListItem>(result);
     }
 
     [HttpGet, Route("get_by_name")]
     public async Task<WebDomainListItem> Get(string name)
     {
-        await Task.CompletedTask;
-        return _mapper.Map<WebDomainListItem>(_webDomainRepository.GetByNameAsync(name));
+        var result = await _webDomainRepository.GetByNameAsync(name);
+        return _mapper.Map<WebDomainListItem>(result);
     }
 }

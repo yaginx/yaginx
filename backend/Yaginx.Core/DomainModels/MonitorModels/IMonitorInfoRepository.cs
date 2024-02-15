@@ -6,5 +6,5 @@ public interface IMonitorInfoRepository
 }
 public interface IResourceReportRepository
 {
-    Task<List<ResourceReportModel>> Search(ReportSearchRequest reportSearchRequest);
+    Task<List<ResourceReportModel>> SearchAsync(ReportSearchRequest reportSearchRequest);
 }
