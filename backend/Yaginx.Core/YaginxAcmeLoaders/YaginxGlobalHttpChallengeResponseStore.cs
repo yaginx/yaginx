@@ -2,7 +2,6 @@
 using AgileLabs.ApiClients;
 using LettuceEncrypt.Internal;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
 using System.Web;
 
 namespace LettuceEncrypt.YaginxAcmeLoaders
@@ -23,7 +22,15 @@ namespace LettuceEncrypt.YaginxAcmeLoaders
 
         public bool TryGetResponse(string token, out string? value)
         {
-            value = GetAsync<string>($"/api/key_value/get?key={HttpUtility.UrlEncode(token)}").Result;
+            var result = GetAsync<EnvelopMessage<string>>($"/api/key_value/get?key={HttpUtility.UrlEncode(token)}").Result;
+            if (result.Code == 200)
+            {
+                value = result.Data;
+            }
+            else
+            {
+                value = string.Empty;
+            }
             return value.IsNotNullOrWhitespace();
         }
 

@@ -20,6 +20,9 @@ namespace Yaginx.YaginxAcmeLoaders
 
         public override IAcmeState MoveNext()
         {
+            if (string.IsNullOrEmpty(Context.CurrentDomain))
+                return MoveTo<TerminalState>();
+
             if (_selector.HasCertForDomain(Context.CurrentDomain))
             {
                 _logger.LogDebug("Certificate for {domainNames} already found.", Context.CurrentDomain);
@@ -28,5 +31,5 @@ namespace Yaginx.YaginxAcmeLoaders
 
             return MoveTo<YaginxBeginCertificateCreationState>();
         }
-    }    
+    }
 }
