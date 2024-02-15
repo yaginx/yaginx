@@ -30,6 +30,7 @@ export async function FetchJson({
   // process data
   switch (method) {
     case "POST":
+    case "PUT":
       if (!data) {
         data = {};
       }

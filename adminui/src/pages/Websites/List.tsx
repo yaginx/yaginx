@@ -4,7 +4,7 @@ import { Space, Button } from "antd"
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import TableList from "@/componets/TableList"
-import { websiteSearch } from "@/api/docker"
+import { websiteDelete, websiteSearch } from "@/api/docker"
 
 const List: React.FC = (props) => {
   const pkFieldName = "id";
@@ -17,6 +17,7 @@ const List: React.FC = (props) => {
     var tempItems: TableOperationMenuItem[] = [];
     // tempItems.push({ commandKey: "detail", commandLabel: "查看" });
     tempItems.push({ commandKey: "edit", commandLabel: "编辑" });
+    tempItems.push({ commandKey: "delete", commandLabel: "删除" });
     return tempItems;
   }
   const onTableMenuClick = (commandKey: string, record: any) => {
@@ -27,6 +28,9 @@ const List: React.FC = (props) => {
       //   break;
       case "edit":
         navigate(`../edit/${pkValue}`);
+        break;
+      case "delete":
+        websiteDelete({ id: pkValue });
         break;
       default:
         break;

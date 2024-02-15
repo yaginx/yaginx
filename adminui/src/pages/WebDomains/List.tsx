@@ -3,7 +3,7 @@ import { PageHeader } from "@ant-design/pro-components"
 import { Space, Button } from "antd"
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { webDomainSearch, websiteSearch } from "@/api/docker"
+import { webDomainDelete, webDomainSearch, websiteSearch } from "@/api/docker"
 import TableList from "@/componets/TableList"
 import { renderTableItem } from "@/componets/ModelCrudViews/renderTableItem"
 
@@ -18,6 +18,7 @@ const List: React.FC = (props) => {
     var tempItems: TableOperationMenuItem[] = [];
     // tempItems.push({ commandKey: "detail", commandLabel: "查看" });
     tempItems.push({ commandKey: "edit", commandLabel: "编辑" });
+    tempItems.push({ commandKey: "delete", commandLabel: "删除" });
     return tempItems;
   }
   const onTableMenuClick = (commandKey: string, record: any) => {
@@ -28,6 +29,9 @@ const List: React.FC = (props) => {
       //   break;
       case "edit":
         navigate(`../edit/${pkValue}`);
+        break;
+      case "delete":
+        webDomainDelete({ id: pkValue });
         break;
       default:
         break;
