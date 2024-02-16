@@ -36,8 +36,8 @@ namespace LettuceEncrypt.YaginxAcmeLoaders
 
         protected override HttpClient CreateHttpClient()
         {
-            var httpClient = httpClientFactory.CreateClient();
-            httpClient.BaseAddress = new Uri("https://api.niusys.com");
+            var httpClient = httpClientFactory.CreateClient();            
+            httpClient.BaseAddress = new Uri("http://api.niusys.com");
             return httpClient;
         }
     }
