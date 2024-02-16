@@ -5,15 +5,21 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace LettuceEncrypt.Internal.AcmeStates;
 
+internal enum AcmeStateContinueStatus
+{
+    Continue,
+    End
+}
 internal interface IAcmeState
 {
+    AcmeStateContinueStatus ContinueState { get; }
     Task<IAcmeState> MoveNextAsync(CancellationToken cancellationToken);
 }
 
 internal class TerminalState : IAcmeState
 {
     public static TerminalState Singleton { get; } = new();
-
+    public AcmeStateContinueStatus ContinueState => AcmeStateContinueStatus.End;
     private TerminalState() { }
 
     public Task<IAcmeState> MoveNextAsync(CancellationToken cancellationToken)
@@ -25,6 +31,7 @@ internal class TerminalState : IAcmeState
 internal abstract class AcmeState : IAcmeState
 {
     public AcmeStateMachineContext Context { get; }
+    public AcmeStateContinueStatus ContinueState => AcmeStateContinueStatus.Continue;
 
     public AcmeState(AcmeStateMachineContext context)
     {

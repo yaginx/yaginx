@@ -10,10 +10,7 @@ using LettuceEncrypt.Internal.PfxBuilder;
 using McMaster.AspNetCore.Kestrel.Certificates;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -71,7 +68,16 @@ public static class LettuceEncryptServiceCollectionExtensions
         services.AddSingleton<IConfigureOptions<LettuceEncryptOptions>>(s =>
         {
             var config = s.GetService<IConfiguration?>();
-            return new ConfigureOptions<LettuceEncryptOptions>(options => config?.Bind("LettuceEncrypt", options));
+            return new ConfigureOptions<LettuceEncryptOptions>(options =>
+            {
+                config?.Bind("LettuceEncrypt", options);
+                if (string.IsNullOrEmpty(options.EmailAddress))
+                {
+                    options.EmailAddress = "duke@feinian.net";
+                }
+
+                options.AcceptTermsOfService = true;
+            });
         });
 
         services.Configure(configure);

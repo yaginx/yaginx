@@ -68,6 +68,11 @@ namespace Yaginx.YaginxAcmeLoaders
 
                         while (!stoppingToken.IsCancellationRequested)
                         {
+                            if (state.ContinueState == AcmeStateContinueStatus.Continue)
+                            {
+                                _logger.LogInformation($"Apply cert SUCCESS for domain {domain}!");
+                                break;
+                            }
                             _logger.LogTrace("ACME state transition: moving to {stateName}", state.GetType().Name);
                             state = await state.MoveNextAsync(stoppingToken);
                         }

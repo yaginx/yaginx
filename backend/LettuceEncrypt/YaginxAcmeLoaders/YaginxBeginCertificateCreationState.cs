@@ -49,17 +49,14 @@ namespace Yaginx.YaginxAcmeLoaders
                 throw;
             }
 
-            return MoveTo<CheckForRenewalState>();
+            return MoveTo<YaginxCheckForRenewalState>();
         }
 
         private async Task SaveCertificateAsync(X509Certificate2 cert, CancellationToken cancellationToken)
         {
             _selector.Add(cert);
 
-            var saveTasks = new List<Task>
-        {
-            Task.Delay(TimeSpan.FromMinutes(5), cancellationToken)
-        };
+            var saveTasks = new List<Task>();
 
             var errors = new List<Exception>();
             foreach (var repo in _certificateRepositories)
