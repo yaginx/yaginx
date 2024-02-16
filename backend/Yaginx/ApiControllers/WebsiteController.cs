@@ -55,21 +55,23 @@ public class WebsiteController : YaginxControllerBase
     }
 
     [HttpGet, HttpPost, Route("search")]
-    public async Task<List<Website>> Search()
+    public async Task<List<WebsiteListItem>> Search()
     {
         var result = await _websiteRepository.SearchAsync();
-        return result.ToList();
+        return _mapper.Map<List<WebsiteListItem>>(result);
     }
 
     [HttpGet, Route("get")]
-    public async Task<Website> Get(long id)
+    public async Task<WebsiteListItem> Get(long id)
     {
-        return await _websiteRepository.GetAsync(id);
+        var entity = await _websiteRepository.GetAsync(id);
+        return _mapper.Map<WebsiteListItem>(entity);
     }
 
     [HttpGet, Route("get_by_name")]
-    public async Task<Website> Get(string name)
+    public async Task<WebsiteListItem> Get(string name)
     {
-        return await _websiteRepository.GetByNameAsync(name);
+        var entity = await _websiteRepository.GetByNameAsync(name);
+        return _mapper.Map<WebsiteListItem>(entity);
     }
 }

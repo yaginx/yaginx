@@ -56,7 +56,7 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
             try
             {
                 _Logger.LogInformation(0, "Start load ReverseProxy Config");
-                var RuleConfigs = LoadDyamicRules();
+                var RuleConfigs = LoadRedisDyamicRules();
                 _config.Routes.AddRange(RuleConfigs.Select(x => x.Item1));
                 _config.Clusters.AddRange(RuleConfigs.Select(x => x.Item2));
 
@@ -75,10 +75,10 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
             {
                 _Logger.LogError(0, ex, "UpdateConfig Error");
             }
-         
+
         }
 
-        private IEnumerable<(RouteConfig, ClusterConfig)> LoadDyamicRules()
+        private IEnumerable<(RouteConfig, ClusterConfig)> LoadRedisDyamicRules()
         {
             var rules = _proxyRuleRedisStorageService.GetRules().Result;
             foreach (var rule in rules)
@@ -92,6 +92,36 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                 string mId = rule.RequestPattern.ToLower();
                 var dicClusters = rule.Clusters.Select(x => new KeyValuePair<string, string>($"{mId}_{x.Key}", x.Value)).ToDictionary(key => key.Key, value => value.Value);
                 yield return BuildRouteAndClusterConfig(mId, rule.RequestPattern, dicClusters);
+            }
+
+            (RouteConfig, ClusterConfig) BuildRouteAndClusterConfig(string mId, string requestPattern, Dictionary<string, string> clusters)
+            {
+                RouteConfig routeConfig = new RouteConfig()
+                {
+                    RouteId = mId,
+                    ClusterId = mId,
+                    Match = new RouteMatch
+                    {
+                        Path = $"/{requestPattern}/{{**remainder}}"
+                    }
+                }.WithTransformUseOriginalHostHeader(useOriginal: false);
+
+
+                Dictionary<string, DestinationConfig> mDestinationConfigs = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase);
+                foreach (var item in clusters)
+                {
+                    mDestinationConfigs.Add(item.Key, new DestinationConfig { Address = item.Value });
+                }
+
+                var clusterConfig = new ClusterConfig()
+                {
+                    ClusterId = mId,
+                    LoadBalancingPolicy = "PowerOfTwoChoices",
+                    HttpRequest = new Yarp.ReverseProxy.Forwarder.ForwarderRequestConfig { ActivityTimeout = new TimeSpan(0, 0, 15, 0, 0) },
+                    Destinations = mDestinationConfigs,
+                    //HttpClient = new HttpClientConfig { WebProxy = new WebProxyConfig() { Address = new Uri("http://localhost:8888") } }
+                };
+                return (routeConfig, clusterConfig);
             }
         }
 
@@ -124,6 +154,7 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
 
                 if (website.ProxyRules.Any())
                 {
+                    // 加载自定义的Rules
                     foreach (var proxyRule in website.ProxyRules)
                     {
                         var routeId = $"router_{websiteId}_{proxyRule.PathPattern.ToLower()}";
@@ -159,6 +190,7 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                 }
                 else
                 {
+                    // 加载默认的配置
                     var routeId = $"router_{websiteId}";
                     var clusterId = $"cluster_{websiteId}";
                     RouteConfig routeConfig = new RouteConfig()
@@ -169,7 +201,20 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                         {
                             Hosts = hosts
                         }
-                    }.WithTransformUseOriginalHostHeader(useOriginal: false);
+                    };
+
+                    routeConfig.WithTransformUseOriginalHostHeader(useOriginal: website.IsWithOriginalHostHeader);
+                    routeConfig.WithTransform((dic) =>
+                    {
+                        foreach (var item in website.ProxyTransforms)
+                        {
+                            if (!dic.TryAdd(item.Key, item.Value))
+                            {
+                                _Logger.LogWarning($"{website.Name} ProxyTransform item {item} add fail with value [{item.Value}]");
+                            }
+                        }
+                    });
+
                     Dictionary<string, DestinationConfig> mDestinationConfigs = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase)
                     {
                         { "default", new DestinationConfig { Address = website.DefaultDestination } }
@@ -186,36 +231,6 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                     yield return (routeConfig, clusterConfig);
                 }
             }
-        }
-
-        private (RouteConfig, ClusterConfig) BuildRouteAndClusterConfig(string mId, string requestPattern, Dictionary<string, string> clusters)
-        {
-            RouteConfig routeConfig = new RouteConfig()
-            {
-                RouteId = mId,
-                ClusterId = mId,
-                Match = new RouteMatch
-                {
-                    Path = $"/{requestPattern}/{{**remainder}}"
-                }
-            }.WithTransformUseOriginalHostHeader(useOriginal: false);
-
-
-            Dictionary<string, DestinationConfig> mDestinationConfigs = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase);
-            foreach (var item in clusters)
-            {
-                mDestinationConfigs.Add(item.Key, new DestinationConfig { Address = item.Value });
-            }
-
-            var clusterConfig = new ClusterConfig()
-            {
-                ClusterId = mId,
-                LoadBalancingPolicy = "PowerOfTwoChoices",
-                HttpRequest = new Yarp.ReverseProxy.Forwarder.ForwarderRequestConfig { ActivityTimeout = new TimeSpan(0, 0, 15, 0, 0) },
-                Destinations = mDestinationConfigs,
-                //HttpClient = new HttpClientConfig { WebProxy = new WebProxyConfig() { Address = new Uri("http://localhost:8888") } }
-            };
-            return (routeConfig, clusterConfig);
         }
 
         protected virtual void Reload() => Interlocked.Exchange(ref _reloadToken, new RouteChangeToken()).OnReload();

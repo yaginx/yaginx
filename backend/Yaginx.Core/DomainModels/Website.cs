@@ -1,4 +1,5 @@
-﻿namespace Yaginx.DomainModels;
+﻿
+namespace Yaginx.DomainModels;
 
 /// <summary>
 /// 站点
@@ -22,4 +23,6 @@ public class Website
     public List<WebsiteProxyRuleItem> ProxyRules { get; set; }
     public DateTime CreateTime { get; set; }
     public DateTime UpdateTime { get; set; }
+    public bool IsWithOriginalHostHeader { get; set; }
+    public Dictionary<string, string> ProxyTransforms { get; set; }
 }

@@ -51,7 +51,7 @@ namespace Yaginx.YaginxAcmeLoaders
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(30));
+                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
                 var domains = await _domainRepsitory.GetFreeCertDomainAsync();
                 foreach (var domain in domains)
                 {
@@ -66,13 +66,13 @@ namespace Yaginx.YaginxAcmeLoaders
                             acmeState.Context.EmailAddress = "duke@feinian.net";
                         }
 
-                        while (!stoppingToken.IsCancellationRequested)
+                        while (state.ContinueState == AcmeStateContinueStatus.Continue && !stoppingToken.IsCancellationRequested)
                         {
-                            if (state.ContinueState == AcmeStateContinueStatus.Continue)
-                            {
-                                _logger.LogInformation($"Apply cert SUCCESS for domain {domain}!");
-                                break;
-                            }
+                            //if (state.ContinueState == AcmeStateContinueStatus.Continue)
+                            //{
+                            //    _logger.LogInformation($"Apply cert SUCCESS for domain {domain}!");
+                            //    break;
+                            //}
                             _logger.LogTrace("ACME state transition: moving to {stateName}", state.GetType().Name);
                             state = await state.MoveNextAsync(stoppingToken);
                         }

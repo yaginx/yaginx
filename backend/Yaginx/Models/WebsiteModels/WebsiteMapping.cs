@@ -8,6 +8,7 @@ namespace Yaginx.Models.WebsiteModels
         public WebsiteMapping()
         {
             CreateMap<WebsiteUpsertRequest, Website>();
+            CreateMap<Website, WebsiteListItem>();
         }
     }
 }
