@@ -11,7 +11,6 @@ using AgileLabs.Securities;
 using AgileLabs.WebApp.Hosting;
 using AgileLabs.WorkContexts;
 using Docker.DotNet;
-using Google.Protobuf.WellKnownTypes;
 using LettuceEncrypt;
 using LettuceEncrypt.Internal;
 using LettuceEncrypt.YaginxAcmeLoaders;
@@ -20,7 +19,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
-using System.Net.Http;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using Yaginx.DataStore.MongoStore;
@@ -36,9 +34,9 @@ using Yaginx.Services.Securities;
 using Yaginx.WorkContexts;
 using Yaginx.YaginxAcmeLoaders;
 using Yarp.ReverseProxy.Configuration;
-using Yarp.ReverseProxy.Forwarder;
 using Yarp.ReverseProxy.Transforms;
 using Yarp.ReverseProxy.Transforms.Builder;
+
 public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEndpointConfig, IMvcOptionsConfig, IMvcBuildConfig
 {
     public int Order => 1;
@@ -154,9 +152,9 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             services.AddClientApp(options =>
             {
                 options.RootPath = "ClientApp";
-                options.PathBase = BasePath;
-                options.ClientApps.Add(ClientAppConfig.Create("/adminui", "AdminUI"));
-                options.ClientApps.Add(ClientAppConfig.Create("/helps", "HelpDocs"));
+                //options.PathBase = BasePath;
+                options.ClientApps.Add(ClientAppConfig.Create($"/{BasePath}/adminui", "AdminUI"));
+                options.ClientApps.Add(ClientAppConfig.Create($"/{BasePath}/helps", "HelpDocs"));
             });
         }
 
@@ -215,7 +213,7 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
     public const string BasePath = "/yaginx";
     public RequestPiplineCollection Configure(RequestPiplineCollection piplineActions, AppBuildContext buildContext)
     {
-        piplineActions.Register("UseBasePath", RequestPiplineStage.BeforeRouting, app => app.UsePathBase(BasePath));
+        //piplineActions.Register("UseBasePath", RequestPiplineStage.BeforeRouting, app => app.UsePathBase(BasePath));
         if ((RunningModes.RunningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
         {
             piplineActions.Register("TrafficMonitorMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<TrafficMonitorMiddleware>());
