@@ -10,7 +10,7 @@ export const PORT = 1314;
 // 基本路径
 export const VITE_BASE_PATH = '/yaginx/adminui/';
 // 请求接口地址
-export const VITE_PROXY_HTTP = 'http://localhost:8080/'; //'https://sh01.vm.niusys.net/';
+export const VITE_PROXY_HTTP = 'http://duke.feinian.net/'; //'https://sh01.vm.niusys.net/';
 // 应用名称
 export const VITE_APP_TITLE = 'YAGINX';
 // 开启 mock

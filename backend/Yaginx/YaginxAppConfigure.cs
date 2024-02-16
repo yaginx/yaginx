@@ -11,9 +11,7 @@ using AgileLabs.Securities;
 using AgileLabs.WebApp.Hosting;
 using AgileLabs.WorkContexts;
 using Docker.DotNet;
-using Hangfire;
-using Hangfire.Console;
-using Hangfire.MemoryStorage;
+using Google.Protobuf.WellKnownTypes;
 using LettuceEncrypt;
 using LettuceEncrypt.Internal;
 using LettuceEncrypt.YaginxAcmeLoaders;
@@ -22,9 +20,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
+using System.Net.Http;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
-using Yaginx.Configures.Hangfires;
 using Yaginx.DataStore.MongoStore;
 using Yaginx.HostedServices;
 using Yaginx.Infrastructure;
@@ -38,6 +36,7 @@ using Yaginx.Services.Securities;
 using Yaginx.WorkContexts;
 using Yaginx.YaginxAcmeLoaders;
 using Yarp.ReverseProxy.Configuration;
+using Yarp.ReverseProxy.Forwarder;
 using Yarp.ReverseProxy.Transforms;
 using Yarp.ReverseProxy.Transforms.Builder;
 public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEndpointConfig, IMvcOptionsConfig, IMvcBuildConfig
@@ -131,24 +130,24 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
         services.AddSingleton(appSettings);
         #endregion
 
-        #region Hangfire
-        // Add Hangfire services.
-        services.AddHangfire((provider, configuration) =>
-        {
-            configuration
-               .UseSimpleAssemblyNameTypeSerializer()
-               .UseRecommendedSerializerSettings()
-               .UseSerilogLogProvider()
-               .UseConsole()
-               .UseMemoryStorage();
-        });
+        //#region Hangfire
+        //// Add Hangfire services.
+        //services.AddHangfire((provider, configuration) =>
+        //{
+        //    configuration
+        //       .UseSimpleAssemblyNameTypeSerializer()
+        //       .UseRecommendedSerializerSettings()
+        //       .UseSerilogLogProvider()
+        //       .UseConsole()
+        //       .UseMemoryStorage();
+        //});
 
-        // Add the processing server as IHostedService
-        services.AddSingleton<HangfireJobActivator>();
-        services.AddSingleton<JobActivator>(serficeProvider => serficeProvider.GetRequiredService<HangfireJobActivator>());
-        services.AddHangfireServer();
+        //// Add the processing server as IHostedService
+        //services.AddSingleton<HangfireJobActivator>();
+        //services.AddSingleton<JobActivator>(serficeProvider => serficeProvider.GetRequiredService<HangfireJobActivator>());
+        //services.AddHangfireServer();
 
-        #endregion
+        //#endregion
 
         if ((runningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
         {
@@ -209,6 +208,8 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
         {
             options.MatchPattern = buildContext.Configuration.GetSection("MonitorInterfacePattern").Value;
         }));
+
+        services.AddHttpForwarder();
     }
 
     public const string BasePath = "/yaginx";
@@ -266,14 +267,49 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
                 app.UseSwaggerUI();
             });
         }
-        piplineActions.Register("HangfireDashboard", RequestPiplineStage.BeforeRouting, app =>
-        {
-            app.UseHangfireDashboard(options: new DashboardOptions()
-            {
-                DashboardTitle = "Jobs",
-                Authorization = new[] { new HangfireAuthorizationFilter() }
-            });
-        });
+        //piplineActions.Register("HangfireDashboard", RequestPiplineStage.BeforeRouting, app =>
+        //{
+        //    app.UseHangfireDashboard(options: new DashboardOptions()
+        //    {
+        //        DashboardTitle = "Jobs",
+        //        Authorization = new[] { new HangfireAuthorizationFilter() }
+        //    });
+        //});
+
+        //piplineActions.Register("Test", RequestPiplineStage.BeforeEndpointConfig, app =>
+        //{
+        //    //app.Map("/test/{**catch-all}", async (HttpContext httpContext, IHttpForwarder forwarder) =>
+        //    //{
+        //    //    var error = await forwarder.SendAsync(httpContext, "https://localhost:10000/",
+        //    //        httpClient, requestConfig, transformer);
+        //    //    // Check if the operation was successful
+        //    //    if (error != ForwarderError.None)
+        //    //    {
+        //    //        var errorFeature = httpContext.GetForwarderErrorFeature();
+        //    //        var exception = errorFeature.Exception;
+        //    //    }
+        //    //});
+
+        //    app.MapWhen(httpContext => httpContext.Request.Host.Value.Contains("openai"), childApp =>
+        //    {
+        //        //var transformer = new CustomTransformer(); // or HttpTransformer.Default;
+        //        //var requestConfig = new ForwarderRequestConfig { ActivityTimeout = TimeSpan.FromSeconds(100) };
+
+        //        // When using IHttpForwarder for direct forwarding you are responsible for routing, destination discovery, load balancing, affinity, etc..
+        //        // For an alternate example that includes those features see BasicYarpSample.
+        //        //childApp.Map("/{**catch-all}", async (HttpContext httpContext, IHttpForwarder forwarder) =>
+        //        //{
+        //        //    var error = await forwarder.SendAsync(httpContext, "https://localhost:10000/",
+        //        //        httpClient, requestConfig, transformer);
+        //        //    // Check if the operation was successful
+        //        //    if (error != ForwarderError.None)
+        //        //    {
+        //        //        var errorFeature = httpContext.GetForwarderErrorFeature();
+        //        //        var exception = errorFeature.Exception;
+        //        //    }
+        //        //});
+        //    });
+        //});
 
         piplineActions.Register("Security", RequestPiplineStage.BeforeEndpointConfig, app =>
         {
@@ -289,9 +325,17 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
         var runningMode = RunningModes.RunningMode;
         if ((runningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
         {
-            endpoints.MapReverseProxy(ReverseProxyBuilder.ProxyBuilder);
+            try
+            {
+                endpoints.MapReverseProxy(ReverseProxyBuilder.ProxyBuilder);
+            }
+            catch (Exception ex)
+            {
+                appBuildContext.BootstrapLogger.LogError(0, ex, "Yarp配置错误");
+            }
+
         }
-        //endpoints.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}");
+        //endpoints.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}"); 
 
         endpoints.MapDefaultControllerRoute();
         //endpoints.MapFallbackToFile(DefaultIndexFileName);

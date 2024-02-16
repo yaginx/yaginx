@@ -18,7 +18,7 @@ public class WebsiteController : YaginxControllerBase
     }
 
     [HttpPost, Route("upsert")]
-    public async Task<Website> Add([FromBody] WebsiteUpsertRequest request)
+    public async Task<WebsiteListItem> Add([FromBody] WebsiteUpsertRequest request)
     {
         Website returnValue;
         if (!request.Id.HasValue)
@@ -45,7 +45,7 @@ public class WebsiteController : YaginxControllerBase
             returnValue = oldSite;
         }
         _proxyRuleChangeNotifyService.ProxyRuleConfigChanged();
-        return returnValue;
+        return _mapper.Map<WebsiteListItem>(returnValue);
     }
 
     [HttpDelete, Route("delete")]

@@ -70,14 +70,14 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
                 serverOptions.Limits.MaxRequestBodySize = null;                
                 serverOptions.Limits.MaxRequestBufferSize = 5 * 1024 * 1024;//5M
 
-                serverOptions.ListenAnyIP(8080, listenOptions =>
+                serverOptions.ListenAnyIP(80, listenOptions =>
                 {
                     listenOptions.Protocols = HttpProtocols.Http1;
                 });
 
                 if (!buildContext.HostEnvironment.IsDevelopment() && ((RunningModes.RunningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode))
                 {
-                    serverOptions.ListenAnyIP(8443, listenOptions =>
+                    serverOptions.ListenAnyIP(443, listenOptions =>
                     {
                         listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
                         listenOptions.UseHttps(httpsOptions =>

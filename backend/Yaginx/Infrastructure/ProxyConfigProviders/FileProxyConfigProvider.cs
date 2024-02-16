@@ -1,6 +1,7 @@
 using AgileLabs;
 using Microsoft.Extensions.Primitives;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Authentication;
 using Yaginx.DomainModels;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
@@ -135,7 +136,7 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
 
                 var websiteId = website.Id.Value.ToString();
 
-                var hosts = new List<string> { website.DefaultHost };
+                var hosts = new List<string>();
 
                 if (website.DefaultHost.IsNotNullOrWhitespace())
                 {
@@ -169,12 +170,18 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                                 Hosts = hosts,
                                 Path = proxyRule.PathPattern
                             }
-                        }.WithTransformUseOriginalHostHeader(useOriginal: false);
+                        };
 
                         Dictionary<string, DestinationConfig> mDestinationConfigs = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase);
-                        foreach (var dest in proxyRule.Destinations)
+                        if (!proxyRule.Destinations.IsNullOrEmpty())
                         {
-                            mDestinationConfigs.Add(dest.Name, new DestinationConfig { Address = dest.Address });
+                            foreach (var dest in proxyRule.Destinations)
+                            {
+                                if (!mDestinationConfigs.TryAdd(dest.Name, new DestinationConfig { Address = dest.Address }))
+                                {
+                                    _Logger.LogWarning($"{website.Name} pattern [{proxyRule.PathPattern}] destination {dest.Name} add fail(Duplicated) with value {dest.Address}");
+                                }
+                            }
                         }
 
                         var clusterConfig = new ClusterConfig()
@@ -183,7 +190,14 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                             LoadBalancingPolicy = "PowerOfTwoChoices",
                             HttpRequest = new Yarp.ReverseProxy.Forwarder.ForwarderRequestConfig { ActivityTimeout = new TimeSpan(0, 0, 15, 0, 0) },
                             Destinations = mDestinationConfigs,
-                            //HttpClient = new HttpClientConfig { WebProxy = new WebProxyConfig() { Address = new Uri("http://localhost:8888") } }
+                            //HttpClient = new HttpClientConfig
+                            //{
+                            //    SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13,
+                            //    WebProxy = new WebProxyConfig()
+                            //    {
+                            //        Address = new Uri("http://localhost:8888")
+                            //    }
+                            //}
                         };
                         yield return (routeConfig, clusterConfig);
                     }
@@ -201,12 +215,11 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                         {
                             Hosts = hosts
                         }
-                    };
-
-                    routeConfig.WithTransformUseOriginalHostHeader(useOriginal: website.IsWithOriginalHostHeader);
-                    routeConfig.WithTransform((dic) =>
+                    }
+                    .WithTransformUseOriginalHostHeader(useOriginal: website.IsWithOriginalHostHeader);
+                    if (!website.ProxyTransforms.IsNullOrEmpty())
                     {
-                        if (!website.ProxyTransforms.IsNullOrEmpty())
+                        routeConfig = routeConfig.WithTransform((dic) =>
                         {
                             foreach (var item in website.ProxyTransforms)
                             {
@@ -215,8 +228,8 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                                     _Logger.LogWarning($"{website.Name} ProxyTransform item {item} add fail with value [{item.Value}]");
                                 }
                             }
-                        }
-                    });
+                        });
+                    }
 
                     Dictionary<string, DestinationConfig> mDestinationConfigs = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase)
                     {
@@ -229,7 +242,14 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                         LoadBalancingPolicy = "PowerOfTwoChoices",
                         HttpRequest = new Yarp.ReverseProxy.Forwarder.ForwarderRequestConfig { ActivityTimeout = new TimeSpan(0, 0, 15, 0, 0) },
                         Destinations = mDestinationConfigs,
-                        //HttpClient = new HttpClientConfig { WebProxy = new WebProxyConfig() { Address = new Uri("http://localhost:8888") } }
+                        //HttpClient = new HttpClientConfig
+                        //{
+                        //    SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13,
+                        //    //WebProxy = new WebProxyConfig()
+                        //    //{
+                        //    //    Address = new Uri("http://localhost:8888")
+                        //    //}
+                        //}
                     };
                     yield return (routeConfig, clusterConfig);
                 }

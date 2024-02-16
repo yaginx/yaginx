@@ -1,6 +1,6 @@
 ﻿using AgileLabs;
-using Hangfire;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
@@ -11,6 +11,9 @@ public static class ReverseProxyBuilder
 
     private static async Task ProxyForwarder(HttpContext context, Func<Task> next)
     {
+        var proxyFeature = context.GetReverseProxyFeature();
+        proxyFeature.AvailableDestinations = proxyFeature.AvailableDestinations;
+
         var serviceProvider = context.RequestServices;
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         var logger = loggerFactory.CreateLogger("Yaginx.ProxyForwarder");
@@ -51,6 +54,12 @@ public static class ReverseProxyBuilder
             else
             {
                 await next();
+            }
+
+            var errorFeature = context.GetForwarderErrorFeature();
+            if (errorFeature is not null)
+            {
+                logger.LogError(0, errorFeature.Exception, $"转发异常-{errorFeature.Error}");
             }
         }
         catch (Exception ex)

@@ -1,9 +1,6 @@
 using AgileLabs;
 using Docker.DotNet;
 using Docker.DotNet.Models;
-using Hangfire;
-using Hangfire.Console;
-using Hangfire.Server;
 using Newtonsoft.Json;
 using Yaginx.Configures.Dockers;
 using Yaginx.Infrastructure.Configuration;
@@ -24,10 +21,9 @@ namespace Yaginx.Services.DockerServices
             _logger = logger;
         }
 
-        [AutomaticRetry(Attempts = 0)]
-        public async Task ReplaceImage(ReplaceNewImageRequest request, PerformContext context, CancellationToken cancellationToken = default)
+        public async Task ReplaceImage(ReplaceNewImageRequest request, CancellationToken cancellationToken = default)
         {
-            context?.WriteLine("Start Replace Image Progress");
+            _logger.LogInformation("Start Replace Image Progress");
 
             // 获取Image
             if (!string.IsNullOrEmpty(request.Image))
@@ -37,7 +33,7 @@ namespace Yaginx.Services.DockerServices
                 {
                     await _dockerClient.Images.CreateImageAsync(new ImagesCreateParameters { FromImage = request.Image },
                                                                 authConfig,
-                                                                new Progress<JSONMessage>((message) => context?.WriteLine(JsonConvert.SerializeObject(message, Formatting.Indented))),
+                                                                new Progress<JSONMessage>((message) => _logger.LogInformation(JsonConvert.SerializeObject(message, Formatting.Indented))),
                                                                 cancellationToken);
 
                     var imageInspectResult = await _dockerClient.Images.InspectImageAsync(request.Image);
@@ -46,18 +42,18 @@ namespace Yaginx.Services.DockerServices
                         throw new Exception($"Image: {request.Image}不存在");
                     }
 
-                    context?.WriteLine("Image 信息");
-                    context?.WriteLine(JsonConvert.SerializeObject(imageInspectResult, Formatting.Indented));
+                    _logger.LogInformation("Image 信息");
+                    _logger.LogInformation(JsonConvert.SerializeObject(imageInspectResult, Formatting.Indented));
                 }
                 catch (DockerImageNotFoundException ex)
                 {
-                    context?.WriteLine(ex.FullMessage());
+                    _logger.LogInformation(ex.FullMessage());
                     throw;
                 }
             }
             else
             {
-                context?.WriteLine("Image未指定");
+                //context?.WriteLine("Image未指定");
                 throw new Exception($"Image未指定");
             }
 
@@ -126,22 +122,22 @@ namespace Yaginx.Services.DockerServices
             }
             if (container != null)
             {
-                context?.WriteLine("Start Stop Old Container");
+                _logger.LogInformation("Start Stop Old Container");
                 await _dockerClient.Containers.StopContainerAsync(container.ID, new ContainerStopParameters() { WaitBeforeKillSeconds = 100 * 1000 });
 
-                context?.WriteLine("Start Remove Old Container");
+                _logger.LogInformation("Start Remove Old Container");
                 await _dockerClient.Containers.RemoveContainerAsync(container.ID, new ContainerRemoveParameters { });
             }
 
-            context?.WriteLine("Start CreateContainerAsync");
+            _logger.LogInformation("Start CreateContainerAsync");
             var createResult = await _dockerClient.Containers.CreateContainerAsync(createContainerParameters);
 
-            context?.WriteLine("Start StartContainerAsync");
+            _logger.LogInformation("Start StartContainerAsync");
             var startResult = await _dockerClient.Containers.StartContainerAsync(createResult.ID, new ContainerStartParameters() { });
 
             var processResult = JsonConvert.SerializeObject(new { CreateResult = createResult, StartResult = startResult }, Formatting.Indented);
             _logger.LogInformation($"{processResult}");
-            context?.WriteLine(processResult);
+            _logger.LogInformation(processResult);
         }
 
         private AuthConfig? GetAuthConfig(string image)

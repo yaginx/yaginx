@@ -1,9 +1,9 @@
 using Docker.DotNet;
 using Docker.DotNet.Models;
-using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Web;
+using Yaginx.MemoryBuses;
 using Yaginx.Models;
 using Yaginx.Models.DockerModels;
 using Yaginx.Services.DockerServices;
@@ -61,12 +61,9 @@ public class ContainerController : YaginxControllerBase
     }
 
     [HttpPost, Route("replace")]
-    public async Task<(string message, string jobId)> ReplaceImage([FromBody] ReplaceNewImageRequest request)
+    public async Task ReplaceImage([FromBody] ReplaceNewImageRequest request, [FromServices] ContainerServcie containerServcie, [FromServices] IMemoryBus memoryBus)
     {
-        var queuedJobId = BackgroundJob.Enqueue<ContainerServcie>(service => service.ReplaceImage(request, null, default));
-        await Task.CompletedTask;
-        //return Json(new { message = "queued", jobId = queuedJobId });
-        return ("queued", queuedJobId);
+        await containerServcie.ReplaceImage(request);
     }
 
     private async Task<ContainerListResponse?> GetContainerByContainerId(string containerId)

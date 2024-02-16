@@ -1,6 +1,5 @@
 ﻿using AgileLabs;
 using AgileLabs.WorkContexts.Extensions;
-using Hangfire;
 
 namespace Yaginx.HostedServices
 {
@@ -49,10 +48,10 @@ namespace Yaginx.HostedServices
             ////    TimeZone = TimeZoneInfo.Local
             ////});
 
-            RecurringJob.AddOrUpdate<CodeAutoGenerateService>(nameof(CodeAutoGenerateService), service => service.UserCodeGenerateAsync(), "0 * * * *", new RecurringJobOptions
-            {
-                TimeZone = TimeZoneInfo.Local
-            });
+            //RecurringJob.AddOrUpdate<CodeAutoGenerateService>(nameof(CodeAutoGenerateService), service => service.UserCodeGenerateAsync(), "0 * * * *", new RecurringJobOptions
+            //{
+            //    TimeZone = TimeZoneInfo.Local
+            //});
 
             //RecurringJob.AddOrUpdate<DailyTokenSupplementBackService>(nameof(DailyTokenSupplementBackService), service => service.SupplementAsync(), "0 0 * * *", new RecurringJobOptions
             //{

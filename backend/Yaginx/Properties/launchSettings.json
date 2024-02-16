@@ -3,7 +3,7 @@
     "yaginx-Development": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:8080/swagger",
+      "launchUrl": "http://localhost:80/swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
         //"RUNNING_MODE": "DP"
