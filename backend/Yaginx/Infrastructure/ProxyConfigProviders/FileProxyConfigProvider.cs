@@ -152,7 +152,7 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                     }
                 }
 
-                if (website.ProxyRules.Any())
+                if (!website.ProxyRules.IsNullOrEmpty())
                 {
                     // 加载自定义的Rules
                     foreach (var proxyRule in website.ProxyRules)
@@ -206,11 +206,14 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                     routeConfig.WithTransformUseOriginalHostHeader(useOriginal: website.IsWithOriginalHostHeader);
                     routeConfig.WithTransform((dic) =>
                     {
-                        foreach (var item in website.ProxyTransforms)
+                        if (!website.ProxyTransforms.IsNullOrEmpty())
                         {
-                            if (!dic.TryAdd(item.Key, item.Value))
+                            foreach (var item in website.ProxyTransforms)
                             {
-                                _Logger.LogWarning($"{website.Name} ProxyTransform item {item} add fail with value [{item.Value}]");
+                                if (!dic.TryAdd(item.Key, item.Value))
+                                {
+                                    _Logger.LogWarning($"{website.Name} ProxyTransform item {item} add fail with value [{item.Value}]");
+                                }
                             }
                         }
                     });
