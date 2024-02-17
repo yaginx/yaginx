@@ -57,6 +57,12 @@ export const EditForm: React.FC<any> = (props) => {
           <Form.Item name="defaultDestination" label="defaultDestination">
             <Input />
           </Form.Item>
+          <Form.Item name="defaultDestinationHost" label="defaultDestinationHost">
+            <Input />
+          </Form.Item>
+          <Form.Item name="webProxy" label="webProxy">
+            <Input />
+          </Form.Item>
           <Form.Item name="isWithOriginalHostHeader" label="是否转发Host">
             <Switch checkedChildren="转发Host" unCheckedChildren="不转发Host" />
           </Form.Item>

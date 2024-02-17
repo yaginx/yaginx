@@ -1,7 +1,6 @@
 using AgileLabs;
 using Microsoft.Extensions.Primitives;
 using System.Diagnostics.CodeAnalysis;
-using System.Security.Authentication;
 using Yaginx.DomainModels;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
@@ -76,7 +75,6 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
             {
                 _Logger.LogError(0, ex, "UpdateConfig Error");
             }
-
         }
 
         private IEnumerable<(RouteConfig, ClusterConfig)> LoadRedisDyamicRules()
@@ -217,6 +215,12 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                         }
                     }
                     .WithTransformUseOriginalHostHeader(useOriginal: website.IsWithOriginalHostHeader);
+
+                    if (website.DefaultDestinationHost.IsNotNullOrWhitespace())
+                    {
+                        routeConfig = routeConfig.WithTransformRequestHeader("Host", website.DefaultDestinationHost, false);
+                    }
+
                     if (!website.ProxyTransforms.IsNullOrEmpty())
                     {
                         routeConfig = routeConfig.WithTransform((dic) =>
@@ -236,20 +240,22 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                         { "default", new DestinationConfig { Address = website.DefaultDestination } }
                     };
 
+                    Uri webProxyAddress = null;
+                    if (website.WebProxy.IsNotNullOrWhitespace())
+                    {
+                        webProxyAddress = new Uri(website.WebProxy);
+                    }
+
                     var clusterConfig = new ClusterConfig()
                     {
                         ClusterId = clusterId,
                         LoadBalancingPolicy = "PowerOfTwoChoices",
                         HttpRequest = new Yarp.ReverseProxy.Forwarder.ForwarderRequestConfig { ActivityTimeout = new TimeSpan(0, 0, 15, 0, 0) },
                         Destinations = mDestinationConfigs,
-                        //HttpClient = new HttpClientConfig
-                        //{
-                        //    SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13,
-                        //    //WebProxy = new WebProxyConfig()
-                        //    //{
-                        //    //    Address = new Uri("http://localhost:8888")
-                        //    //}
-                        //}
+                        HttpClient = new HttpClientConfig
+                        {
+                            WebProxy = new WebProxyConfig() { Address = webProxyAddress }
+                        }
                     };
                     yield return (routeConfig, clusterConfig);
                 }

@@ -17,6 +17,9 @@ namespace Yaginx.Models.WebsiteModels
         /// </summary>
         public string DefaultDestination { get; set; }
 
+        public string DefaultDestinationHost { get; set; }
+        public string WebProxy { get; set; }
+
         public List<WebsiteHostItem> Hosts { get; set; }
         public List<WebsiteProxyRuleItem> ProxyRules { get; set; }
         public List<KeyValuePair<string, string>> ProxyTransforms { get; set; }
@@ -36,7 +39,8 @@ namespace Yaginx.Models.WebsiteModels
         /// 默认的转发地址
         /// </summary>
         public string DefaultDestination { get; set; }
-
+        public string DefaultDestinationHost { get; set; }
+        public string WebProxy { get; set; }
         public List<WebsiteHostItem> Hosts { get; set; }
         public List<WebsiteProxyRuleItem> ProxyRules { get; set; }
         public List<KeyValuePair<string, string>> ProxyTransforms { get; set; }
