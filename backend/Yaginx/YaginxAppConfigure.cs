@@ -153,8 +153,8 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             {
                 options.RootPath = "ClientApp";
                 //options.PathBase = BasePath;
-                options.ClientApps.Add(ClientAppConfig.Create($"/{BasePath}/adminui", "AdminUI"));
-                options.ClientApps.Add(ClientAppConfig.Create($"/{BasePath}/helps", "HelpDocs"));
+                options.ClientApps.Add(ClientAppConfig.Create($"/adminui", "AdminUI"));
+                options.ClientApps.Add(ClientAppConfig.Create($"/helps", "HelpDocs"));
             });
         }
 
