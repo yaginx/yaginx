@@ -82,21 +82,21 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             services.AddSingleton<IProxyConfigProvider, FileProxyConfigProvider>();
             services.AddHttpForwarder();
             services.AddReverseProxy();
-                //.LoadFromConfig(buildContext.Configuration.GetSection("ReverseProxy"))
-                //.AddTransforms(builderContext =>
-                //{
-                //    /*
-                //     Append: 在上游的基础上带上当前节点信息传给下游
-                //     Set: 忽略上游信息, 使用当前节点信息往下传
-                //     Off:直接把上游信息传给下游,忽略当前节点
-                //     Remove: 不往下传该信息
-                //     */
-                //    builderContext.AddXForwardedFor(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
-                //    builderContext.AddXForwardedHost(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
-                //    builderContext.AddXForwardedProto(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
-                //    builderContext.AddXForwardedPrefix(action: ForwardedTransformActions.Append);
-                //})
-                //.AddTransforms(DefaultRouteTransform);
+            //.LoadFromConfig(buildContext.Configuration.GetSection("ReverseProxy"))
+            //.AddTransforms(builderContext =>
+            //{
+            //    /*
+            //     Append: 在上游的基础上带上当前节点信息传给下游
+            //     Set: 忽略上游信息, 使用当前节点信息往下传
+            //     Off:直接把上游信息传给下游,忽略当前节点
+            //     Remove: 不往下传该信息
+            //     */
+            //    builderContext.AddXForwardedFor(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
+            //    builderContext.AddXForwardedHost(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
+            //    builderContext.AddXForwardedProto(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
+            //    builderContext.AddXForwardedPrefix(action: ForwardedTransformActions.Append);
+            //})
+            //.AddTransforms(DefaultRouteTransform);
             #endregion
         }
         #region DockerEgnine
@@ -153,8 +153,8 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             {
                 options.RootPath = "ClientApp";
                 //options.PathBase = BasePath;
-                options.ClientApps.Add(ClientAppConfig.Create($"/adminui", "AdminUI"));
-                options.ClientApps.Add(ClientAppConfig.Create($"/helps", "HelpDocs"));
+                options.ClientApps.Add(ClientAppConfig.Create($"{BasePath}/adminui", "AdminUI"));
+                options.ClientApps.Add(ClientAppConfig.Create($"{BasePath}/helps", "HelpDocs"));
             });
         }
 
