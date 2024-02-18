@@ -254,7 +254,8 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                         Destinations = mDestinationConfigs,
                         HttpClient = new HttpClientConfig
                         {
-                            WebProxy = new WebProxyConfig() { Address = webProxyAddress }
+                            WebProxy = new WebProxyConfig() { Address = webProxyAddress },
+                            DangerousAcceptAnyServerCertificate = website.IsAllowUnsafeSslCertificate,
                         }
                     };
                     yield return (routeConfig, clusterConfig);

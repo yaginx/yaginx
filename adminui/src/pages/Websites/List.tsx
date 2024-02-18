@@ -5,6 +5,7 @@ import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import TableList from "@/componets/TableList"
 import { websiteDelete, websiteSearch } from "@/api/docker"
+import { renderTableItem } from "@/componets/ModelCrudViews/renderTableItem"
 
 const List: React.FC = (props) => {
   const pkFieldName = "id";
@@ -38,7 +39,10 @@ const List: React.FC = (props) => {
   }
 
   const initTableColumn = (columnsArray: any[]) => {
-    columnsArray.push({ title: 'name', key: 'name', width: 150, dataIndex: "name" })
+    columnsArray.push({ title: 'name', key: 'name', width: 150, dataIndex: "name" });
+    columnsArray.push({ title: 'defaultHost', key: 'defaultHost', width: 150, dataIndex: "defaultHost" })
+    columnsArray.push({ title: 'defaultDestination', key: 'defaultDestination', dataIndex: "defaultDestination" })
+    columnsArray.push(renderTableItem("isHaveSslCert", "证书是否存在"));
     // columnsArray.push({
     //   title: 'domain', key: 'domain', width: 150,
     //   render: (text: any, record: any) => record.hosts.map((element: any) => <>{element?.domain}</>)

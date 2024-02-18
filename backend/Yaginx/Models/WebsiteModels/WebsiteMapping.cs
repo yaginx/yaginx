@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Yaginx.DomainModels;
+using Yaginx.Models.WebDomainModels;
 
 namespace Yaginx.Models.WebsiteModels
 {
@@ -8,7 +9,8 @@ namespace Yaginx.Models.WebsiteModels
         public WebsiteMapping()
         {
             CreateMap<WebsiteUpsertRequest, Website>();
-            CreateMap<Website, WebsiteListItem>();
+            CreateMap<Website, WebsiteListItem>()
+                .ForMember(d => d.IsHaveSslCert, mo => mo.MapFrom<DomainHasCertResolver, string>(s => s.DefaultHost));
         }
     }
 }

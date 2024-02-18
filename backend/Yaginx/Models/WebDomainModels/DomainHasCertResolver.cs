@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using LettuceEncrypt.Internal;
-using Yaginx.DomainModels;
 
 namespace Yaginx.Models.WebDomainModels
 {
-    public class DomainHasCertResolver : IMemberValueResolver<WebDomain, WebDomainListItem, string, bool>
+    public class DomainHasCertResolver : IMemberValueResolver<object, object, string, bool>
     {
         private readonly CertificateSelector _certificateSelector;
 
@@ -13,9 +12,9 @@ namespace Yaginx.Models.WebDomainModels
             _certificateSelector = certificateSelector;
         }
 
-        public bool Resolve(WebDomain source, WebDomainListItem destination, string sourceMember, bool destMember, ResolutionContext context)
+        public bool Resolve(object source, object destination, string sourceMember, bool destMember, ResolutionContext context)
         {
-            return _certificateSelector.HasCertForDomain(source.Name);
+            return _certificateSelector.HasCertForDomain(sourceMember);
         }
     }
 }
