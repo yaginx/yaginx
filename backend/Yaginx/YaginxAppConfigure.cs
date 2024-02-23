@@ -31,6 +31,8 @@ using Yaginx.MemoryBuses;
 using Yaginx.Services;
 using Yaginx.Services.DockerServices;
 using Yaginx.Services.Securities;
+using Yaginx.SimpleProcessors;
+using Yaginx.SimpleProcessors.ConfigProviders;
 using Yaginx.WorkContexts;
 using Yaginx.YaginxAcmeLoaders;
 using Yarp.ReverseProxy.Configuration;
@@ -166,6 +168,9 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
         services.ConfigureOpenTelementoryService(buildContext);
         if ((runningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
         {
+            services.AddSingleton<ISimpleProcessorConfigProvider, SimpleProcessorConfigProvider>();
+            services.AddSimpleProcessor();
+
             #region Certificates
             services.AddLettuceEncrypt().PersistDataToDirectory(new DirectoryInfo(AppData.Path), string.Empty);
             services.AddScoped<YaginxAcmeCertificateFactory>()
@@ -323,6 +328,7 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
         {
             try
             {
+                endpoints.MapSimpleProcessor(SimpleProcessorBuilder.ProxyBuilder);
                 endpoints.MapReverseProxy(ReverseProxyBuilder.ProxyBuilder);
             }
             catch (Exception ex)
@@ -335,25 +341,6 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
 
         endpoints.MapDefaultControllerRoute();
         //endpoints.MapFallbackToFile(DefaultIndexFileName);
-    }
-
-    public static void DefaultRouteTransform(TransformBuilderContext builderContext)
-    {
-        // 转发OriginalHost
-        builderContext.AddOriginalHost(true);
-
-        // 往下游转发时附加认证信息
-        builderContext.AddRequestTransform(async requestTransformContext =>
-        {
-            // 这里加入当前的认证信息
-            //var identityInfo = requestTransformContext.HttpContext.User.Identity as ClaimsIdentity;
-            //if (identityInfo.IsAuthenticated)
-            //{
-            //	var ssid = identityInfo.GetClaimValueAs<string>(ClaimNames.Ssid);
-            //	requestTransformContext.ProxyRequest.Headers.Authorization = new AuthenticationHeaderValue("SessionKey", ssid);
-            //}
-            await Task.CompletedTask;
-        });
     }
 
     public void ConfigureMvcOptions(MvcOptions mvcOptions, AppBuildContext appBuildContext)

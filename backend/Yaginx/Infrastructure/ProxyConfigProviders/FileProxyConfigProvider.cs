@@ -56,7 +56,7 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
             try
             {
                 _Logger.LogInformation(0, "Start load ReverseProxy Config");
-                var RuleConfigs = LoadRedisDyamicRules();
+                var RuleConfigs = LoadRedisDyamicRules().ToList();
                 _config.Routes.AddRange(RuleConfigs.Select(x => x.Item1));
                 _config.Clusters.AddRange(RuleConfigs.Select(x => x.Item2));
 
