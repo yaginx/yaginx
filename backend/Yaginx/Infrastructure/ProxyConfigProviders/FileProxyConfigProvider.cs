@@ -89,7 +89,7 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                     continue;
 
                 string mId = rule.RequestPattern.ToLower();
-                var dicClusters = rule.Clusters.Select(x => new KeyValuePair<string, string>($"{mId}_{x.Key}", x.Value)).ToDictionary(key => key.Key, value => value.Value);
+                var dicClusters = rule.Clusters.Select(x => new KeyValuePair<string, string>($"{mId}_{x.ClusterId}", x.Address)).ToDictionary(key => key.Key, value => value.Value);
                 yield return BuildRouteAndClusterConfig(mId, rule.RequestPattern, dicClusters);
             }
 
