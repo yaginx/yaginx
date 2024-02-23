@@ -49,13 +49,15 @@ public sealed class SimpleProcessorEndpointFactory
         //    endpointBuilder.Metadata.Add(new RequestMetadata(matchers));
         //}
         endpointBuilder.Metadata.Add(new RequestMetadata(new List<RequestMetadataMatcher>()));
-        var matchers = new List<RequestMetadataMatcher>(releatedHosts.Length + 1);
+        var matchers = new List<RequestMetadataMatcher>(releatedHosts?.Length ?? 0 + 1);
         matchers.Add(new RequestMetadataMatcher(primaryHost));
-        foreach (var item in releatedHosts)
+        if (releatedHosts != null)
         {
-            matchers.Add(new RequestMetadataMatcher(item));
+            foreach (var item in releatedHosts)
+            {
+                matchers.Add(new RequestMetadataMatcher(item));
+            }
         }
-
         endpointBuilder.Metadata.Add(new RequestMetadata(matchers));
         for (var i = 0; i < conventions.Count; i++)
         {

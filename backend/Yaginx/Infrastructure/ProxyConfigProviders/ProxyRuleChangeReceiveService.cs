@@ -3,7 +3,7 @@ using StackExchange.Redis;
 
 namespace Yaginx.Infrastructure.ProxyConfigProviders
 {
-	public class ProxyRuleChangeReceiveService : BackgroundService
+    public class ProxyRuleChangeReceiveService : BackgroundService
 	{
 		private readonly IRedisStore _redisClient;
 		private readonly ProxyRuleChangeNotifyService _proxyRuleChangeNotifyService;

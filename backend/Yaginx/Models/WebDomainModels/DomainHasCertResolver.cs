@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using AgileLabs;
+using AutoMapper;
 using LettuceEncrypt.Internal;
 
 namespace Yaginx.Models.WebDomainModels
@@ -14,6 +15,9 @@ namespace Yaginx.Models.WebDomainModels
 
         public bool Resolve(object source, object destination, string sourceMember, bool destMember, ResolutionContext context)
         {
+            if (sourceMember.IsNullOrEmpty())
+                return false;
+
             return _certificateSelector.HasCertForDomain(sourceMember);
         }
     }

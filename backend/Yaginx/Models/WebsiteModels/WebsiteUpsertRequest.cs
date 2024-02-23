@@ -20,6 +20,7 @@ namespace Yaginx.Models.WebsiteModels
         public string WebProxy { get; set; }
         public bool IsWithOriginalHostHeader { get; set; }
         public bool IsAllowUnsafeSslCertificate { get; set; }
+        public bool IsAutoRedirectHttp2Https { get; set; }
         public List<WebsiteHostItem> Hosts { get; set; }
         public List<WebsiteProxyRuleItem> ProxyRules { get; set; }
         public List<KeyValuePair<string, string>> ProxyTransforms { get; set; }

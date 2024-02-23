@@ -55,27 +55,15 @@ public class RequestMetadataMatchPolicy : MatcherPolicy, IEndpointComparerPolicy
                 //var headerExists = headers.TryGetValue(matcher.Name, out var requestHeaderValues);
                 //var valueIsEmpty = StringValues.IsNullOrEmpty(requestHeaderValues);
 
-                if (!httpContext.Request.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase))
+                var host = httpContext.Request.Host.Host;
+
+                var matched = host.Equals(matcher.Host) && httpContext.Request.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase);
+
+                if (!matched)
                 {
                     candidates.SetValidity(i, false);
+                    break;
                 }
-
-                //var matched = matcher.Mode switch
-                //{
-                //    HeaderMatchMode.Exists => !valueIsEmpty,
-                //    HeaderMatchMode.NotExists => !headerExists,
-                //    //HeaderMatchMode.ExactHeader => !valueIsEmpty && TryMatchExactOrPrefix(matcher, requestHeaderValues),
-                //    //HeaderMatchMode.HeaderPrefix => !valueIsEmpty && TryMatchExactOrPrefix(matcher, requestHeaderValues),
-                //    //HeaderMatchMode.Contains => !valueIsEmpty && TryMatchContainsOrNotContains(matcher, requestHeaderValues),
-                //    //HeaderMatchMode.NotContains => valueIsEmpty || TryMatchContainsOrNotContains(matcher, requestHeaderValues),
-                //    _ => false
-                //};
-
-                //if (!matched)
-                //{
-                //    candidates.SetValidity(i, false);
-                //    break;
-                //}
             }
         }
 

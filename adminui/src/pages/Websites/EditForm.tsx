@@ -47,6 +47,11 @@ export const EditForm: React.FC<any> = (props) => {
               <Form.Item name="isAllowUnsafeSslCertificate" label="是否检查SSL证书有效性" valuePropName="checked">
                 <Switch checkedChildren="忽略SSL证书检查" unCheckedChildren="严格检查SSL证书有效性" />
               </Form.Item>
+            </Col> 
+             <Col span={8}>
+              <Form.Item name="isAutoRedirectHttp2Https" label="Http自动跳转到Https" valuePropName="checked">
+                <Switch checkedChildren="自动跳转" unCheckedChildren="不自动跳转" />
+              </Form.Item>
             </Col>
           </Row>
           <Row gutter={[8, 8]}>

@@ -9,6 +9,7 @@ namespace Yaginx.Models.WebsiteModels
         public WebsiteMapping()
         {
             CreateMap<WebsiteUpsertRequest, Website>();
+            CreateMap<Website, WebsiteUpsertRequest>();
             CreateMap<Website, WebsiteListItem>()
                 .ForMember(d => d.IsHaveSslCert, mo => mo.MapFrom<DomainHasCertResolver, string>(s => s.DefaultHost));
         }

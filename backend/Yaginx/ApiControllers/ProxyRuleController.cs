@@ -1,5 +1,6 @@
 using AgileLabs;
 using Microsoft.AspNetCore.Mvc;
+using Yaginx.Infrastructure;
 using Yaginx.Infrastructure.ProxyConfigProviders;
 
 namespace Yaginx.ApiControllers;

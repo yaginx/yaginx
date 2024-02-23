@@ -35,7 +35,7 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
             _changeToken = new CancellationTokenSource();
             _reloadToken = new RouteChangeToken();
 
-            ChangeToken.OnChange(() => _proxyRuleChangeNotifyService.CreateChanageToken(), Reload);
+            ChangeToken.OnChange(() => _proxyRuleChangeNotifyService.CreateProxyChanageToken(), Reload);
         }
 
         public IProxyConfig GetConfig()

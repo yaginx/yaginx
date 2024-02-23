@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using Yaginx.DomainModels;
 using Yaginx.Infrastructure.ProxyConfigProviders;
 using Yaginx.SimpleProcessors.ConfigProviders;
-using Yarp.ReverseProxy.Configuration;
 
 namespace Yaginx.Infrastructure
 {
@@ -16,23 +15,20 @@ namespace Yaginx.Infrastructure
         private IDisposable _subscription;
         private ILogger<FileProxyConfigProvider> _Logger;
         private readonly ProxyRuleChangeNotifyService _proxyRuleChangeNotifyService;
-        private readonly ProxyRuleRedisStorageService _proxyRuleRedisStorageService;
         private readonly IWebsiteRepository _websiteRepository;
 
         public SimpleProcessorConfigProvider(
             ILogger<FileProxyConfigProvider> logger,
             ProxyRuleChangeNotifyService proxyRuleChangeNotifyService,
-            ProxyRuleRedisStorageService proxyRuleRedisStorageService,
             IWebsiteRepository websiteRepository)
         {
             _Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _proxyRuleChangeNotifyService = proxyRuleChangeNotifyService;
-            _proxyRuleRedisStorageService = proxyRuleRedisStorageService;
             _websiteRepository = websiteRepository;
             _changeToken = new CancellationTokenSource();
             _reloadToken = new RouteChangeToken();
 
-            ChangeToken.OnChange(() => _proxyRuleChangeNotifyService.CreateChanageToken(), Reload);
+            ChangeToken.OnChange(() => _proxyRuleChangeNotifyService.CreateSimpleProcessorChanageToken(), Reload);
         }
         public ISimpleProcessorConfig GetConfig()
         {
@@ -56,10 +52,12 @@ namespace Yaginx.Infrastructure
                 //_config.Routes.AddRange(RuleConfigs.Select(x => x.Item1));
                 //_config.Clusters.AddRange(RuleConfigs.Select(x => x.Item2));
 
-                //var databaseConfigs = LoadDatabaseRules().ToList();
+                var databaseConfigs = LoadDatabaseRules().ToList();
 
                 //_config.Routes.AddRange(databaseConfigs.Select(x => x.Item1));
                 //_config.Clusters.AddRange(databaseConfigs.Select(x => x.Item2));
+
+                _config.Routes.AddRange(databaseConfigs);
 
                 CancellationTokenSource mOldChangeToken = _changeToken;
                 _changeToken = new CancellationTokenSource();
@@ -70,6 +68,36 @@ namespace Yaginx.Infrastructure
             catch (Exception ex)
             {
                 _Logger.LogError(0, ex, "UpdateConfig Error");
+            }
+        }
+        private IEnumerable<RequestMetadataConfig> LoadDatabaseRules()
+        {
+            var websites = _websiteRepository.SearchAsync().Result;
+            foreach (var website in websites)
+            {
+                if (!website.IsAutoRedirectHttp2Https)
+                    continue;
+
+                if (string.IsNullOrEmpty(website.DefaultHost))
+                    continue;
+
+                var websiteId = website.Id.Value.ToString();
+
+                RequestMetadataConfig config = new RequestMetadataConfig() { RouteId = websiteId };
+
+                config.PrimaryHost = website.DefaultHost.ToLower();
+
+                var relatedHost = new List<string>(website.Hosts.Count);
+                foreach (var host in website.Hosts)
+                {
+                    var normalizedHost = host.Domain.ToLower();
+                    if (!relatedHost.Contains(normalizedHost))
+                    {
+                        relatedHost.Add(normalizedHost);
+                    }
+                }
+                config.RelatedHost = relatedHost.ToArray();
+                yield return config;
             }
         }
 

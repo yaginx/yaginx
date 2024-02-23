@@ -2,7 +2,7 @@ using AgileLabs.Caching.Redis;
 using Microsoft.Extensions.Primitives;
 using StackExchange.Redis;
 
-namespace Yaginx.Infrastructure.ProxyConfigProviders
+namespace Yaginx.Infrastructure
 {
     public class ProxyRuleChangeNotifyService
     {
@@ -29,15 +29,22 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
         }
 
         #region Dynamic Update
-        private CancellationTokenSource _tokenSource;
+        private CancellationTokenSource _tokenSourceProxyRule;
+        private CancellationTokenSource _tokenSourceSimpleProcessor;
 
         /// <summary>
         /// 获取CancellationChangeToken实例方法
         /// </summary>
-        public CancellationChangeToken CreateChanageToken()
+        public CancellationChangeToken CreateProxyChanageToken()
         {
-            _tokenSource = new CancellationTokenSource();
-            return new CancellationChangeToken(_tokenSource.Token);
+            _tokenSourceProxyRule = new CancellationTokenSource();
+            return new CancellationChangeToken(_tokenSourceProxyRule.Token);
+        }
+
+        public CancellationChangeToken CreateSimpleProcessorChanageToken()
+        {
+            _tokenSourceSimpleProcessor = new CancellationTokenSource();
+            return new CancellationChangeToken(_tokenSourceSimpleProcessor.Token);
         }
 
         /// <summary>
@@ -46,7 +53,8 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
         public void ProxyRuleConfigChanged()
         {
             _logger.LogWarning($"Proxy Rules Config Changed!");
-            _tokenSource.Cancel();
+            _tokenSourceProxyRule.Cancel();
+            _tokenSourceSimpleProcessor.Cancel();
             _logger.LogWarning($"Proxy Rules Config Changed Notify Success!");
         }
         #endregion

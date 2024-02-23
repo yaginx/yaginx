@@ -38,6 +38,7 @@ public class Website
     /// 是否携带源主机头
     /// </summary>
     public bool IsWithOriginalHostHeader { get; set; }
+    public bool IsAutoRedirectHttp2Https { get; set; }
 
     public List<WebsiteHostItem> Hosts { get; set; }
     public List<WebsiteProxyRuleItem> ProxyRules { get; set; }
@@ -45,5 +46,4 @@ public class Website
     public DateTime UpdateTime { get; set; }
 
     public Dictionary<string, string> ProxyTransforms { get; set; }
-
 }

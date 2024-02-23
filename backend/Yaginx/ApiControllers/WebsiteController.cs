@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Yaginx.DataStore.LiteDBStore.Repositories;
 using Yaginx.DomainModels;
-using Yaginx.Infrastructure.ProxyConfigProviders;
+using Yaginx.Infrastructure;
 using Yaginx.Models.WebsiteModels;
 
 namespace Yaginx.ApiControllers;
@@ -18,7 +18,7 @@ public class WebsiteController : YaginxControllerBase
     }
 
     [HttpPost, Route("upsert")]
-    public async Task<WebsiteListItem> Add([FromBody] WebsiteUpsertRequest request)
+    public async Task<WebsiteUpsertRequest> Add([FromBody] WebsiteUpsertRequest request)
     {
         Website returnValue;
         if (!request.Id.HasValue)
@@ -45,7 +45,7 @@ public class WebsiteController : YaginxControllerBase
             returnValue = oldSite;
         }
         _proxyRuleChangeNotifyService.ProxyRuleConfigChanged();
-        return _mapper.Map<WebsiteListItem>(returnValue);
+        return _mapper.Map<WebsiteUpsertRequest>(returnValue);
     }
 
     [HttpDelete, Route("delete")]

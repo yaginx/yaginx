@@ -73,7 +73,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
             var endpoint = existingRoute.Value.CachedEndpoint;
             if (endpoint is null)
             {
-                endpoint = _simpleProcessorEndpointFactory.CreateEndpoint(existingRoute.Value.RouteId, existingRoute.Value.PrimaryHost, existingRoute.Value.RelatedHost, 0, _conventions);
+                endpoint = _simpleProcessorEndpointFactory.CreateEndpoint($"SimpleProcessor-{existingRoute.Value.RouteId}", existingRoute.Value.PrimaryHost, existingRoute.Value.RelatedHost, -1, _conventions);
                 existingRoute.Value.CachedEndpoint = endpoint;
             }
             endpoints.Add(endpoint);
@@ -215,7 +215,9 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
                 //var newModel = BuildRouteModel(incomingRoute, cluster);
                 var newState = new SimpleProcessRouteState()
                 {
-                    RouteId = incomingRoute.RouteId
+                    RouteId = incomingRoute.RouteId,
+                    PrimaryHost = incomingRoute.PrimaryHost,
+                    RelatedHost = incomingRoute.RelatedHost
                     //Model = newModel,
                     //ClusterRevision = cluster?.Revision,
                 };
