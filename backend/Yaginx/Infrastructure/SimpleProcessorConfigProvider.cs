@@ -13,12 +13,12 @@ namespace Yaginx.Infrastructure
         private RouteChangeToken _reloadToken;
         private bool _disposed;
         private IDisposable _subscription;
-        private ILogger<FileProxyConfigProvider> _Logger;
+        private ILogger<SimpleProcessorConfigProvider> _Logger;
         private readonly ProxyRuleChangeNotifyService _proxyRuleChangeNotifyService;
         private readonly IWebsiteRepository _websiteRepository;
 
         public SimpleProcessorConfigProvider(
-            ILogger<FileProxyConfigProvider> logger,
+            ILogger<SimpleProcessorConfigProvider> logger,
             ProxyRuleChangeNotifyService proxyRuleChangeNotifyService,
             IWebsiteRepository websiteRepository)
         {
@@ -47,7 +47,7 @@ namespace Yaginx.Infrastructure
 
             try
             {
-                _Logger.LogInformation(0, "Start load ReverseProxy Config");
+                _Logger.LogInformation(0, "Start load SimpleProcessor Config");
                 //var RuleConfigs = LoadRedisDyamicRules().ToList();
                 //_config.Routes.AddRange(RuleConfigs.Select(x => x.Item1));
                 //_config.Clusters.AddRange(RuleConfigs.Select(x => x.Item2));
@@ -63,7 +63,7 @@ namespace Yaginx.Infrastructure
                 _changeToken = new CancellationTokenSource();
                 _config.ChangeToken = new CancellationChangeToken(_changeToken.Token);
                 mOldChangeToken?.Cancel(throwOnFirstException: false);
-                _Logger.LogInformation(0, "Success load ReverseProxy Config");
+                _Logger.LogInformation(0, "Success load SimpleProcessor Config");
             }
             catch (Exception ex)
             {

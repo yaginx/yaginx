@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Primitives;
 using Serilog;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Yaginx.SimpleProcessors.ConfigProviders;
@@ -23,9 +24,11 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
     public SimpleProcessorConventionBuilder DefaultBuilder { get; }
 
     private readonly ConfigState[] _configs;
+    private readonly ISimpleProcessorConfigChangeListener [] _configChangeListeners;
 
     public SimpleProcessorConfigManager(SimpleProcessorEndpointFactory simpleProcessorEndpointFactory,
-        IEnumerable<ISimpleProcessorConfigProvider> providers)
+        IEnumerable<ISimpleProcessorConfigProvider> providers,
+        IEnumerable<ISimpleProcessorConfigChangeListener> configChangeListeners)
     {
         _endpointsChangeToken = new CancellationChangeToken(_endpointsChangeSource.Token);
         _conventions = new List<Action<EndpointBuilder>>();
@@ -33,6 +36,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
         _simpleProcessorEndpointFactory = simpleProcessorEndpointFactory;
 
         _providers = providers?.ToArray() ?? throw new ArgumentNullException(nameof(providers));
+        _configChangeListeners = configChangeListeners?.ToArray() ?? Array.Empty<ISimpleProcessorConfigChangeListener>();
 
         if (_providers.Length == 0)
         {
@@ -158,7 +162,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
             //    configChangeListener.ConfigurationApplied(proxyConfigs);
             //}
 
-            //ListenForConfigChanges();
+            ListenForConfigChanges();
             await Task.CompletedTask;
         }
         catch (Exception ex)
@@ -170,6 +174,166 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
         // Directly enumerate the ConcurrentDictionary to limit locking and copying.
         //_ = _activeHealthCheckMonitor.CheckHealthAsync(_clusters.Select(pair => pair.Value));
         return this;
+    }
+
+    private void ListenForConfigChanges()
+    {
+        // Use a central change token to avoid overlap between different sources.
+        var source = new CancellationTokenSource();
+        _configChangeSource = source;
+        var poll = false;
+
+        foreach (var configState in _configs)
+        {
+            if (configState.LoadFailed)
+            {
+                // We can't register for change notifications if the last load failed.
+                poll = true;
+                continue;
+            }
+
+            configState.CallbackCleanup?.Dispose();
+            var token = configState.LatestConfig.ChangeToken;
+            if (token.ActiveChangeCallbacks)
+            {
+                configState.CallbackCleanup = token.RegisterChangeCallback(SignalChange, source);
+            }
+            else
+            {
+                poll = true;
+            }
+        }
+
+        if (poll)
+        {
+            source.CancelAfter(TimeSpan.FromMinutes(5));
+        }
+
+        // Don't register until we're done hooking everything up to avoid cancellation races.
+        source.Token.Register(ReloadConfig, this);
+
+        static void SignalChange(object? obj)
+        {
+            var token = (CancellationTokenSource)obj!;
+            try
+            {
+                token.Cancel();
+            }
+            // Don't throw if the source was already disposed.
+            catch (ObjectDisposedException) { }
+        }
+
+        static void ReloadConfig(object? state)
+        {
+            var manager = (SimpleProcessorConfigManager)state!;
+            _ = manager.ReloadConfigAsync();
+        }
+    }
+    private async Task ReloadConfigAsync()
+    {
+        _configChangeSource.Dispose();
+
+        var sourcesChanged = false;
+        var routes = new List<RequestMetadataConfig>();
+        var clusters = new List<ClusterConfig>();
+        var reloadedConfigs = new List<(ConfigState Config, ValueTask<ISimpleProcessorConfig> ResolveTask)>();
+
+        // Start reloading changed configurations.
+        foreach (var instance in _configs)
+        {
+            if (instance.LatestConfig.ChangeToken.HasChanged)
+            {
+                try
+                {
+                    var reloadTask = LoadConfigAsync(instance.Provider, cancellationToken: default);
+                    reloadedConfigs.Add((instance, reloadTask));
+                }
+                catch (Exception ex)
+                {
+                    OnConfigLoadError(instance, ex);
+                }
+            }
+        }
+
+        // Wait for all changed config providers to be reloaded.
+        foreach (var (instance, loadTask) in reloadedConfigs)
+        {
+            try
+            {
+                instance.LatestConfig = await loadTask.ConfigureAwait(false);
+                instance.LoadFailed = false;
+                sourcesChanged = true;
+            }
+            catch (Exception ex)
+            {
+                OnConfigLoadError(instance, ex);
+            }
+        }
+
+        // Extract the routes and clusters from the configs, regardless of whether they were reloaded.
+        foreach (var instance in _configs)
+        {
+            if (instance.LatestConfig.Routes is { Count: > 0 } updatedRoutes)
+            {
+                routes.AddRange(updatedRoutes);
+            }
+
+            //if (instance.LatestConfig.Clusters is { Count: > 0 } updatedClusters)
+            //{
+            //    clusters.AddRange(updatedClusters);
+            //}
+        }
+
+        var proxyConfigs = ExtractListOfProxyConfigs(_configs);
+        foreach (var configChangeListener in _configChangeListeners)
+        {
+            configChangeListener.ConfigurationLoaded(proxyConfigs);
+        }
+
+        try
+        {
+            // Only reload if at least one provider changed.
+            if (sourcesChanged)
+            {
+                var hasChanged = await ApplyConfigAsync(routes);
+                lock (_syncRoot)
+                {
+                    // Skip if changes are signaled before the endpoints are initialized for the first time.
+                    // The endpoint conventions might not be ready yet.
+                    if (hasChanged && _endpoints is not null)
+                    {
+                        CreateEndpoints();
+                    }
+                }
+            }
+
+            foreach (var configChangeListener in _configChangeListeners)
+            {
+                configChangeListener.ConfigurationApplied(proxyConfigs);
+            }
+        }
+        catch (Exception ex)
+        {
+            //Log.ErrorApplyingConfig(_logger, ex);
+
+            foreach (var configChangeListener in _configChangeListeners)
+            {
+                configChangeListener.ConfigurationApplyingFailed(proxyConfigs, ex);
+            }
+        }
+
+        ListenForConfigChanges();
+
+        void OnConfigLoadError(ConfigState instance, Exception ex)
+        {
+            instance.LoadFailed = true;
+            //Log.ErrorReloadingConfig(_logger, ex);
+
+            foreach (var configChangeListener in _configChangeListeners)
+            {
+                configChangeListener.ConfigurationLoadingFailed(instance.Provider, ex);
+            }
+        }
     }
     private async Task<bool> ApplyConfigAsync(IReadOnlyList<RequestMetadataConfig> routes)
     {
