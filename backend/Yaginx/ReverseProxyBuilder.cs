@@ -7,7 +7,10 @@ using System.Text.RegularExpressions;
 
 public static class ReverseProxyBuilder
 {
-    public static void ProxyBuilder(IReverseProxyApplicationBuilder app) => app.Use(ProxyForwarder);
+    public static void ProxyBuilder(IReverseProxyApplicationBuilder app)
+    {
+        app.Use(ProxyForwarder);
+    }
 
     private static async Task ProxyForwarder(HttpContext context, Func<Task> next)
     {

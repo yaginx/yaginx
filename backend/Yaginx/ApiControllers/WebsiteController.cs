@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Text;
 using Yaginx.DataStore.LiteDBStore.Repositories;
 using Yaginx.DomainModels;
 using Yaginx.Infrastructure;
@@ -73,5 +75,19 @@ public class WebsiteController : YaginxControllerBase
     {
         var entity = await _websiteRepository.GetByNameAsync(name);
         return _mapper.Map<WebsiteListItem>(entity);
+    }
+
+    [HttpGet, Route("config/backup")]
+    public async Task<IActionResult> BackupConfig()
+    {
+        var result = await _websiteRepository.SearchAsync();
+        HttpContext.Response.Headers.TryAdd("Content-Disposition", "attachment; filename=\"website_config_backup.json\"");
+        return Content(JsonConvert.SerializeObject(result), "application/octet-stream", contentEncoding: Encoding.UTF8);
+    }
+
+    public async Task<IActionResult> RestoreConfig()
+    {
+        await Task.CompletedTask;
+        return Content(string.Empty);
     }
 }
