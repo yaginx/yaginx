@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.Extensions;
 using Yaginx.SimpleProcessors.ConfigProviders;
 using Yarp.ReverseProxy.Configuration;
+using Yarp.ReverseProxy.Model;
 
 namespace Yaginx.SimpleProcessors;
 public interface ISimpleProcessorConfigChangeListener
@@ -47,8 +48,9 @@ internal sealed class AutoRedirectToHttpsMiddleware
     {
         //_ = context ?? throw new ArgumentNullException(nameof(context));
 
-        //var config = context.GetRouteModel().Config;
+        var feature = context.Features.Get<ISimpleProcessorFeature>() ?? throw new InvalidOperationException($"{typeof(ISimpleProcessorFeature).FullName} is missing.");
 
+        var model = feature.Model;
         //if (config.MaxRequestBodySize.HasValue)
         //{
         //    var sizeFeature = context.Features.Get<IHttpMaxRequestBodySizeFeature>();
@@ -61,7 +63,7 @@ internal sealed class AutoRedirectToHttpsMiddleware
         //        Log.MaxRequestBodySizeSet(_logger, limit);
         //    }
         //}
-        context.Response.Redirect($"https://{context.Request.Host}{context.Request.GetEncodedPathAndQuery()}");
+        context.Response.Redirect($"https://{model.PrimaryHost}{context.Request.GetEncodedPathAndQuery()}");
         await Task.CompletedTask;
     }
 

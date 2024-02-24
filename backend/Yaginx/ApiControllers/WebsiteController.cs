@@ -1,5 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AgileLabs.AspNet.WebApis.Exceptions;
+using AgileLabs.FileUpload;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System.Collections;
 using System.Text;
 using Yaginx.DataStore.LiteDBStore.Repositories;
 using Yaginx.DomainModels;
@@ -82,12 +89,64 @@ public class WebsiteController : YaginxControllerBase
     {
         var result = await _websiteRepository.SearchAsync();
         HttpContext.Response.Headers.TryAdd("Content-Disposition", "attachment; filename=\"website_config_backup.json\"");
-        return Content(JsonConvert.SerializeObject(result), "application/octet-stream", contentEncoding: Encoding.UTF8);
+        return Content(JsonConvert.SerializeObject(result.ToList()), "application/octet-stream", contentEncoding: Encoding.UTF8);
+    }
+    [HttpPost]
+    [DisableFormValueModelBinding]
+    [Route("config/restore")]
+    public async Task RestoreConfig()
+    {
+        var formOptions = HttpContext.RequestServices.GetRequiredService<IOptions<FormOptions>>()?.Value;
+        var allowExtensions = new[] { ".json" };
+        Func<string, long> getSizeLimitFunc = (ext) =>
+        {
+            var result = 2L * 1024 * 1024 * 1024;
+            switch (ext)
+            {
+                case ".json":
+                    result = 4L * 1024 * 1024 * 1024;
+                    break;
+                default:
+                    break;
+            }
+            return result;
+        };
+        var files = await this.ReadUploadFiles(formOptions, allowExtensions, getSizeLimitFunc);
+        if (files.Count != 1)
+        {
+            throw new Exception("只允许上传一个文件");
+        }       
+
+        try
+        {
+            var fileContent = files.First().FileContent;
+
+            string configJson = Encoding.UTF8.GetString(fileContent);
+
+            var websites = JsonConvert.DeserializeObject<List<Website>>(configJson);
+            foreach (var website in websites)
+            {
+                await _websiteRepository.UpdateAsync(website);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("恢复失败", ex);
+        }
+    }
+}
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+public class DisableFormValueModelBindingAttribute : Attribute, IResourceFilter
+{
+    public void OnResourceExecuting(ResourceExecutingContext context)
+    {
+        var factories = context.ValueProviderFactories;
+        factories.RemoveType<FormValueProviderFactory>();
+        factories.RemoveType<FormFileValueProviderFactory>();
+        factories.RemoveType<JQueryFormValueProviderFactory>();
     }
 
-    public async Task<IActionResult> RestoreConfig()
+    public void OnResourceExecuted(ResourceExecutedContext context)
     {
-        await Task.CompletedTask;
-        return Content(string.Empty);
     }
 }

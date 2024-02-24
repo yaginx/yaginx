@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Primitives;
 using System.Runtime.CompilerServices;
-using Yarp.ReverseProxy.Configuration;
 
 namespace Yaginx.SimpleProcessors.ConfigProviders;
 
@@ -16,7 +15,7 @@ public interface ISimpleProcessorConfig
     /// <summary>
     /// Routes matching requests to clusters.
     /// </summary>
-    IReadOnlyList<RequestMetadataConfig> Routes { get; }
+    IReadOnlyList<WebSiteMetadataConfig> WebSites { get; }
 
     /// <summary>
     /// A notification that triggers when this snapshot expires.
@@ -30,7 +29,7 @@ public class SimpleProcessConfig : ISimpleProcessorConfig
     /// <summary>
     /// 当前路由
     /// </summary>
-    public List<RequestMetadataConfig> Routes { get; internal set; } = new List<RequestMetadataConfig>();
+    public List<WebSiteMetadataConfig> WebSites { get; internal set; } = new List<WebSiteMetadataConfig>();
 
     /// <summary>
     /// 热更新Token
@@ -39,5 +38,5 @@ public class SimpleProcessConfig : ISimpleProcessorConfig
     /// <summary>
     /// 实现接口
     /// </summary>
-    IReadOnlyList<RequestMetadataConfig> ISimpleProcessorConfig.Routes => Routes;
+    IReadOnlyList<WebSiteMetadataConfig> ISimpleProcessorConfig.WebSites => WebSites;
 }

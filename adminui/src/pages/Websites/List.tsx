@@ -1,18 +1,18 @@
 import { TableOperationMenuItem } from "@/componets/TableOperationMenus"
 import { PageHeader } from "@ant-design/pro-components"
-import { Space, Button } from "antd"
+import { Space, Button, UploadProps, message, Upload } from "antd"
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import TableList from "@/componets/TableList"
 import { websiteDelete, websiteSearch } from "@/api/docker"
 import { renderTableItem } from "@/componets/ModelCrudViews/renderTableItem"
+import { DownloadOutlined, UploadOutlined } from "@ant-design/icons"
 
 const List: React.FC = (props) => {
   const pkFieldName = "id";
 
   const navigate = useNavigate();
   const [refreshTable, forceRefreshTable] = useState<number>(0);
-  const [editModalFormVisiable, setEditModalFormVisiable] = useState(false);
 
   const renderTableOperationMenu: (record: any) => TableOperationMenuItem[] = (record: any) => {
     var tempItems: TableOperationMenuItem[] = [];
@@ -52,12 +52,42 @@ const List: React.FC = (props) => {
     //   render: (text: any, record: any) => record.proxyRules.map((element: any) => <>{element?.pathPattern}</>)
     // })
   }
-
+  const downloadConfig = async () => {
+    const newTab = window.open('/api/website/config/backup', '_blank');
+    newTab?.focus();
+    message.success(`网站配置备份成功`);
+  };
+  const uploadProps: UploadProps = {
+    name: 'file',
+    action: '/api/website/config/restore',
+    // headers: {
+    //   authorization: 'authorization-text',
+    // },
+    showUploadList: false,
+    onChange(info) {
+      if (info.file.status !== 'uploading') {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === 'done') {
+        forceRefreshTable(Math.random() + 1)
+        message.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+  };
   return (
-    <PageHeader title={"Websites"} tags={
+    <PageHeader title={"站点管理"} tags={
       <Space size="middle">
         <Button key="refresh" onClick={() => forceRefreshTable(Math.random() + 1)} >Refresh</Button>
         <Button key="create" onClick={() => navigate("../create")} >Create</Button>
+      </Space>
+    } extra={
+      <Space size="middle">
+        <Button icon={<DownloadOutlined />} onClick={downloadConfig}>备份配置</Button>
+        <Upload {...uploadProps}>
+          <Button icon={<UploadOutlined />}>恢复配置</Button>
+        </Upload>
       </Space>
     }>
       <TableList searchAction={websiteSearch} realodTableData={refreshTable} initTableColumn={initTableColumn}

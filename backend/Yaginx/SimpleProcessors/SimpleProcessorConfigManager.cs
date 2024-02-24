@@ -24,7 +24,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
     public SimpleProcessorConventionBuilder DefaultBuilder { get; }
 
     private readonly ConfigState[] _configs;
-    private readonly ISimpleProcessorConfigChangeListener [] _configChangeListeners;
+    private readonly ISimpleProcessorConfigChangeListener[] _configChangeListeners;
 
     public SimpleProcessorConfigManager(SimpleProcessorEndpointFactory simpleProcessorEndpointFactory,
         IEnumerable<ISimpleProcessorConfigProvider> providers,
@@ -77,7 +77,12 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
             var endpoint = existingRoute.Value.CachedEndpoint;
             if (endpoint is null)
             {
-                endpoint = _simpleProcessorEndpointFactory.CreateEndpoint($"SimpleProcessor-{existingRoute.Value.RouteId}", existingRoute.Value.PrimaryHost, existingRoute.Value.RelatedHost, -1, _conventions);
+                var model = new RequestMetadataModel
+                {
+                    PrimaryHost = existingRoute.Value.PrimaryHost,
+                    RelatedHost = existingRoute.Value.RelatedHost
+                };
+                endpoint = _simpleProcessorEndpointFactory.CreateEndpoint($"SimpleProcessor-{existingRoute.Value.RouteId}", model, -1, _conventions);
                 existingRoute.Value.CachedEndpoint = endpoint;
             }
             endpoints.Add(endpoint);
@@ -128,7 +133,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
         // We intend this to crash the app so we don't try listening for further changes.
         try
         {
-            var routes = new List<RequestMetadataConfig>();
+            var routes = new List<WebSiteMetadataConfig>();
 
             // Begin resolving config providers concurrently.
             var resolvedConfigs = new List<(int Index, ISimpleProcessorConfigProvider Provider, ValueTask<ISimpleProcessorConfig> Config)>(_providers.Length);
@@ -144,7 +149,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
             {
                 var config = await configLoadTask;
                 _configs[i] = new ConfigState(provider, config);
-                routes.AddRange(config.Routes ?? Array.Empty<RequestMetadataConfig>());
+                routes.AddRange(config.WebSites ?? Array.Empty<WebSiteMetadataConfig>());
                 //clusters.AddRange(config.Clusters ?? Array.Empty<ClusterConfig>());
             }
 
@@ -234,7 +239,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
         _configChangeSource.Dispose();
 
         var sourcesChanged = false;
-        var routes = new List<RequestMetadataConfig>();
+        var routes = new List<WebSiteMetadataConfig>();
         var clusters = new List<ClusterConfig>();
         var reloadedConfigs = new List<(ConfigState Config, ValueTask<ISimpleProcessorConfig> ResolveTask)>();
 
@@ -273,7 +278,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
         // Extract the routes and clusters from the configs, regardless of whether they were reloaded.
         foreach (var instance in _configs)
         {
-            if (instance.LatestConfig.Routes is { Count: > 0 } updatedRoutes)
+            if (instance.LatestConfig.WebSites is { Count: > 0 } updatedRoutes)
             {
                 routes.AddRange(updatedRoutes);
             }
@@ -335,7 +340,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
             }
         }
     }
-    private async Task<bool> ApplyConfigAsync(IReadOnlyList<RequestMetadataConfig> routes)
+    private async Task<bool> ApplyConfigAsync(IReadOnlyList<WebSiteMetadataConfig> routes)
     {
         var (configuredRoutes, routeErrors) = await VerifyRoutesAsync(routes, cancellation: default);
 
@@ -348,7 +353,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
         var routesChanged = UpdateRuntimeRoutes(configuredRoutes);
         return routesChanged;
     }
-    private bool UpdateRuntimeRoutes(IList<RequestMetadataConfig> incomingRoutes)
+    private bool UpdateRuntimeRoutes(IList<WebSiteMetadataConfig> incomingRoutes)
     {
         var desiredRoutes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var changed = false;
@@ -412,15 +417,15 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
 
         return changed;
     }
-    private async Task<(IList<RequestMetadataConfig>, IList<Exception>)> VerifyRoutesAsync(IReadOnlyList<RequestMetadataConfig> routes, CancellationToken cancellation)
+    private async Task<(IList<WebSiteMetadataConfig>, IList<Exception>)> VerifyRoutesAsync(IReadOnlyList<WebSiteMetadataConfig> routes, CancellationToken cancellation)
     {
         if (routes is null)
         {
-            return (Array.Empty<RequestMetadataConfig>(), Array.Empty<Exception>());
+            return (Array.Empty<WebSiteMetadataConfig>(), Array.Empty<Exception>());
         }
 
         var seenRouteIds = new HashSet<string>(routes.Count, StringComparer.OrdinalIgnoreCase);
-        var configuredRoutes = new List<RequestMetadataConfig>(routes.Count);
+        var configuredRoutes = new List<WebSiteMetadataConfig>(routes.Count);
         var errors = new List<Exception>();
 
         foreach (var r in routes)
@@ -468,7 +473,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
 
         if (errors.Count > 0)
         {
-            return (Array.Empty<RequestMetadataConfig>(), errors);
+            return (Array.Empty<WebSiteMetadataConfig>(), errors);
         }
         await Task.CompletedTask;
         return (configuredRoutes, errors);
@@ -620,7 +625,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
             ChangeToken = changeToken;
         }
 
-        public IReadOnlyList<RequestMetadataConfig> Routes => _innerConfig.Routes;
+        public IReadOnlyList<WebSiteMetadataConfig> WebSites => _innerConfig.WebSites;
         //public IReadOnlyList<ClusterConfig> Clusters { get; }
         public IChangeToken ChangeToken { get; }
     }

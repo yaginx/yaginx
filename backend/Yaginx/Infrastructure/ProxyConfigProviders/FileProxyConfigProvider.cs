@@ -144,7 +144,7 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
 
                 foreach (var host in website.Hosts)
                 {
-                    var normalizedHost = host.Domain.ToLower();
+                    var normalizedHost = host.ToLower();
                     if (!hosts.Contains(normalizedHost))
                     {
                         hosts.Add(normalizedHost);

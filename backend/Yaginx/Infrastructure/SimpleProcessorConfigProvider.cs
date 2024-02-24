@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Primitives;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using Yaginx.DomainModels;
 using Yaginx.Infrastructure.ProxyConfigProviders;
@@ -57,7 +58,7 @@ namespace Yaginx.Infrastructure
                 //_config.Routes.AddRange(databaseConfigs.Select(x => x.Item1));
                 //_config.Clusters.AddRange(databaseConfigs.Select(x => x.Item2));
 
-                _config.Routes.AddRange(databaseConfigs);
+                _config.WebSites.AddRange(databaseConfigs);
 
                 CancellationTokenSource mOldChangeToken = _changeToken;
                 _changeToken = new CancellationTokenSource();
@@ -70,7 +71,7 @@ namespace Yaginx.Infrastructure
                 _Logger.LogError(0, ex, "UpdateConfig Error");
             }
         }
-        private IEnumerable<RequestMetadataConfig> LoadDatabaseRules()
+        private IEnumerable<WebSiteMetadataConfig> LoadDatabaseRules()
         {
             var websites = _websiteRepository.SearchAsync().Result;
             foreach (var website in websites)
@@ -82,15 +83,21 @@ namespace Yaginx.Infrastructure
                     continue;
 
                 var websiteId = website.Id.Value.ToString();
+                var metadata = new Dictionary<string, object>();
+                metadata.Add("RawModel", website);
 
-                RequestMetadataConfig config = new RequestMetadataConfig() { RouteId = websiteId };
+                WebSiteMetadataConfig config = new WebSiteMetadataConfig()
+                {
+                    RouteId = websiteId,
+                    Metadata = new ReadOnlyDictionary<string, object>(metadata)
+                };
 
                 config.PrimaryHost = website.DefaultHost.ToLower();
 
-                var relatedHost = new List<string>(website.Hosts.Count);
+                var relatedHost = new List<string>(website.Hosts.Length);
                 foreach (var host in website.Hosts)
                 {
-                    var normalizedHost = host.Domain.ToLower();
+                    var normalizedHost = host.ToLower();
                     if (!relatedHost.Contains(normalizedHost))
                     {
                         relatedHost.Add(normalizedHost);

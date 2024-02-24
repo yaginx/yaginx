@@ -40,10 +40,19 @@ public class Website
     public bool IsWithOriginalHostHeader { get; set; }
     public bool IsAutoRedirectHttp2Https { get; set; }
 
-    public List<WebsiteHostItem> Hosts { get; set; }
+    public string[] Hosts { get; set; }
     public List<WebsiteProxyRuleItem> ProxyRules { get; set; }
     public DateTime CreateTime { get; set; }
     public DateTime UpdateTime { get; set; }
 
     public Dictionary<string, string> ProxyTransforms { get; set; }
+    public List<SimpleResponseItem> SimpleResponses { get; set; }
+}
+public class SimpleResponseItem
+{
+    public string Url { get; set; }
+    public string ContentType { get; set; }
+    public int StatusCode { get; set; }
+    public string ResponseContent { get; set; }
+    public List<KeyValuePair<string, string>> ExtraHeaders { get; set; }
 }

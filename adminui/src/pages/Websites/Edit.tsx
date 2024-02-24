@@ -32,9 +32,12 @@ export const Edit: React.FC = (props) => {
     setInitialValues(newValue);
     form.setFieldsValue(newValue);
   };
+
+
   useEffect(() => {
     get();
   }, []);
+
   return (
     <PageHeader title={`Website: [#${initialValues["name"]}]`} onBack={() => navigate("../")}
       extra={<Space size="middle">

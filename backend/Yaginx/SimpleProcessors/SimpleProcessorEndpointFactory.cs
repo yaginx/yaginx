@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.FileSystemGlobbing;
 using System.Text.RegularExpressions;
+using Yaginx.SimpleProcessors.ConfigProviders;
 using Yaginx.SimpleProcessors.RequestMetadatas;
 using Yarp.ReverseProxy.Model;
 
@@ -9,7 +10,7 @@ namespace Yaginx.SimpleProcessors;
 public sealed class SimpleProcessorEndpointFactory
 {
     private RequestDelegate? _pipeline;
-    public Endpoint CreateEndpoint(string name, string primaryHost, string[] releatedHosts, int order = 0, IReadOnlyList<Action<EndpointBuilder>> conventions = null)
+    public Endpoint CreateEndpoint(string name, RequestMetadataModel model, int order = 0, IReadOnlyList<Action<EndpointBuilder>> conventions = null)
     {
         //var config = route.Config;
         //var match = config.Match;
@@ -25,7 +26,7 @@ public sealed class SimpleProcessorEndpointFactory
             DisplayName = name
         };
 
-        //endpointBuilder.Metadata.Add(route);
+        endpointBuilder.Metadata.Add(model);
 
         //if (match.Hosts is not null && match.Hosts.Count != 0)
         //{
@@ -48,12 +49,14 @@ public sealed class SimpleProcessorEndpointFactory
         //    matchers.Add(new RequestMetadataMatcher(header.Name, header.Values, header.Mode, header.IsCaseSensitive));
         //    endpointBuilder.Metadata.Add(new RequestMetadata(matchers));
         //}
+        var relatedHosts = model.RelatedHost;
+        var primaryHost = model.PrimaryHost;
         endpointBuilder.Metadata.Add(new RequestMetadata(new List<RequestMetadataMatcher>()));
-        var matchers = new List<RequestMetadataMatcher>(releatedHosts?.Length ?? 0 + 1);
+        var matchers = new List<RequestMetadataMatcher>(relatedHosts?.Length ?? 0 + 1);
         matchers.Add(new RequestMetadataMatcher(primaryHost));
-        if (releatedHosts != null)
+        if (relatedHosts != null)
         {
-            foreach (var item in releatedHosts)
+            foreach (var item in relatedHosts)
             {
                 matchers.Add(new RequestMetadataMatcher(item));
             }
