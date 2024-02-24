@@ -50,12 +50,19 @@ steps:
     - helpdocs
     - backend  
     environment:
+      HUB_HOST: 
+        from_secret: hub_host
+      HUB_USERNAME: 
+        from_secret: hub_username
+      HUB_PASSWORD: 
+        from_secret: hub_password 
     commands:
       - export IMAGE_VERSION=$(date +'%y%m%d_%H%M%S')
       - echo $${IMAGE_VERSION} > `pwd`/publish/version.txt
       - echo "current version" && cat `pwd`/publish/version.txt
 
       - echo "开始构建docker镜像"
-      - docker build -t cnhub.feinian.net/yaginx/yaginx:latest -t cnhub.feinian.net/yaginx/yaginx:$IMAGE_VERSION --file `pwd`/backend/Yaginx/Dockerfile `pwd`/publish
-      - docker push cnhub.feinian.net/yaginx/yaginx:$IMAGE_VERSION
-      - docker push cnhub.feinian.net/yaginx/yaginx:latest
+      - docker login --username $$HUB_USERNAME --password $$HUB_PASSWORD $$HUB_HOST
+      - docker build -t $HUB_HOST/yaginx/yaginx:latest -t $HUB_HOST/yaginx/yaginx:$IMAGE_VERSION --file `pwd`/backend/Yaginx/Dockerfile `pwd`/publish
+      - docker push $HUB_HOST/yaginx/yaginx:$IMAGE_VERSION
+      - docker push $HUB_HOST/yaginx/yaginx:latest
