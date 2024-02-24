@@ -1,14 +1,12 @@
 ﻿using Microsoft.Extensions.Primitives;
-using Serilog;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Yaginx.DomainModels;
 using Yaginx.SimpleProcessors.ConfigProviders;
 using Yarp.ReverseProxy.Configuration;
 
 namespace Yaginx.SimpleProcessors;
-
 
 public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
 {
@@ -16,7 +14,8 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
     private List<Endpoint>? _endpoints;
     private IChangeToken _endpointsChangeToken;
     private readonly List<Action<EndpointBuilder>> _conventions;
-    private readonly SimpleProcessorEndpointFactory _simpleProcessorEndpointFactory;
+    private readonly Http2HttpsEndpointFactory _simpleProcessorEndpointFactory;
+    private readonly WebsitePreProcessEndpointFactory _websitePreProcessEndpointFactory;
     private readonly ISimpleProcessorConfigProvider[] _providers;
     private CancellationTokenSource _endpointsChangeSource = new();
     private CancellationTokenSource _configChangeSource = new();
@@ -26,7 +25,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
     private readonly ConfigState[] _configs;
     private readonly ISimpleProcessorConfigChangeListener[] _configChangeListeners;
 
-    public SimpleProcessorConfigManager(SimpleProcessorEndpointFactory simpleProcessorEndpointFactory,
+    public SimpleProcessorConfigManager(Http2HttpsEndpointFactory simpleProcessorEndpointFactory, WebsitePreProcessEndpointFactory websitePreProcessEndpointFactory,
         IEnumerable<ISimpleProcessorConfigProvider> providers,
         IEnumerable<ISimpleProcessorConfigChangeListener> configChangeListeners)
     {
@@ -34,7 +33,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
         _conventions = new List<Action<EndpointBuilder>>();
         DefaultBuilder = new SimpleProcessorConventionBuilder(_conventions);
         _simpleProcessorEndpointFactory = simpleProcessorEndpointFactory;
-
+        _websitePreProcessEndpointFactory = websitePreProcessEndpointFactory;
         _providers = providers?.ToArray() ?? throw new ArgumentNullException(nameof(providers));
         _configChangeListeners = configChangeListeners?.ToArray() ?? Array.Empty<ISimpleProcessorConfigChangeListener>();
 
@@ -73,20 +72,52 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
         // Directly enumerate the ConcurrentDictionary to limit locking and copying.
         foreach (var existingRoute in _routes)
         {
+            if (!existingRoute.Value.Metadata.TryGetValue("RawModel", out var websiteObjValue))
+            {
+                continue;
+            }
+
+            var website = (Website)websiteObjValue;
+            if (website.SimpleResponses == null || !website.SimpleResponses.Any())
+            {
+                continue;
+            }
+
             // Only rebuild the endpoint for modified routes or clusters.
-            var endpoint = existingRoute.Value.CachedEndpoint;
+            var endpoint = existingRoute.Value.CachedWebsitePreProcessEndpoint;
             if (endpoint is null)
             {
-                var model = new RequestMetadataModel
+                var model = new WebsitePreProcessMetadataModel
                 {
                     PrimaryHost = existingRoute.Value.PrimaryHost,
-                    RelatedHost = existingRoute.Value.RelatedHost
+                    RelatedHost = existingRoute.Value.RelatedHost,
+                    Metadata = existingRoute.Value.Metadata,
                 };
-                endpoint = _simpleProcessorEndpointFactory.CreateEndpoint($"SimpleProcessor-{existingRoute.Value.RouteId}", model, -1, _conventions);
-                existingRoute.Value.CachedEndpoint = endpoint;
+                endpoint = _websitePreProcessEndpointFactory.CreateEndpoint($"WebsitePreProcess-{existingRoute.Value.RouteId}", model, website, -2, _conventions);
+                existingRoute.Value.CachedWebsitePreProcessEndpoint = endpoint;
             }
             endpoints.Add(endpoint);
         }
+
+        foreach (var existingRoute in _routes)
+        {
+            // Only rebuild the endpoint for modified routes or clusters.
+            var endpoint = existingRoute.Value.CachedHttp2HttpsEndpoint;
+            if (endpoint is null)
+            {
+                var model = new WebsitePreProcessMetadataModel
+                {
+                    PrimaryHost = existingRoute.Value.PrimaryHost,
+                    RelatedHost = existingRoute.Value.RelatedHost,
+                    Metadata = existingRoute.Value.Metadata,
+                };
+                //endpoint = _simpleProcessorEndpointFactory.CreateHttp2HttpsEndpoint($"WebSitePreProcessor-{existingRoute.Value.RouteId}", model, -2, _conventions);
+                endpoint = _simpleProcessorEndpointFactory.CreateHttp2HttpsEndpoint($"Http2Https-{existingRoute.Value.RouteId}", model, -1, _conventions);
+                existingRoute.Value.CachedHttp2HttpsEndpoint = endpoint;
+            }
+            endpoints.Add(endpoint);
+        }
+
         //var endpoint = _simpleProcessorEndpointFactory.CreateEndpoint("simple_processor_all", 0, _conventions);
         //endpoints.Add(endpoint);
 
@@ -386,9 +417,8 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
                 {
                     RouteId = incomingRoute.RouteId,
                     PrimaryHost = incomingRoute.PrimaryHost,
-                    RelatedHost = incomingRoute.RelatedHost
-                    //Model = newModel,
-                    //ClusterRevision = cluster?.Revision,
+                    RelatedHost = incomingRoute.RelatedHost,
+                    Metadata = incomingRoute.Metadata,
                 };
                 var added = _routes.TryAdd(newState.RouteId, newState);
                 Debug.Assert(added);

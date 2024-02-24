@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Routing.Matching;
-using Microsoft.Extensions.Primitives;
 
-namespace Yaginx.SimpleProcessors.RequestMetadatas;
-public class RequestMetadataMatchPolicy : MatcherPolicy, IEndpointComparerPolicy, IEndpointSelectorPolicy
+namespace Yaginx.SimpleProcessors.Metadatas.WebsitePreProcessMetadatas;
+
+public class WebsitePreProcessMetadataMatchPolicy : MatcherPolicy, IEndpointComparerPolicy, IEndpointSelectorPolicy
 {
-    public IComparer<Endpoint> Comparer => new RequestMetadataEndpointComparer();
+    public IComparer<Endpoint> Comparer => new WebsitePreProcessMetadataEndpointComparer();
 
     public override int Order => 0;
 
@@ -25,7 +25,7 @@ public class RequestMetadataMatchPolicy : MatcherPolicy, IEndpointComparerPolicy
     {
         return endpoints.Any(e =>
         {
-            var metadata = e.Metadata.GetMetadata<IRequestMetadata>();
+            var metadata = e.Metadata.GetMetadata<IWebsitePreProcessMetadata>();
             return metadata?.Matchers?.Length > 0;
         });
     }
@@ -43,7 +43,7 @@ public class RequestMetadataMatchPolicy : MatcherPolicy, IEndpointComparerPolicy
                 continue;
             }
 
-            var matchers = candidates[i].Endpoint.Metadata.GetMetadata<IRequestMetadata>()?.Matchers;
+            var matchers = candidates[i].Endpoint.Metadata.GetMetadata<IWebsitePreProcessMetadata>()?.Matchers;
 
             if (matchers is null)
             {
@@ -56,8 +56,8 @@ public class RequestMetadataMatchPolicy : MatcherPolicy, IEndpointComparerPolicy
                 //var valueIsEmpty = StringValues.IsNullOrEmpty(requestHeaderValues);
 
                 var host = httpContext.Request.Host.Host;
-
-                var matched = host.Equals(matcher.Host) && httpContext.Request.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase);
+                var requestPath = httpContext.Request.Path.Value;
+                var matched = host.Equals(matcher.Host) && matcher.Urls.Contains(requestPath, StringComparer.OrdinalIgnoreCase);
 
                 if (!matched)
                 {

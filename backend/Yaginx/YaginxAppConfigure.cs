@@ -21,6 +21,7 @@ using Microsoft.OpenApi.Models;
 using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using Yaginx;
 using Yaginx.DataStore.MongoStore;
 using Yaginx.HostedServices;
 using Yaginx.Infrastructure;

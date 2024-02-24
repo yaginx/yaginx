@@ -46,7 +46,7 @@ public class Website
     public DateTime UpdateTime { get; set; }
 
     public Dictionary<string, string> ProxyTransforms { get; set; }
-    public List<SimpleResponseItem> SimpleResponses { get; set; }
+    public SimpleResponseItem[] SimpleResponses { get; set; }
 }
 public class SimpleResponseItem
 {

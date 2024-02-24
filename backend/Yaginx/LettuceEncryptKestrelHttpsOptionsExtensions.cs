@@ -1,15 +1,15 @@
 using McMaster.AspNetCore.Kestrel.Certificates;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 
-namespace Microsoft.AspNetCore.Hosting;
+namespace Yaginx;
 
 /// <summary>
 /// Methods for configuring Kestrel.
 /// </summary>
 public static class LettuceEncryptKestrelHttpsOptionsExtensions
 {
-	private const string MissingServicesMessage =
-		"Missing required LettuceEncrypt services. Did you call '.AddLettuceEncrypt()' to add these your DI container?";
+    private const string MissingServicesMessage =
+        "Missing required LettuceEncrypt services. Did you call '.AddLettuceEncrypt()' to add these your DI container?";
 
     /// <summary>
     /// Configured LettuceEncrypt on this HTTPS endpoint for Kestrel.
@@ -22,24 +22,24 @@ public static class LettuceEncryptKestrelHttpsOptionsExtensions
     /// has not been used to add required services to the application service provider.
     /// </exception>
     public static HttpsConnectionAdapterOptions UseYaginxLettuceEncrypt(
-		this HttpsConnectionAdapterOptions httpsOptions,
-		IServiceProvider applicationServices)
-	{
-		var selector = applicationServices.GetService<IServerCertificateSelector>();
+        this HttpsConnectionAdapterOptions httpsOptions,
+        IServiceProvider applicationServices)
+    {
+        var selector = applicationServices.GetService<IServerCertificateSelector>();
 
-		if (selector is null)
-		{
-			throw new InvalidOperationException(MissingServicesMessage);
-		}
+        if (selector is null)
+        {
+            throw new InvalidOperationException(MissingServicesMessage);
+        }
 
-		return httpsOptions.UseLettuceEncrypt(selector);
-	}
+        return httpsOptions.UseLettuceEncrypt(selector);
+    }
 
-	internal static HttpsConnectionAdapterOptions UseLettuceEncrypt(
-		this HttpsConnectionAdapterOptions httpsOptions,
-		IServerCertificateSelector selector)
-	{
-		httpsOptions.UseServerCertificateSelector(selector);
-		return httpsOptions;
-	}
+    internal static HttpsConnectionAdapterOptions UseLettuceEncrypt(
+        this HttpsConnectionAdapterOptions httpsOptions,
+        IServerCertificateSelector selector)
+    {
+        httpsOptions.UseServerCertificateSelector(selector);
+        return httpsOptions;
+    }
 }

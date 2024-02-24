@@ -5,37 +5,11 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 
-public sealed class FeatureMiddleware
-{
-    private readonly RequestDelegate _next;
-    private readonly ILogger _logger;
-
-    public FeatureMiddleware(RequestDelegate next, ILogger<FeatureMiddleware> logger)
-    {
-        _next = next ?? throw new ArgumentNullException(nameof(next));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
-    /// <inheritdoc/>
-    public async Task Invoke(HttpContext context)
-    {
-        var proxyFeature = context.GetReverseProxyFeature();
-
-        //if (context.Request.Scheme.Equals("http"))
-        //{
-        //    context.Response.Redirect($"https://{context.Request.Host}{context.Request.GetEncodedPathAndQuery()}");
-        //    return;
-        //}
-
-        await _next(context);
-    }
-}
-
 public static class ReverseProxyBuilder
 {
     public static void ProxyBuilder(IReverseProxyApplicationBuilder app)
     {
-        app.UseMiddleware<FeatureMiddleware>();
+        //app.UseMiddleware<FeatureMiddleware>();
         app.Use(ProxyForwarder);
     }
 

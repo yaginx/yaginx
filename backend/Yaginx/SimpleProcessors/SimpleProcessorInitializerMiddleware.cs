@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.Timeouts;
 using System.Diagnostics;
+using Yaginx.DomainModels;
 using Yaginx.SimpleProcessors.ConfigProviders;
 using Yarp.ReverseProxy.Model;
 namespace Yaginx.SimpleProcessors;
@@ -21,8 +22,11 @@ internal sealed class SimpleProcessorInitializerMiddleware
         var endpoint = context.GetEndpoint()
            ?? throw new InvalidOperationException($"Routing Endpoint wasn't set for the current request.");
 
-        var model = endpoint.Metadata.GetMetadata<RequestMetadataModel>()
-            ?? throw new InvalidOperationException($"Routing Endpoint is missing {typeof(RequestMetadataModel).FullName} metadata.");
+        var model = endpoint.Metadata.GetMetadata<WebsitePreProcessMetadataModel>()
+            ?? throw new InvalidOperationException($"Routing Endpoint is missing {typeof(WebsitePreProcessMetadataModel).FullName} metadata.");
+
+        //var website = endpoint.Metadata.GetMetadata<Website>()
+        //  ?? throw new InvalidOperationException($"Routing Endpoint is missing {typeof(Website).FullName} metadata.");
 
         //var cluster = route.Cluster;
         //// TODO: Validate on load https://github.com/microsoft/reverse-proxy/issues/797

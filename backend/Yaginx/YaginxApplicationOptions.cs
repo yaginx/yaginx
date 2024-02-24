@@ -2,6 +2,7 @@ using AgileLabs;
 using AgileLabs.WebApp;
 using AgileLabs.WebApp.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Yaginx;
 using Yaginx.Configures;
 public class YaginxApplicationOptions : DefaultMvcApplicationOptions
 {

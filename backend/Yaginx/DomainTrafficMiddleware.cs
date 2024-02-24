@@ -7,8 +7,9 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using Yaginx.DomainModels;
+using Yaginx.Infrastructure;
 
-namespace Yaginx.Infrastructure
+namespace Yaginx
 {
     public class DomainTrafficMiddleware
     {
@@ -146,7 +147,7 @@ namespace Yaginx.Infrastructure
                     var trafficRepository = scope.WorkContext.ServiceProvider.GetRequiredService<IHostTrafficRepository>();
                     foreach (var item in lastPeriodData)
                     {
-                       await trafficRepository.UpsertAsync(new HostTraffic
+                        await trafficRepository.UpsertAsync(new HostTraffic
                         {
                             Id = IdGenerator.NextId(),
                             HostName = item.Key,

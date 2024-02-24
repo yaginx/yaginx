@@ -41,17 +41,26 @@ public static class SimpleProcessorBuilderExtension
         {
             throw new ArgumentNullException(nameof(configureApp));
         }
+        {
+            var proxyAppBuilder = new SimpleProcessorApplicationBuilder(endpoints.CreateApplicationBuilder());
+            proxyAppBuilder.UseMiddleware<SimpleProcessorInitializerMiddleware>();
+            configureApp(proxyAppBuilder);
+            proxyAppBuilder.UseMiddleware<FeatureMiddleware>();
+            var app = proxyAppBuilder.Build();
 
-        var proxyAppBuilder = new SimpleProcessorApplicationBuilder(endpoints.CreateApplicationBuilder());
-        proxyAppBuilder.UseMiddleware<SimpleProcessorInitializerMiddleware>();
-        configureApp(proxyAppBuilder);
-        proxyAppBuilder.UseMiddleware<AutoRedirectToHttpsMiddleware>();
-        //proxyAppBuilder.UseMiddleware<ForwarderMiddleware>();
-        var app = proxyAppBuilder.Build();
+            var proxyEndpointFactory = endpoints.ServiceProvider.GetRequiredService<WebsitePreProcessEndpointFactory>();
+            proxyEndpointFactory.SetProxyPipeline(app);
+        }
+        {
+            var proxyAppBuilder = new SimpleProcessorApplicationBuilder(endpoints.CreateApplicationBuilder());
+            proxyAppBuilder.UseMiddleware<SimpleProcessorInitializerMiddleware>();
+            configureApp(proxyAppBuilder);
+            proxyAppBuilder.UseMiddleware<AutoRedirectToHttpsMiddleware>();
+            var app = proxyAppBuilder.Build();
 
-        var proxyEndpointFactory = endpoints.ServiceProvider.GetRequiredService<SimpleProcessorEndpointFactory>();
-        proxyEndpointFactory.SetProxyPipeline(app);
-
+            var proxyEndpointFactory = endpoints.ServiceProvider.GetRequiredService<Http2HttpsEndpointFactory>();
+            proxyEndpointFactory.SetProxyPipeline(app);
+        }
         return GetOrCreateDataSource(endpoints).DefaultBuilder;
     }
 
