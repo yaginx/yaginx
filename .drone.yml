@@ -60,6 +60,9 @@ steps:
       - export IMAGE_VERSION=$(date +'%y%m%d_%H%M%S')
       - echo $${IMAGE_VERSION} > `pwd`/publish/version.txt
       - echo "current version" && cat `pwd`/publish/version.txt
+      - echo $$HUB_HOST
+      - echo $$HUB_USERNAME
+      - echo $$HUB_PASSWORD
 
       - echo "开始构建docker镜像"
       - docker login --username $$HUB_USERNAME --password $$HUB_PASSWORD $$HUB_HOST
