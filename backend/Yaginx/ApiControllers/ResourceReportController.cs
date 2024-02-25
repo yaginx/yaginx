@@ -1,11 +1,9 @@
 ﻿using AgileLabs;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using Yaginx.DomainModels.MonitorModels;
 using Yaginx.Services;
-using static Yaginx.ApiControllers.ResourceReportController;
 
 namespace Yaginx.ApiControllers;
 

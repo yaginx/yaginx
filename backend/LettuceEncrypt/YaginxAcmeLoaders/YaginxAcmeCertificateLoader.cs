@@ -51,7 +51,8 @@ namespace Yaginx.YaginxAcmeLoaders
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+                var waitSconds = RandomNumberGenerator.GetInt32(30, 120);// 每隔30~120秒检查一次
+                await Task.Delay(TimeSpan.FromSeconds(waitSconds), stoppingToken);
                 var domains = await _domainRepsitory.GetFreeCertDomainAsync();
                 foreach (var domain in domains)
                 {

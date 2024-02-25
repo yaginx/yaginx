@@ -63,9 +63,7 @@ public class TrafficMonitorMiddleware
             {
                 _logger.LogError(ex, "秒级统计异常");
             }
-
-
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            await Task.Delay(TimeSpan.FromSeconds(5));
         }
         _logger.LogDebug("StaticitsSecondData Task End");
     }
