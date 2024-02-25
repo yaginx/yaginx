@@ -57,8 +57,13 @@ public class WebsitePreProcessMetadataMatchPolicy : MatcherPolicy, IEndpointComp
 
                 var host = httpContext.Request.Host.Host;
                 var requestPath = httpContext.Request.Path.Value;
-                var matched = host.Equals(matcher.Host) && matcher.Urls.Contains(requestPath, StringComparer.OrdinalIgnoreCase);
+                if (!matcher.Urls.Contains(requestPath, StringComparer.OrdinalIgnoreCase))
+                {
+                    candidates.SetValidity(i, false);
+                    break;
+                }
 
+                var matched = host.Equals(matcher.PrimaryHost) || matcher.RelatedHost.Contains(host);
                 if (!matched)
                 {
                     candidates.SetValidity(i, false);

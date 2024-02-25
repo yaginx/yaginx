@@ -56,7 +56,12 @@ public class Http2HttpsMetadataMatchPolicy : MatcherPolicy, IEndpointComparerPol
 
                 var host = httpContext.Request.Host.Host;
 
-                var matched = host.Equals(matcher.Host) && httpContext.Request.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase);
+                var matched = host.Equals(matcher.PrimaryHost) && httpContext.Request.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase);
+
+                if (!matched)
+                {
+                    matched = matcher.RelatedHost.Contains(host);
+                }
 
                 if (!matched)
                 {

@@ -407,24 +407,28 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
                 //    currentRoute.Model = newModel;
                 //    currentRoute.ClusterRevision = cluster?.Revision;
                 //    changed = true;
-                //    Log.RouteChanged(_logger, currentRoute.RouteId);
+                //    //Log.RouteChanged(_logger, currentRoute.RouteId);
                 //}
+                //currentRoute.CachedWebsitePreProcessEndpoint = null;//recreate endpoint
+                //currentRoute.CachedHttp2HttpsEndpoint = null;
+                //currentRoute.PrimaryHost = incomingRoute.PrimaryHost;
+                //currentRoute.RelatedHost = incomingRoute.RelatedHost;
+                //changed = true;
+
+                _routes.Remove(incomingRoute.RouteId, out var _);
             }
-            else
+            //var newModel = BuildRouteModel(incomingRoute, cluster);
+            var newState = new SimpleProcessRouteState()
             {
-                //var newModel = BuildRouteModel(incomingRoute, cluster);
-                var newState = new SimpleProcessRouteState()
-                {
-                    RouteId = incomingRoute.RouteId,
-                    PrimaryHost = incomingRoute.PrimaryHost,
-                    RelatedHost = incomingRoute.RelatedHost,
-                    Metadata = incomingRoute.Metadata,
-                };
-                var added = _routes.TryAdd(newState.RouteId, newState);
-                Debug.Assert(added);
-                changed = true;
-                //Log.RouteAdded(_logger, newState.RouteId);
-            }
+                RouteId = incomingRoute.RouteId,
+                PrimaryHost = incomingRoute.PrimaryHost,
+                RelatedHost = incomingRoute.RelatedHost,
+                Metadata = incomingRoute.Metadata,
+            };
+            var added = _routes.TryAdd(newState.RouteId, newState);
+            Debug.Assert(added);
+            changed = true;
+            //Log.RouteAdded(_logger, newState.RouteId);
         }
 
         // Directly enumerate the ConcurrentDictionary to limit locking and copying.

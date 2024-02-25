@@ -1,6 +1,6 @@
 ﻿using Yaginx.DomainModels;
 
-namespace Yaginx.SimpleProcessors;
+namespace Yaginx.SimpleProcessors.Middlewares;
 
 public sealed class FeatureMiddleware
 {

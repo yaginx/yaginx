@@ -68,7 +68,7 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
             webHostBuilder.ConfigureKestrel(serverOptions =>
             {
                 //serverOptions.Limits.MaxRequestBodySize = 500 * 1024 * 1024;//500M
-                serverOptions.Limits.MaxRequestBodySize = null;                
+                serverOptions.Limits.MaxRequestBodySize = null;
                 serverOptions.Limits.MaxRequestBufferSize = 5 * 1024 * 1024;//5M
 
                 serverOptions.ListenAnyIP(8080, listenOptions =>
@@ -76,7 +76,7 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
                     listenOptions.Protocols = HttpProtocols.Http1;
                 });
 
-                if (!buildContext.HostEnvironment.IsDevelopment() && ((RunningModes.RunningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode))
+                if (((RunningModes.RunningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode))
                 {
                     serverOptions.ListenAnyIP(8443, listenOptions =>
                     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.Extensions;
 using Yaginx.DomainModels;
 
-namespace Yaginx.SimpleProcessors;
+namespace Yaginx.SimpleProcessors.Middlewares;
 internal sealed class AutoRedirectToHttpsMiddleware
 {
     private readonly RequestDelegate _next;

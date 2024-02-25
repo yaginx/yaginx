@@ -3,7 +3,7 @@ using System.Diagnostics;
 using Yaginx.DomainModels;
 using Yaginx.SimpleProcessors.ConfigProviders;
 using Yarp.ReverseProxy.Model;
-namespace Yaginx.SimpleProcessors;
+namespace Yaginx.SimpleProcessors.Middlewares;
 
 internal sealed class SimpleProcessorInitializerMiddleware
 {

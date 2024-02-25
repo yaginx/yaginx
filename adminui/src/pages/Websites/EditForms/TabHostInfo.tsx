@@ -45,7 +45,7 @@ export const TabHostInfo = {
                                     >
                                         <Input placeholder="Host" style={{ width: '60%' }} />
                                     </Form.Item>
-                                    {fields.length > 1 ? (
+                                    {fields.length >= 0 ? (
                                         <MinusCircleOutlined
                                             className="dynamic-delete-button"
                                             onClick={() => remove(field.name)}

@@ -5,6 +5,7 @@ namespace Yaginx.SimpleProcessors.Metadatas.WebsitePreProcessMetadatas;
 
 internal sealed class WebsitePreProcessMetadataMatcher
 {
-    public string Host { get; init; }
+    public string PrimaryHost { get; init; }
+    public string[] RelatedHost { get; init; }
     public ImmutableSortedSet<string> Urls { get; init; }
 }

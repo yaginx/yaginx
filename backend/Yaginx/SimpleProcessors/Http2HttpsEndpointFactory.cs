@@ -32,14 +32,7 @@ public sealed class Http2HttpsEndpointFactory
         var primaryHost = model.PrimaryHost;
 
         var matchers = new List<Http2HttpsMetadataMatcher>(relatedHosts?.Length ?? 0 + 1);
-        matchers.Add(new Http2HttpsMetadataMatcher(primaryHost));
-        if (relatedHosts != null)
-        {
-            foreach (var item in relatedHosts)
-            {
-                matchers.Add(new Http2HttpsMetadataMatcher(item));
-            }
-        }
+        matchers.Add(new Http2HttpsMetadataMatcher(primaryHost, relatedHosts));
         endpointBuilder.Metadata.Add(new Http2HttpsMetadata(matchers));
 
         for (var i = 0; i < conventions.Count; i++)

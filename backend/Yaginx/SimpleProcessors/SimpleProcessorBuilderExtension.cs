@@ -10,6 +10,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver.Core.Clusters;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Health;
+using Yaginx.SimpleProcessors.Middlewares;
 
 namespace Yaginx.SimpleProcessors;
 public static class SimpleProcessorBuilderExtension

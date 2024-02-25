@@ -34,18 +34,18 @@ public sealed class WebsitePreProcessEndpointFactory
         var primaryHost = model.PrimaryHost;
 
         var matchers = new List<WebsitePreProcessMetadataMatcher>(relatedHosts?.Length ?? 0 + 1);
-        matchers.Add(new WebsitePreProcessMetadataMatcher() { Host = primaryHost, Urls = preProcessUrl });
-        if (relatedHosts != null)
-        {
-            foreach (var item in relatedHosts)
-            {
-                if (item.Equals(primaryHost, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-                matchers.Add(new WebsitePreProcessMetadataMatcher() { Host = item, Urls = preProcessUrl });
-            }
-        }
+        matchers.Add(new WebsitePreProcessMetadataMatcher() { PrimaryHost = primaryHost, RelatedHost = relatedHosts, Urls = preProcessUrl });
+        //if (relatedHosts != null)
+        //{
+        //    foreach (var item in relatedHosts)
+        //    {
+        //        if (item.Equals(primaryHost, StringComparison.OrdinalIgnoreCase))
+        //        {
+        //            continue;
+        //        }
+        //        matchers.Add(new WebsitePreProcessMetadataMatcher() { PrimaryHost = item, Urls = preProcessUrl });
+        //    }
+        //}
         endpointBuilder.Metadata.Add(new WebsitePreProcessMetadata(matchers));
 
         for (var i = 0; i < conventions.Count; i++)
