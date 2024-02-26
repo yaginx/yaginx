@@ -147,7 +147,14 @@ namespace Yaginx.Services.DockerServices
             if (!string.IsNullOrEmpty(imageDomain) && imageDomain.IndexOf('.') > 0)
             {
                 var registryItem = _appSettings.Get<RegistryConfig>().FirstOrDefault(x => x.ServerAddress == imageDomain);
-                authConfig = new AuthConfig { ServerAddress = registryItem.ServerAddress, Username = registryItem.UserName, Password = registryItem.Password };
+                if (registryItem != null)
+                {
+                    authConfig = new AuthConfig { ServerAddress = registryItem.ServerAddress, Username = registryItem.UserName, Password = registryItem.Password };
+                }
+                else
+                {
+                    _logger.LogInformation($"image's register {imageDomain} auth not found in config file");
+                }
             }
 
             return authConfig;
