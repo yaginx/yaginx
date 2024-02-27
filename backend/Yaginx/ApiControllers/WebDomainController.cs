@@ -4,7 +4,7 @@ using Yaginx.Models.WebDomainModels;
 
 namespace Yaginx.ApiControllers;
 
-[ApiController, Route("api/web_domain")]
+[ApiController, Route("yaginx/api/web_domain")]
 public class WebDomainController : YaginxControllerBase
 {
     private readonly IWebDomainRepository _webDomainRepository;

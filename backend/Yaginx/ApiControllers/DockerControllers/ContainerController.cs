@@ -9,7 +9,7 @@ using Yaginx.Models.DockerModels;
 using Yaginx.Services.DockerServices;
 
 namespace Yaginx.ApiControllers.DockerControllers;
-[ApiController, Route("api/docker/container")]
+[ApiController, Route("yaginx/api/docker/container")]
 public class ContainerController : YaginxControllerBase
 {
     private readonly IDockerClient _dockerClient;

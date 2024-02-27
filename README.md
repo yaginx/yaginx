@@ -14,11 +14,27 @@ Replacement for nginx's HTTP reverse proxy, but more power feature than nginx.
 ## deploy
 
 ```bash
+
+mkdir -p /data/mongo/{db,backup,configdb,log}
+docker run -d --restart always --name mongodb \
+-p 127.0.0.1:27017:27017 \
+--memory="500m" --memory-reservation="200m" \
+--volume=/data/mongo/db:/data/db \
+--volume=/data/mongo/backup:/data/backup \
+--volume=/data/mongo/configdb:/data/configdb  \
+--volume=/data/mongo/log:/var/log  \
+mongo:latest
+
+mkdir -p /data/redis_data
+docker run -d --name redis -p 127.0.0.1:6379:6379 -e TZ=Asia/Shanghai \
+    -v /data/redis_data:/data \
+    redis:7.2.3 redis-server --save 60 1 --loglevel warning 
+
 mkdir -p /data/yaginx
 docker pull cnhub.feinian.net/yaginx/yaginx:latest
 docker rm yaginx -f || true
-docker run -d -it --name yaginx -p 80:8080 -p 443:8443 \
--v /data/yaginx:/app_data -v /run/docker.sock:/var/run/docker.sock --link redis:redis cnhub.feinian.net/yaginx/yaginx:latest
+docker run -d -it --name yaginx -p 8080:8080 -p 8443:8443 \
+-v /data/yaginx:/app_data -v /run/docker.sock:/var/run/docker.sock --link redis:redis hub.feinian.net/yaginx/yaginx:latest
 ```
 
 ## ReverseProxy Config

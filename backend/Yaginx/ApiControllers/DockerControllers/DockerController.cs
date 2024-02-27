@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Yaginx.ApiControllers.DockerControllers;
 
-[ApiController, Route("api/docker")]
+[ApiController, Route("yaginx/api/docker")]
 public class DockerController : YaginxControllerBase
 {
     private readonly IDockerClient _dockerClient;

@@ -4,7 +4,7 @@ using Yaginx.Infrastructure;
 using Yaginx.Infrastructure.ProxyConfigProviders;
 
 namespace Yaginx.ApiControllers;
-[ApiController, Route("api/proxy_rule")]
+[ApiController, Route("yaginx/api/proxy_rule")]
 public class ProxyRuleController : YaginxControllerBase
 {
     #region Proxy Rules

@@ -8,7 +8,7 @@ using Yaginx.Services;
 namespace Yaginx.ApiControllers;
 
 [ApiController]
-[Route("api/resource/report")]
+[Route("yaginx/api/resource/report")]
 public class ResourceReportController : YaginxControllerBase
 {
     private readonly IResourceReportRepository _resourceReportRepository;

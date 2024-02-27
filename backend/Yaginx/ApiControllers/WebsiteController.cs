@@ -14,7 +14,7 @@ using Yaginx.Infrastructure;
 using Yaginx.Models.WebsiteModels;
 
 namespace Yaginx.ApiControllers;
-[ApiController, Route("api/website")]
+[ApiController, Route("yaginx/api/website")]
 public class WebsiteController : YaginxControllerBase
 {
     private readonly IWebsiteRepository _websiteRepository;

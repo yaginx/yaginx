@@ -12,7 +12,7 @@ export const RequestQtyDiagram: React.FC<RequestQtyDiagramProps> = (props) => {
   // const { cycleType } = props;
   const [cycleType, setCycleType] = useState(props.cycleType);
   const asyncFetch = () => {
-    fetch('/api/resource/report/all_report_data?cycleType=' + cycleType)
+    fetch('/yaginx/api/resource/report/all_report_data?cycleType=' + cycleType)
       .then((response) => response.json())
       .then((json) => setData(json.data))
       .catch((error) => {

@@ -4,7 +4,7 @@ using Yaginx.Models.TrafficModels;
 
 namespace Yaginx.ApiControllers;
 
-[ApiController, Route("api/host_traffic")]
+[ApiController, Route("yaginx/api/host_traffic")]
 public class HostTrafficController : YaginxControllerBase
 {
     private readonly IHostTrafficRepository _hostTrafficRepository;

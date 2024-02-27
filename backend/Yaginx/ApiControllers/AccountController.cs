@@ -16,7 +16,7 @@ using Yaginx.WorkContexts;
 
 namespace Yaginx.ApiControllers;
 
-[ApiController, Route("api/account")]
+[ApiController, Route("yaginx/api/account")]
 public class AccountController : YaginxControllerBase
 {
     private readonly IAuthenticateService _userService;

@@ -53,13 +53,13 @@ const List: React.FC = (props) => {
     // })
   }
   const downloadConfig = async () => {
-    const newTab = window.open('/api/website/config/backup', '_blank');
+    const newTab = window.open('/yaginx/api/website/config/backup', '_blank');
     newTab?.focus();
     message.success(`网站配置备份成功`);
   };
   const uploadProps: UploadProps = {
     name: 'file',
-    action: '/api/website/config/restore',
+    action: '/yaginx/api/website/config/restore',
     // headers: {
     //   authorization: 'authorization-text',
     // },
