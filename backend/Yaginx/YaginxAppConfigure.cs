@@ -242,15 +242,15 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
 
                 app.UseClientApp();
 
-                app.UseStaticFiles(new StaticFileOptions
-                {
-                    OnPrepareResponse = ctx =>
-                    {
-                        // Cache static files for 12 hours
-                        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=31536000, immutable");
-                        ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddHours(12).ToString("R", CultureInfo.InvariantCulture));
-                    }
-                });
+                //app.UseStaticFiles(new StaticFileOptions
+                //{
+                //    OnPrepareResponse = ctx =>
+                //    {
+                //        // Cache static files for 12 hours
+                //        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=31536000, immutable");
+                //        ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddHours(12).ToString("R", CultureInfo.InvariantCulture));
+                //    }
+                //});
             });
 
             //piplineActions.Register("OpenApi Docs", RequestPiplineStage.BeforeRouting, app =>

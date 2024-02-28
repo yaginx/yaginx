@@ -31,4 +31,8 @@
 		<ProjectReference Include="..\Yaginx.DataStore.MongoStore\Yaginx.DataStore.MongoStore.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="wwwroot\" />
+	</ItemGroup>
+
 </Project>
