@@ -14,7 +14,7 @@ namespace Yaginx
     public class DomainTrafficMiddleware
     {
         public RequestDelegate Next { get; }
-        public const string STATS_PATH = "/traffic";
+        public const string STATS_PATH = "/yaginx/traffic";
         private readonly IEmbeddedResourceQuery _embeddedResourceQuery;
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly ILogger<DomainTrafficMiddleware> _logger;

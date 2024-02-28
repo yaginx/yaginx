@@ -3,7 +3,6 @@ using AgileLabs.AppRegisters;
 using AgileLabs.AspNet;
 using AgileLabs.AspNet.ClientAppServices;
 using AgileLabs.AspNet.WebApis.Filters;
-using AgileLabs.Diagnostics;
 using AgileLabs.FileProviders;
 using AgileLabs.Json;
 using AgileLabs.Json.Converters;
@@ -17,7 +16,6 @@ using LettuceEncrypt.YaginxAcmeLoaders;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.WebEncoders;
-using Microsoft.OpenApi.Models;
 using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
@@ -37,8 +35,6 @@ using Yaginx.SimpleProcessors.ConfigProviders;
 using Yaginx.WorkContexts;
 using Yaginx.YaginxAcmeLoaders;
 using Yarp.ReverseProxy.Configuration;
-using Yarp.ReverseProxy.Transforms;
-using Yarp.ReverseProxy.Transforms.Builder;
 
 public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEndpointConfig, IMvcOptionsConfig, IMvcBuildConfig
 {
@@ -65,8 +61,8 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
         });
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        //services.AddEndpointsApiExplorer();
+        //services.AddSwaggerGen();
 
         services.AddResponseCaching();
         services.AddResponseCompression();
@@ -223,9 +219,9 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             piplineActions.Register("TrafficMonitorMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<TrafficMonitorMiddleware>());
             piplineActions.Register("DomainTrafficMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<DomainTrafficMiddleware>());
             piplineActions.Register("ProcessDurationMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<TraceInfoHeaderOutputMiddleware>());
-            piplineActions.Register("RequestStatisticsMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<RequestStatisticsMiddleware>());
-            piplineActions.Register("MapDiagnositicRequest", RequestPiplineStage.BeforeRouting, app => app.MapDiagnositicRequest());
-            piplineActions.Register("DiagnositicMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<DiagnositicMiddleware>());
+            //piplineActions.Register("RequestStatisticsMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<RequestStatisticsMiddleware>());
+            //piplineActions.Register("MapDiagnositicRequest", RequestPiplineStage.BeforeRouting, app => app.MapDiagnositicRequest());
+            //piplineActions.Register("DiagnositicMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<DiagnositicMiddleware>());
 
             //piplineActions.Register("AutoRedirect", RequestPiplineStage.BeforeRouting, app =>
             //{
@@ -257,17 +253,20 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
                 });
             });
 
-            piplineActions.Register("OpenApi Docs", RequestPiplineStage.BeforeRouting, app =>
-            {
-                app.UseSwagger(optons =>
-                {
-                    optons.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
-                    {
-                        swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}{BasePath}" } };
-                    });
-                });
-                app.UseSwaggerUI();
-            });
+            //piplineActions.Register("OpenApi Docs", RequestPiplineStage.BeforeRouting, app =>
+            //{
+            //    app.UseSwagger(optons =>
+            //    {
+            //        optons.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+            //        {
+            //            swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}{BasePath}" } };
+            //        });
+            //    });
+            //    app.UseSwaggerUI(options =>
+            //    {
+                    
+            //    });
+            //});
         }
         //piplineActions.Register("HangfireDashboard", RequestPiplineStage.BeforeRouting, app =>
         //{
