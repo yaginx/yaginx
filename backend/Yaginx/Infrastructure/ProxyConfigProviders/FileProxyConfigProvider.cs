@@ -129,16 +129,17 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
             var websites = _websiteRepository.SearchAsync().Result;
             foreach (var website in websites)
             {
-                if (string.IsNullOrEmpty(website.DefaultHost) || string.IsNullOrEmpty(website.DefaultDestination))
+                var spec = website.Specifications;
+                if (string.IsNullOrEmpty(spec.DefaultHost) || string.IsNullOrEmpty(spec.DefaultDestination))
                     continue;
 
                 var websiteId = website.Id.Value.ToString();
 
                 var hosts = new List<string>();
 
-                if (website.DefaultHost.IsNotNullOrWhitespace())
+                if (spec.DefaultHost.IsNotNullOrWhitespace())
                 {
-                    var normalizedHost = website.DefaultHost.ToLower();
+                    var normalizedHost = spec.DefaultHost.ToLower();
                     hosts.Add(normalizedHost);
                 }
 
@@ -214,11 +215,11 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                             Hosts = hosts
                         }
                     }
-                    .WithTransformUseOriginalHostHeader(useOriginal: website.IsWithOriginalHostHeader);
+                    .WithTransformUseOriginalHostHeader(useOriginal: spec.IsWithOriginalHostHeader);
 
-                    if (website.DefaultDestinationHost.IsNotNullOrWhitespace())
+                    if (spec.DefaultDestinationHost.IsNotNullOrWhitespace())
                     {
-                        routeConfig = routeConfig.WithTransformRequestHeader("Host", website.DefaultDestinationHost, false);
+                        routeConfig = routeConfig.WithTransformRequestHeader("Host", spec.DefaultDestinationHost, false);
                     }
 
                     if (!website.ProxyTransforms.IsNullOrEmpty())
@@ -234,16 +235,16 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                             }
                         });
                     }
-
+     
                     Dictionary<string, DestinationConfig> mDestinationConfigs = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase)
                     {
-                        { "default", new DestinationConfig { Address = website.DefaultDestination } }
+                        { "default", new DestinationConfig { Address = spec.DefaultDestination } }
                     };
 
                     Uri webProxyAddress = null;
-                    if (website.WebProxy.IsNotNullOrWhitespace())
+                    if (spec.WebProxy.IsNotNullOrWhitespace())
                     {
-                        webProxyAddress = new Uri(website.WebProxy);
+                        webProxyAddress = new Uri(spec.WebProxy);
                     }
 
                     var clusterConfig = new ClusterConfig()
@@ -255,7 +256,7 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                         HttpClient = new HttpClientConfig
                         {
                             WebProxy = new WebProxyConfig() { Address = webProxyAddress },
-                            DangerousAcceptAnyServerCertificate = website.IsAllowUnsafeSslCertificate,
+                            DangerousAcceptAnyServerCertificate = spec.IsAllowUnsafeSslCertificate,
                         }
                     };
                     yield return (routeConfig, clusterConfig);

@@ -1,35 +1,21 @@
-﻿using Yaginx.DataStore.PostgreSQLStore.Abstracted;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
+using Yaginx.DataStore.PostgreSQLStore.Abstracted;
+using Yaginx.DataStore.PostgreSQLStore.Entities;
 using Yaginx.DomainModels;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : YaginxCrudBaseRepository<User, UserEntity>, IUserRepository
     {
-        private readonly CrudRepository<User> _userCrudRepository;
-
-        public UserRepository(CrudRepository<User> userCrudRepository)
+        public UserRepository(IWoDbContextFactory factory, IMapper mapper, ILogger<UserRepository> logger) : base(factory, mapper, logger)
         {
-            _userCrudRepository = userCrudRepository;
-        }
-        public async Task AddAsync(User user)
-        {
-            await _userCrudRepository.InsertAsync(user);
-        }
-
-        public async Task<int> CountAsync()
-        {
-            var result = await _userCrudRepository.CountAsync(x => true);
-            return result;
         }
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            return await _userCrudRepository.GetAsync<User>(x => x.Email == email);
-        }
-
-        public async Task UpdateAsync(User user)
-        {
-            await _userCrudRepository.SingleUpdateAsync(user);
+            var entity = await base.GetAsync(x => x.Email == email);
+            return _mapper.Map<User>(entity);
         }
     }
 }

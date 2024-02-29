@@ -11,11 +11,11 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
     public class CrudRepository
     {
         private readonly IWoDbContextFactory _dbContextFactory;
-        private readonly ILogger<CrudRepository> _logger;
+        private readonly ILogger _logger;
         protected readonly int MaxQueryDataCount = 99999;
         public async Task<DbContext> GetDbContextAsync() => await _dbContextFactory.GetDefaultDbContextAsync();
 
-        public CrudRepository(IWoDbContextFactory dbContextFactory, ILogger<CrudRepository> logger)
+        public CrudRepository(IWoDbContextFactory dbContextFactory, ILogger logger)
         {
             _dbContextFactory = dbContextFactory;
             _logger = logger;

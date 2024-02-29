@@ -8,7 +8,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
 {
     public class CrudRepository<T> : CrudRepository where T : class, new()
     {
-        public CrudRepository(IWoDbContextFactory factory, ILogger<CrudRepository<T>> logger) : base(factory, logger)
+        public CrudRepository(IWoDbContextFactory factory, ILogger logger) : base(factory, logger)
         {
         }
 

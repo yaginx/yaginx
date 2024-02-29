@@ -15,7 +15,7 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
             await _databaseRepository.InsertAsync(user);
         }
 
-        public async Task<int> CountAsync()
+        public async Task<long> CountAsync()
         {
             var result = await _databaseRepository.SearchAsync<User>();
             return result.Count();

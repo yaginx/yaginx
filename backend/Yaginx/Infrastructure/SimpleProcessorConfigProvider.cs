@@ -76,10 +76,11 @@ namespace Yaginx.Infrastructure
             var websites = _websiteRepository.SearchAsync().Result;
             foreach (var website in websites)
             {
-                if (!website.IsAutoRedirectHttp2Https)
+                var spec = website.Specifications;
+                if (!spec.IsAutoRedirectHttp2Https)
                     continue;
 
-                if (string.IsNullOrEmpty(website.DefaultHost))
+                if (string.IsNullOrEmpty(spec.DefaultHost))
                     continue;
 
                 var websiteId = website.Id.Value.ToString();
@@ -92,7 +93,7 @@ namespace Yaginx.Infrastructure
                     Metadata = new ReadOnlyDictionary<string, object>(metadata)
                 };
 
-                config.PrimaryHost = website.DefaultHost.ToLower();
+                config.PrimaryHost = spec.DefaultHost.ToLower();
 
                 var relatedHost = new List<string>(website.Hosts.Length);
                 foreach (var host in website.Hosts)

@@ -9,6 +9,18 @@ public class Website
     public long? Id { get; set; }
     public string Name { get; set; }
 
+    public WebsiteSpecifications Specifications { get; set; }
+
+    public string[] Hosts { get; set; }
+    public List<WebsiteProxyRuleItem> ProxyRules { get; set; }
+    public DateTime CreateTime { get; set; }
+    public DateTime UpdateTime { get; set; }
+
+    public Dictionary<string, string> ProxyTransforms { get; set; }
+    public SimpleResponseItem[] SimpleResponses { get; set; }
+}
+public class WebsiteSpecifications
+{
     /// <summary>
     /// 默认的主机头(请求主机头)
     /// </summary>
@@ -39,14 +51,6 @@ public class Website
     /// </summary>
     public bool IsWithOriginalHostHeader { get; set; }
     public bool IsAutoRedirectHttp2Https { get; set; }
-
-    public string[] Hosts { get; set; }
-    public List<WebsiteProxyRuleItem> ProxyRules { get; set; }
-    public DateTime CreateTime { get; set; }
-    public DateTime UpdateTime { get; set; }
-
-    public Dictionary<string, string> ProxyTransforms { get; set; }
-    public SimpleResponseItem[] SimpleResponses { get; set; }
 }
 public class SimpleResponseItem
 {
