@@ -44,7 +44,7 @@ namespace Yaginx.Controllers
                 {
                     await webDomainRepository.AddAsync(item);
                 }
-                return Content(string.Empty);
+                return Content("upgrade success");
             }
             catch (Exception ex)
             {
