@@ -10,13 +10,13 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
         {
             _databaseRepository = databaseRepository;
         }
-        public async Task<List<HostTraffic>> SearchAsync()
+        public async Task<IEnumerable<HostTraffic>> SearchAsync()
         {
             var result = await _databaseRepository.SearchAsync<HostTraffic>();
             return result.OrderByDescending(x => x.Period).ThenBy(x => x.HostName).ToList();
         }
 
-        public Task<List<HostTraffic>> SearchAsync(string hostName)
+        public Task<IEnumerable<HostTraffic>> SearchAsync(string hostName)
         {
             throw new NotImplementedException();
         }

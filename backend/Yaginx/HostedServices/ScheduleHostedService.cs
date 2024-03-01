@@ -19,7 +19,6 @@ namespace Yaginx.HostedServices
         {
             _logger.LogInformation("Timed Background Service is starting.");
 
-
             using (var scope = AgileLabContexts.Context.CreateScopeWithWorkContext())
             {
                 var initService = scope.Resolve<InitService>();
@@ -37,27 +36,6 @@ namespace Yaginx.HostedServices
             {
                 return;
             }
-            //RecurringJob.AddOrUpdate<ChatgptUserDailyUsageReportService>(nameof(ChatgptUserDailyUsageReportService), service => service.LastDayUsageReportAsync(), "0 8 * * *", new RecurringJobOptions
-            //{
-            //    TimeZone = TimeZoneInfo.Local
-            //});
-
-
-            ////RecurringJob.AddOrUpdate<UnactiveUserInviceComeBackService>(nameof(UnactiveUserInviceComeBackService), service => service.InviteAsync(), "0 12 * * *", new RecurringJobOptions
-            ////{
-            ////    TimeZone = TimeZoneInfo.Local
-            ////});
-
-            //RecurringJob.AddOrUpdate<CodeAutoGenerateService>(nameof(CodeAutoGenerateService), service => service.UserCodeGenerateAsync(), "0 * * * *", new RecurringJobOptions
-            //{
-            //    TimeZone = TimeZoneInfo.Local
-            //});
-
-            //RecurringJob.AddOrUpdate<DailyTokenSupplementBackService>(nameof(DailyTokenSupplementBackService), service => service.SupplementAsync(), "0 0 * * *", new RecurringJobOptions
-            //{
-            //    TimeZone = TimeZoneInfo.Local
-            //});
-            await Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

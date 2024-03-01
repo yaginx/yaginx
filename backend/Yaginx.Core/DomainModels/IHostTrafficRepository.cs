@@ -3,6 +3,6 @@
 public interface IHostTrafficRepository
 {
     Task UpsertAsync(HostTraffic hostTraffic);
-    Task<List<HostTraffic>> SearchAsync();
-    Task<List<HostTraffic>> SearchAsync(string hostName);
+    Task<IEnumerable<HostTraffic>> SearchAsync();
+    Task<IEnumerable<HostTraffic>> SearchAsync(string hostName);
 }
