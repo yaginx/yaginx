@@ -20,6 +20,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
         {
             return app =>
             {
+                Console.WriteLine("AutoCommiter");
                 app.UseMiddleware<AutoCommiterMiddleware>();
                 next(app);
             };

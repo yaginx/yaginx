@@ -221,7 +221,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
 
         foreach (var configState in _configs)
         {
-            if (configState.LoadFailed)
+            if (configState.LoadFailed || configState.LatestConfig.ChangeToken == null)
             {
                 // We can't register for change notifications if the last load failed.
                 poll = true;

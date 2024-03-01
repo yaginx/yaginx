@@ -56,7 +56,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
                                                          string[] array = x.Split('=');
                                                          return new Tuple<string, string>(array[0], array[1]);
                                                      }).ToDictionary((key) => key.Item1, (value) => value.Item2);
-            dictionary.TryAdd("Application Name", $"{Assembly.GetEntryAssembly().GetName().Name}/{_workContext.Identity.Id}");
+            dictionary.TryAdd("Application Name", $"{Assembly.GetEntryAssembly().GetName().Name}/{_workContext.Identity?.Id}");
             dictionary.TryAdd("Connection Idle Lifetime", "60");
             return string.Join(";", dictionary.Select((x) => x.Key + "=" + x.Value));
         }

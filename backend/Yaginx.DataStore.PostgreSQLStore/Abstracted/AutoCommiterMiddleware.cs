@@ -8,8 +8,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
     {
         private readonly ILogger<AutoCommiterMiddleware> _logger;
 
-        public AutoCommiterMiddleware(
-            ILogger<AutoCommiterMiddleware> logger)
+        public AutoCommiterMiddleware(ILogger<AutoCommiterMiddleware> logger)
         {
             _logger = logger;
         }

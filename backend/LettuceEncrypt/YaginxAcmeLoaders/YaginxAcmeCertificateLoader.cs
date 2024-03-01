@@ -14,20 +14,17 @@ namespace Yaginx.YaginxAcmeLoaders
 
         private readonly IServer _server;
         private readonly IConfiguration _config;
-        private readonly ICertificateDomainRepsitory _domainRepsitory;
 
         public YaginxAcmeCertificateLoader(
             IServiceScopeFactory serviceScopeFactory,
             ILogger<YaginxAcmeCertificateLoader> logger,
             IServer server,
-            IConfiguration config,
-            ICertificateDomainRepsitory domainRepsitory)
+            IConfiguration config)
         {
             _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
             _server = server;
             _config = config;
-            _domainRepsitory = domainRepsitory;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -53,6 +50,8 @@ namespace Yaginx.YaginxAcmeLoaders
             {
                 var waitSconds = RandomNumberGenerator.GetInt32(30, 120);// 每隔30~120秒检查一次
                 await Task.Delay(TimeSpan.FromSeconds(waitSconds), stoppingToken);
+                using var acmeStateMachineScopeRoot = _serviceScopeFactory.CreateScope();
+                var _domainRepsitory = acmeStateMachineScopeRoot.ServiceProvider.GetRequiredService<ICertificateDomainRepsitory>();
                 var domains = await _domainRepsitory.GetFreeCertDomainAsync();
                 foreach (var domain in domains)
                 {

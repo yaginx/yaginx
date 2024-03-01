@@ -182,7 +182,7 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             services.AddHostedService<YaginxAcmeCertificateLoader>();
             #endregion
 
-            //services.UseLiteDBDataStore(buildContext);
+            services.UseLiteDBDataStore(buildContext);
             services.AddedPostgreSQLStore(buildContext);
 
             services.AddHostedService<ScheduleHostedService>();

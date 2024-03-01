@@ -42,11 +42,11 @@ public static class LiteDBRegisterExtensions
             return new LiteDbDatabaseRepository(string.Join(';', newDbParms.ToArray()));
         });
 
-        services.AddScoped<IWebDomainRepository, WebDomainRepository>();
-        services.AddScoped<IWebsiteRepository, WebsiteRepository>();
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IHostTrafficRepository, HostTrafficRepository>();
-        services.AddScoped<ICertificateDomainRepsitory, WebDomainRepository>();
+        //services.AddScoped<IWebDomainRepository, WebDomainRepository>();
+        //services.AddScoped<IWebsiteRepository, WebsiteRepository>();
+        //services.AddScoped<IUserRepository, UserRepository>();
+        //services.AddScoped<IHostTrafficRepository, HostTrafficRepository>();
+        //services.AddScoped<ICertificateDomainRepsitory, WebDomainRepository>();
         return services;
     }
 }

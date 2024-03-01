@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Primitives;
+﻿using AgileLabs;
+using AgileLabs.WorkContexts.Extensions;
+using Microsoft.Extensions.Primitives;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using Yaginx.DomainModels;
@@ -16,16 +18,13 @@ namespace Yaginx.Infrastructure
         private IDisposable _subscription;
         private ILogger<SimpleProcessorConfigProvider> _Logger;
         private readonly ProxyRuleChangeNotifyService _proxyRuleChangeNotifyService;
-        private readonly IWebsiteRepository _websiteRepository;
 
         public SimpleProcessorConfigProvider(
             ILogger<SimpleProcessorConfigProvider> logger,
-            ProxyRuleChangeNotifyService proxyRuleChangeNotifyService,
-            IWebsiteRepository websiteRepository)
+            ProxyRuleChangeNotifyService proxyRuleChangeNotifyService)
         {
             _Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _proxyRuleChangeNotifyService = proxyRuleChangeNotifyService;
-            _websiteRepository = websiteRepository;
             _changeToken = new CancellationTokenSource();
             _reloadToken = new RouteChangeToken();
 
@@ -73,6 +72,8 @@ namespace Yaginx.Infrastructure
         }
         private IEnumerable<WebSiteMetadataConfig> LoadDatabaseRules()
         {
+            using var scope = AgileLabContexts.Context.CreateScopeWithWorkContext();
+            var _websiteRepository = scope.WorkContext.Resolve<IWebsiteRepository>();
             var websites = _websiteRepository.SearchAsync().Result;
             foreach (var website in websites)
             {

@@ -68,7 +68,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
             var workContext = AgileLabContexts.Context.CurrentWorkContext;
             if (workContext == null)
             {
-                throw new Exception($"{workContext}为null，请检查上下文环境");
+                throw new Exception($"{nameof(workContext)}为null，请检查上下文环境");
             }
 
             long? accountId = null;

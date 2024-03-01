@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Yaginx.DomainModels;
 using System.Reflection.Emit;
+using AutoMapper;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Entities
 {
@@ -13,8 +14,8 @@ namespace Yaginx.DataStore.PostgreSQLStore.Entities
 
         public string[] Hosts { get; set; }
         public List<WebsiteProxyRuleItem> ProxyRules { get; set; }
-        public DateTime CreateTime { get; set; }
-        public DateTime UpdateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
 
         public Dictionary<string, string> ProxyTransforms { get; set; }
         public SimpleResponseItem[] SimpleResponses { get; set; }
@@ -33,6 +34,17 @@ namespace Yaginx.DataStore.PostgreSQLStore.Entities
             builder.Property(p => p.SimpleResponses).HasColumnType("jsonb");
             builder.Property(p => p.Hosts).HasColumnType("jsonb");
             builder.Property(p => p.ProxyTransforms).HasColumnType("jsonb");
+        }
+    }
+
+    public class Mapping : Profile
+    {
+        public Mapping()
+        {
+            CreateMap<WebsiteDomainModel, WebsiteEntity>();
+            CreateMap<User, UserEntity>();
+            CreateMap<WebDomain, WebDomainEntity>();
+            CreateMap<HostTraffic, HostTrafficEntity>();
         }
     }
 }

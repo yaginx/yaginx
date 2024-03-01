@@ -39,7 +39,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
             {
                 try
                 {
-                    _context = (DbContext)Activator.CreateInstance(typeof(T), _loggerFactory, _connectionSafeHelper);
+                    _context = (DbContext)Activator.CreateInstance(typeof(T), _loggerFactory);
 
                     if (_context == null)
                     {

@@ -25,6 +25,7 @@ namespace Yaginx.Controllers
             return Content(result);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Upgrade([FromServices] LiteDbDatabaseRepository liteDbDatabaseRepository,
             [FromServices] IMapper mapper,
             [FromServices] IWebsiteRepository websiteRepository,

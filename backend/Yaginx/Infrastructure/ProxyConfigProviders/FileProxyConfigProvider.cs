@@ -1,4 +1,5 @@
 using AgileLabs;
+using AgileLabs.WorkContexts.Extensions;
 using Microsoft.Extensions.Primitives;
 using System.Diagnostics.CodeAnalysis;
 using Yaginx.DomainModels;
@@ -20,18 +21,15 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
         private ILogger<FileProxyConfigProvider> _Logger;
         private readonly ProxyRuleChangeNotifyService _proxyRuleChangeNotifyService;
         private readonly ProxyRuleRedisStorageService _proxyRuleRedisStorageService;
-        private readonly IWebsiteRepository _websiteRepository;
 
         public FileProxyConfigProvider(
             ILogger<FileProxyConfigProvider> logger,
             ProxyRuleChangeNotifyService proxyRuleChangeNotifyService,
-            ProxyRuleRedisStorageService proxyRuleRedisStorageService,
-            IWebsiteRepository websiteRepository)
+            ProxyRuleRedisStorageService proxyRuleRedisStorageService)
         {
             _Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _proxyRuleChangeNotifyService = proxyRuleChangeNotifyService;
             _proxyRuleRedisStorageService = proxyRuleRedisStorageService;
-            _websiteRepository = websiteRepository;
             _changeToken = new CancellationTokenSource();
             _reloadToken = new RouteChangeToken();
 
@@ -126,6 +124,8 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
 
         private IEnumerable<(RouteConfig, ClusterConfig)> LoadDatabaseRules()
         {
+            using var scope = AgileLabContexts.Context.CreateScopeWithWorkContext();
+            var _websiteRepository = scope.WorkContext.Resolve<IWebsiteRepository>();
             var websites = _websiteRepository.SearchAsync().Result;
             foreach (var website in websites)
             {

@@ -1,5 +1,8 @@
-﻿using AgileLabs.Storage.PostgreSql;
+﻿using AgileLabs;
+using AgileLabs.AppRegisters;
+using AgileLabs.Storage.PostgreSql;
 using AgileLabs.WebApp.Hosting;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,7 +39,7 @@ namespace Yaginx.DataStore.PostgreSQLStore
             services.TryAddScoped<IConnectionSafeHelper, ConnectionSafeHelper>();
             services.TryAddScoped<IDbContextCommiter, DbContextCommiter>();
             services.TryAddScoped<IDbDataSourceManager, DbDataSourceManager>();
-            services.AddSingleton<IStartupFilter, DefaultAutoCommiterStartupFilter>();
+            //services.AddSingleton<IStartupFilter, DefaultAutoCommiterStartupFilter>();
 
             services.AddScoped<IWebDomainRepository, WebDomainRepository>();
             services.AddScoped<IWebsiteRepository, WebsiteRepository>();
@@ -61,6 +64,17 @@ namespace Yaginx.DataStore.PostgreSQLStore
             services.AddScoped<IWoDbContextFactory<TDbContext>>(sp => sp.GetRequiredService<WoDbContextFactory<TDbContext>>());
             services.AddScoped<IWoDbContextFactory>(sp => sp.GetRequiredService<IWoDbContextFactory<TDbContext>>());
             services.AddScoped(sp => sp.GetRequiredService<WoDbContextFactory<TDbContext>>().GetDbContextAsync().Result);
+
+            services.AddSingleton<AutoCommiterMiddleware>();
+        }
+    }
+
+    public class AutoCommiterPiplineRegister : IRequestPiplineRegister
+    {
+        public RequestPiplineCollection Configure(RequestPiplineCollection piplineActions, AppBuildContext buildContext)
+        {
+            piplineActions.Register("AutoCommiter", RequestPiplineStage.BeginOfPipline, app => app.UseMiddleware<AutoCommiterMiddleware>());
+            return piplineActions;
         }
     }
 }
