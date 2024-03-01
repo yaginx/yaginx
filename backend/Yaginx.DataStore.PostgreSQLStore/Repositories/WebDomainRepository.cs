@@ -3,11 +3,10 @@ using Microsoft.Extensions.Logging;
 using Yaginx.DataStore.PostgreSQLStore.Abstracted;
 using Yaginx.DataStore.PostgreSQLStore.Entities;
 using Yaginx.DomainModels;
-using Yaginx.YaginxAcmeLoaders;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Repositories
 {
-    public class WebDomainRepository : YaginxCrudBaseRepository<WebDomain, WebDomainEntity>, IWebDomainRepository, ICertificateDomainRepsitory
+    public class WebDomainRepository : YaginxCrudBaseRepository<WebDomain, WebDomainEntity>, IWebDomainRepository
     {
         public WebDomainRepository(IWoDbContextFactory factory, IMapper mapper, ILogger<WebDomainRepository> logger) : base(factory, mapper, logger)
         {
@@ -18,18 +17,28 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
             return GetAsync<WebDomain>(x => x.Name == name);
         }
 
-        public async Task UnFreeDomainAsync(string domain, string message)
+        public Task<IEnumerable<WebDomain>> SearchAsync()
         {
-            var webDomain = await GetByNameAsync(domain);
-            webDomain.IsUseFreeCert = false;
-            webDomain.FreeCertMessage = message;
-            await UpdateAsync(webDomain);
+            return base.SearchAsync();
         }
 
-        async Task<IEnumerable<string>> ICertificateDomainRepsitory.GetFreeCertDomainAsync()
+        public Task<IEnumerable<WebDomain>> SearchAsync(bool useFreeCert = false)
         {
-            var result = await GetByQueryAsync<WebDomain>(x => x.IsUseFreeCert);
-            return result.Select(x => x.Name);
+            return base.SearchAsync(x => x.IsUseFreeCert);
         }
+
+        //public async Task UnFreeDomainAsync(string domain, string message)
+        //{
+        //    var webDomain = await GetByNameAsync(domain);
+        //    webDomain.IsUseFreeCert = false;
+        //    webDomain.FreeCertMessage = message;
+        //    await UpdateAsync(webDomain);
+        //}
+
+        //async Task<IEnumerable<string>> ICertificateDomainRepsitory.GetFreeCertDomainAsync()
+        //{
+        //    var result = await GetByQueryAsync<WebDomain>(x => x.IsUseFreeCert);
+        //    return result.Select(x => x.Name);
+        //}
     }
 }

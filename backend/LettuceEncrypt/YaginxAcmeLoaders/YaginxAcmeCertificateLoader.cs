@@ -14,17 +14,20 @@ namespace Yaginx.YaginxAcmeLoaders
 
         private readonly IServer _server;
         private readonly IConfiguration _config;
+        private readonly ICertificateDomainRepsitory _certificateDomainRepsitory;
 
         public YaginxAcmeCertificateLoader(
             IServiceScopeFactory serviceScopeFactory,
             ILogger<YaginxAcmeCertificateLoader> logger,
             IServer server,
-            IConfiguration config)
+            IConfiguration config,
+            ICertificateDomainRepsitory certificateDomainRepsitory)
         {
             _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
             _server = server;
             _config = config;
+            _certificateDomainRepsitory = certificateDomainRepsitory;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -50,9 +53,7 @@ namespace Yaginx.YaginxAcmeLoaders
             {
                 var waitSconds = RandomNumberGenerator.GetInt32(30, 120);// 每隔30~120秒检查一次
                 await Task.Delay(TimeSpan.FromSeconds(waitSconds), stoppingToken);
-                using var acmeStateMachineScopeRoot = _serviceScopeFactory.CreateScope();
-                var _domainRepsitory = acmeStateMachineScopeRoot.ServiceProvider.GetRequiredService<ICertificateDomainRepsitory>();
-                var domains = await _domainRepsitory.GetFreeCertDomainAsync();
+                var domains = await _certificateDomainRepsitory.GetFreeCertDomainAsync();
                 foreach (var domain in domains)
                 {
                     using var acmeStateMachineScope = _serviceScopeFactory.CreateScope();
@@ -83,12 +84,12 @@ namespace Yaginx.YaginxAcmeLoaders
                     }
                     catch (AggregateException ex) when (ex.InnerException != null)
                     {
-                        await _domainRepsitory.UnFreeDomainAsync(domain, ex.InnerException.Message);
+                        await _certificateDomainRepsitory.UnFreeDomainAsync(domain, ex.InnerException.Message);
                         _logger.LogError(0, ex.InnerException, "ACME state machine encountered unhandled error");
                     }
                     catch (Exception ex)
                     {
-                        await _domainRepsitory.UnFreeDomainAsync(domain, ex.Message);
+                        await _certificateDomainRepsitory.UnFreeDomainAsync(domain, ex.Message);
                         _logger.LogError(0, ex, "ACME state machine encountered unhandled error");
                     }
                 }

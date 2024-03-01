@@ -1,4 +1,6 @@
-﻿namespace Yaginx.DomainModels;
+﻿using System.Linq.Expressions;
+
+namespace Yaginx.DomainModels;
 
 public interface IHostTrafficRepository
 {

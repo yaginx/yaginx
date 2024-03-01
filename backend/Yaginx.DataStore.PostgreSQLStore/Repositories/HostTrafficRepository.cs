@@ -20,22 +20,29 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
             return _mapper.Map<List<HostTraffic>>(list);
         }
 
+        public async Task<IEnumerable<HostTraffic>> SearchAsync()
+        {
+            var list = await GetByQueryAsync(x => true);
+            return _mapper.Map<List<HostTraffic>>(list);
+        }
+
         public async Task UpsertAsync(HostTraffic hostTraffic)
         {
             var currentPeriod = TimePeriod.GetCurrentPeriod(SeqNoResetPeriod.Hourly, DateTime.UtcNow);
 
-            var old = await GetAsync<HostTraffic>(x => x.HostName == hostTraffic.HostName && x.Period == currentPeriod.PeriodTs);
-            if (old == null)
+            var entity = await GetAsync<HostTrafficEntity>(x => x.HostName == hostTraffic.HostName && x.Period == currentPeriod.PeriodTs);
+            if (entity == null)
             {
-                hostTraffic.Period = currentPeriod.PeriodTs;
-                await InsertAsync(hostTraffic);
+                entity = _mapper.Map<HostTrafficEntity>(hostTraffic);
+                entity.Period = currentPeriod.PeriodTs;
+                await InsertAsync(entity);
             }
             else
             {
-                old.InboundBytes += hostTraffic.InboundBytes;
-                old.OutboundBytes += hostTraffic.OutboundBytes;
-                old.RequestCounts += hostTraffic.RequestCounts;
-                await UpdateAsync(old);
+                entity.InboundBytes += hostTraffic.InboundBytes;
+                entity.OutboundBytes += hostTraffic.OutboundBytes;
+                entity.RequestCounts += hostTraffic.RequestCounts;
+                await EntryUpdateAsync(entity);
             }
         }
     }

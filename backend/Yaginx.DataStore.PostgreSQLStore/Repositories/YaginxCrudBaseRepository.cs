@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
 using Yaginx.DataStore.PostgreSQLStore.Abstracted;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Repositories
@@ -32,9 +33,9 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
             return _mapper.Map<TDomainModel>(entity);
         }
 
-        public async Task<IEnumerable<TDomainModel>> SearchAsync()
+        public async Task<IEnumerable<TDomainModel>> SearchAsync(Expression<Func<TEntity, bool>> predicate = null)
         {
-            var entityList = await base.GetAllAsync();
+            var entityList = await base.GetByQueryAsync(predicate);
             return _mapper.Map<List<TDomainModel>>(entityList);
         }
 

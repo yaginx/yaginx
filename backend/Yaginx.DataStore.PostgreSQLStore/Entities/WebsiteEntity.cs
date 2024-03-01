@@ -41,10 +41,10 @@ namespace Yaginx.DataStore.PostgreSQLStore.Entities
     {
         public Mapping()
         {
-            CreateMap<WebsiteDomainModel, WebsiteEntity>();
-            CreateMap<User, UserEntity>();
-            CreateMap<WebDomain, WebDomainEntity>();
-            CreateMap<HostTraffic, HostTrafficEntity>();
+            CreateMap<WebsiteDomainModel, WebsiteEntity>().ReverseMap();
+            CreateMap<User, UserEntity>().ReverseMap();
+            CreateMap<WebDomain, WebDomainEntity>().ReverseMap();
+            CreateMap<HostTraffic, HostTrafficEntity>().ReverseMap();
         }
     }
 }

@@ -1,8 +1,10 @@
-﻿namespace Yaginx.DomainModels;
+﻿using System.Linq.Expressions;
+
+namespace Yaginx.DomainModels;
 
 public interface IWebDomainRepository
 {
-    Task<IEnumerable<WebDomain>> SearchAsync();
+    Task<IEnumerable<WebDomain>> SearchAsync(bool useFreeCert = false);
     Task AddAsync(WebDomain webDomain);
     Task UpdateAsync(WebDomain webDomain);
     Task DeleteAsync(long id);

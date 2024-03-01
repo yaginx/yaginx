@@ -1,4 +1,5 @@
-﻿using Yaginx.DomainModels;
+﻿using System.Linq.Expressions;
+using Yaginx.DomainModels;
 
 namespace Yaginx.DataStore.LiteDBStore.Repositories
 {
@@ -10,7 +11,7 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
         {
             _databaseRepository = databaseRepository;
         }
-        public async Task<IEnumerable<HostTraffic>> SearchAsync()
+        public async Task<IEnumerable<HostTraffic>> SearchAsync(Expression<Func<HostTraffic, bool>> predicate = null)
         {
             var result = await _databaseRepository.SearchAsync<HostTraffic>();
             return result.OrderByDescending(x => x.Period).ThenBy(x => x.HostName).ToList();
@@ -19,6 +20,11 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
         public Task<IEnumerable<HostTraffic>> SearchAsync(string hostName)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<HostTraffic>> SearchAsync()
+        {
+            return await _databaseRepository.SearchAsync<HostTraffic>();
         }
 
         public async Task UpsertAsync(HostTraffic hostTraffic)

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using System.Linq.Expressions;
 using Yaginx.DomainModels;
 
 namespace Yaginx.DataStore.LiteDBStore.Repositories
@@ -34,7 +35,7 @@ namespace Yaginx.DataStore.LiteDBStore.Repositories
             return await _databaseRepository.GetAsync<WebsiteDomainModel>(x => x.Name == name);
         }
 
-        public async Task<IEnumerable<WebsiteDomainModel>> SearchAsync()
+        public async Task<IEnumerable<WebsiteDomainModel>> SearchAsync(Expression<Func<WebsiteDomainModel, bool>> predicate = null)
         {
             var websiteList = await _databaseRepository.SearchAsync<Website>();
             return _mapper.Map<List<WebsiteDomainModel>>(websiteList);

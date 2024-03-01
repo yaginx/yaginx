@@ -185,6 +185,8 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             services.UseLiteDBDataStore(buildContext);
             services.AddedPostgreSQLStore(buildContext);
 
+            services.AddSingleton<ICertificateDomainRepsitory, CertificateDomainSingletonService>();
+
             services.AddHostedService<ScheduleHostedService>();
         }
         services.AddScoped<ContainerServcie>();
@@ -264,7 +266,7 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             //    });
             //    app.UseSwaggerUI(options =>
             //    {
-                    
+
             //    });
             //});
         }

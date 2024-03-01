@@ -45,7 +45,6 @@ namespace Yaginx.DataStore.PostgreSQLStore
             services.AddScoped<IWebsiteRepository, WebsiteRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IHostTrafficRepository, HostTrafficRepository>();
-            services.AddScoped<ICertificateDomainRepsitory, WebDomainRepository>();
 
             return services;
         }

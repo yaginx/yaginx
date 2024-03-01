@@ -1,8 +1,10 @@
-﻿namespace Yaginx.DomainModels;
+﻿using System.Linq.Expressions;
+
+namespace Yaginx.DomainModels;
 
 public interface IWebsiteRepository
 {
-    Task<IEnumerable<WebsiteDomainModel>> SearchAsync();
+    Task<IEnumerable<WebsiteDomainModel>> SearchAsync(Expression<Func<WebsiteDomainModel, bool>> predicate = null);
     Task AddAsync(WebsiteDomainModel website);
     Task UpdateAsync(WebsiteDomainModel website);
     Task DeleteAsync(long id);
