@@ -2,10 +2,10 @@
 
 public interface IWebsiteRepository
 {
-    Task<IEnumerable<Website>> SearchAsync();
-    Task AddAsync(Website website);
-    Task UpdateAsync(Website website);
+    Task<IEnumerable<WebsiteDomainModel>> SearchAsync();
+    Task AddAsync(WebsiteDomainModel website);
+    Task UpdateAsync(WebsiteDomainModel website);
     Task DeleteAsync(long id);
-    Task<Website> GetAsync(long id);
-    Task<Website> GetByNameAsync(string name);
+    Task<WebsiteDomainModel> GetAsync(long id);
+    Task<WebsiteDomainModel> GetByNameAsync(string name);
 }

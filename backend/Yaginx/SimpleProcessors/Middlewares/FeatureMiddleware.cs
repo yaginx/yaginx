@@ -22,7 +22,7 @@ public sealed class FeatureMiddleware
         {
             await context.Response.WriteAsync("OK");
         }
-        var webSite = (Website)model.Metadata["RawModel"];
+        var webSite = (WebsiteDomainModel)model.Metadata["RawModel"];
         var requestPath = context.Request.Path.Value.TrimStart('/');
         var preProcess = webSite.SimpleResponses.SingleOrDefault(x => x.Url.Equals(requestPath, StringComparison.OrdinalIgnoreCase));
         if (preProcess != null)

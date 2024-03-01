@@ -77,7 +77,7 @@ public class SimpleProcessorConfigManager : EndpointDataSource, IDisposable
                 continue;
             }
 
-            var website = (Website)websiteObjValue;
+            var website = (WebsiteDomainModel)websiteObjValue;
             if (website.SimpleResponses == null || !website.SimpleResponses.Any())
             {
                 continue;

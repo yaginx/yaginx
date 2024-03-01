@@ -10,7 +10,7 @@ namespace Yaginx.SimpleProcessors;
 public sealed class WebsitePreProcessEndpointFactory
 {
     private RequestDelegate? _pipeline;
-    public Endpoint CreateEndpoint(string name, WebsitePreProcessMetadataModel model, Website website, int order = 0, IReadOnlyList<Action<EndpointBuilder>> conventions = null)
+    public Endpoint CreateEndpoint(string name, WebsitePreProcessMetadataModel model, WebsiteDomainModel website, int order = 0, IReadOnlyList<Action<EndpointBuilder>> conventions = null)
     {
         //var config = route.Config;
         //var match = config.Match;

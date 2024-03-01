@@ -22,7 +22,7 @@ internal sealed class AutoRedirectToHttpsMiddleware
         var model = feature.Model;
         if (model.Metadata.ContainsKey("RawModel"))
         {
-            var webSite = (Website)model.Metadata["RawModel"];
+            var webSite = (WebsiteDomainModel)model.Metadata["RawModel"];
         }
         //if (config.MaxRequestBodySize.HasValue)
         //{

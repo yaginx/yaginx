@@ -8,7 +8,7 @@ namespace Yaginx.Models.WebsiteModels
     {
         public WebsiteMapping()
         {
-            CreateMap<WebsiteUpsertRequest, Website>()
+            CreateMap<WebsiteUpsertRequest, WebsiteDomainModel>()
                 .ForMember(d => d.Specifications, mo => mo.MapFrom(s => new WebsiteSpecifications
                 {
                     DefaultHost = s.DefaultHost,
@@ -20,7 +20,7 @@ namespace Yaginx.Models.WebsiteModels
                     WebProxy = s.WebProxy
                 }));
 
-            CreateMap<Website, WebsiteUpsertRequest>()
+            CreateMap<WebsiteDomainModel, WebsiteUpsertRequest>()
                 .ForMember(d => d.DefaultHost, mo => mo.MapFrom(s => s.Specifications.DefaultHost))
                 .ForMember(d => d.DefaultDestination, mo => mo.MapFrom(s => s.Specifications.DefaultDestination))
                 .ForMember(d => d.DefaultDestinationHost, mo => mo.MapFrom(s => s.Specifications.DefaultDestinationHost))
@@ -29,7 +29,7 @@ namespace Yaginx.Models.WebsiteModels
                 .ForMember(d => d.IsWithOriginalHostHeader, mo => mo.MapFrom(s => s.Specifications.IsWithOriginalHostHeader))
                 .ForMember(d => d.WebProxy, mo => mo.MapFrom(s => s.Specifications.WebProxy));
 
-            CreateMap<Website, WebsiteListItem>()
+            CreateMap<WebsiteDomainModel, WebsiteListItem>()
                 .ForMember(d => d.DefaultHost, mo => mo.MapFrom(s => s.Specifications.DefaultHost))
                 .ForMember(d => d.DefaultDestination, mo => mo.MapFrom(s => s.Specifications.DefaultDestination))
                 .ForMember(d => d.DefaultDestinationHost, mo => mo.MapFrom(s => s.Specifications.DefaultDestinationHost))

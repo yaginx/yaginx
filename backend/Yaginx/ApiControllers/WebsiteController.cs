@@ -27,10 +27,10 @@ public class WebsiteController : YaginxControllerBase
     [HttpPost, Route("upsert")]
     public async Task<WebsiteUpsertRequest> Add([FromBody] WebsiteUpsertRequest request)
     {
-        Website returnValue;
+        WebsiteDomainModel returnValue;
         if (!request.Id.HasValue)
         {
-            var site = _mapper.Map<Website>(request);
+            var site = _mapper.Map<WebsiteDomainModel>(request);
             site.Id = IdGenerator.NextId();
             site.CreateTime = DateTime.Now;
             site.UpdateTime = DateTime.Now;
@@ -121,7 +121,7 @@ public class WebsiteController : YaginxControllerBase
 
             string configJson = Encoding.UTF8.GetString(fileContent);
 
-            var websites = JsonConvert.DeserializeObject<List<Website>>(configJson);
+            var websites = JsonConvert.DeserializeObject<List<WebsiteDomainModel>>(configJson);
             foreach (var website in websites)
             {
                 await _websiteRepository.UpdateAsync(website);

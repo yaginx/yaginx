@@ -4,26 +4,12 @@ namespace Yaginx.DomainModels;
 /// <summary>
 /// 站点
 /// </summary>
-public class Website
+public class WebsiteDomainModel
 {
     public long? Id { get; set; }
     public string Name { get; set; }
 
     public WebsiteSpecifications Specifications { get; set; }
-
-    public string[] Hosts { get; set; }
-    public List<WebsiteProxyRuleItem> ProxyRules { get; set; }
-    public DateTime CreateTime { get; set; }
-    public DateTime UpdateTime { get; set; }
-
-    public Dictionary<string, string> ProxyTransforms { get; set; }
-    public SimpleResponseItem[] SimpleResponses { get; set; }
-}
-
-public class WebsiteV1 : WebsiteSpecifications
-{
-    public long? Id { get; set; }
-    public string Name { get; set; }
 
     public string[] Hosts { get; set; }
     public List<WebsiteProxyRuleItem> ProxyRules { get; set; }

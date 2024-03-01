@@ -29,6 +29,7 @@
 		<ProjectReference Include="..\Yaginx.Core\Yaginx.Core.csproj" />
 		<ProjectReference Include="..\Yaginx.DataStore.LiteDBStore\Yaginx.DataStore.LiteDBStore.csproj" />
 		<ProjectReference Include="..\Yaginx.DataStore.MongoStore\Yaginx.DataStore.MongoStore.csproj" />
+		<ProjectReference Include="..\Yaginx.DataStore.PostgreSQLStore\Yaginx.DataStore.PostgreSQLStore.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

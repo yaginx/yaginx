@@ -2,17 +2,18 @@
 using AgileLabs.WebApp.Hosting;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Text;
+using Yaginx.DataStore.PostgreSQLStore.Abstracted;
+using Yaginx.DataStore.PostgreSQLStore.Repositories;
+using Yaginx.DomainModels;
+using Yaginx.YaginxAcmeLoaders;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
+namespace Yaginx.DataStore.PostgreSQLStore
 {
     public static class ServiceCollectionExtensionsForEfRepository
     {
-        public static IServiceCollection ConfigureServices(this IServiceCollection services, AppBuildContext buildContext)
+        public static IServiceCollection AddedPostgreSQLStore(this IServiceCollection services, AppBuildContext buildContext)
         {
             //var configuration = buildContext.Configuration;
             //var connectonString = configuration.GetConnectionString("Default");
@@ -28,17 +29,21 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
             //});
 
             services.RegisterDbContext<CenterDbContext>();
-
             services.AddHostedService<AutoMigration>();
-
             services.AddScoped(typeof(CrudRepository<>));
             services.AddScoped(typeof(CrudRepository));
 
             services.TryAddScoped<IConnectionSafeHelper, ConnectionSafeHelper>();
             services.TryAddScoped<IDbContextCommiter, DbContextCommiter>();
             services.TryAddScoped<IDbDataSourceManager, DbDataSourceManager>();
-
             services.AddSingleton<IStartupFilter, DefaultAutoCommiterStartupFilter>();
+
+            services.AddScoped<IWebDomainRepository, WebDomainRepository>();
+            services.AddScoped<IWebsiteRepository, WebsiteRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IHostTrafficRepository, HostTrafficRepository>();
+            services.AddScoped<ICertificateDomainRepsitory, WebDomainRepository>();
+
             return services;
         }
 

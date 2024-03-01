@@ -35,7 +35,7 @@ using Yaginx.SimpleProcessors.ConfigProviders;
 using Yaginx.WorkContexts;
 using Yaginx.YaginxAcmeLoaders;
 using Yarp.ReverseProxy.Configuration;
-
+using Yaginx.DataStore.PostgreSQLStore;
 public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEndpointConfig, IMvcOptionsConfig, IMvcBuildConfig
 {
     public int Order => 1;
@@ -182,8 +182,8 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             services.AddHostedService<YaginxAcmeCertificateLoader>();
             #endregion
 
-
-            services.UseLiteDBDataStore(buildContext);
+            //services.UseLiteDBDataStore(buildContext);
+            services.AddedPostgreSQLStore(buildContext);
 
             services.AddHostedService<ScheduleHostedService>();
         }

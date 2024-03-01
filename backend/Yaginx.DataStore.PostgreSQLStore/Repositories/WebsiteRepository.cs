@@ -6,16 +6,16 @@ using Yaginx.DomainModels;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Repositories
 {
-    public class WebsiteRepository : YaginxCrudBaseRepository<Website, WebsiteEntity>, IWebsiteRepository
+    public class WebsiteRepository : YaginxCrudBaseRepository<WebsiteDomainModel, WebsiteEntity>, IWebsiteRepository
     {
         public WebsiteRepository(IWoDbContextFactory factory, IMapper mapper, ILogger<WebsiteRepository> logger) : base(factory, mapper, logger)
         {
         }
 
-        public async Task<Website> GetByNameAsync(string name)
+        public async Task<WebsiteDomainModel> GetByNameAsync(string name)
         {
             var entity = await base.GetAsync(x => x.Name == name);
-            return _mapper.Map<Website>(entity);
+            return _mapper.Map<WebsiteDomainModel>(entity);
         }
     }
 }

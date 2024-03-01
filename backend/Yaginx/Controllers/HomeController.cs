@@ -1,5 +1,10 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
+using Yaginx.DataStore.LiteDBStore;
+using Yaginx.DataStore.LiteDBStore.Repositories;
+using Yaginx.DomainModels;
 
 namespace Yaginx.Controllers
 {
@@ -18,6 +23,32 @@ namespace Yaginx.Controllers
                 return DateTime.Now.ToString();
             });
             return Content(result);
+        }
+
+        public async Task<IActionResult> Upgrade([FromServices] LiteDbDatabaseRepository liteDbDatabaseRepository,
+            [FromServices] IMapper mapper,
+            [FromServices] IWebsiteRepository websiteRepository,
+            [FromServices] IWebDomainRepository webDomainRepository)
+        {
+            try
+            {
+                var liteDbWebsites = await new WebsiteRepository(liteDbDatabaseRepository, mapper).SearchAsync();
+                foreach (var item in liteDbWebsites)
+                {
+                    await websiteRepository.AddAsync(item);
+                }
+
+                var webDomainList = await new WebDomainRepository(liteDbDatabaseRepository).SearchAsync();
+                foreach (var item in webDomainList)
+                {
+                    await webDomainRepository.AddAsync(item);
+                }
+                return Content(string.Empty);
+            }
+            catch (Exception ex)
+            {
+                return Content(JsonConvert.SerializeObject(ex));
+            }
         }
     }
 }
