@@ -20,7 +20,7 @@ const httpsRE = /^https:\/\//;
  */
 export function createProxy() {
   const ProxyList: ProxyTargetList = {
-    '/api': {
+    '/yaginx/api': {
       target: VITE_PROXY_HTTP,
       changeOrigin: true,
       //  rewrite: (pre) => pre.replace(/^\/api/, ''), // 将 /api 重写为空

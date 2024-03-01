@@ -36,6 +36,7 @@ using Yaginx.WorkContexts;
 using Yaginx.YaginxAcmeLoaders;
 using Yarp.ReverseProxy.Configuration;
 using Yaginx.DataStore.PostgreSQLStore;
+using Microsoft.OpenApi.Models;
 public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEndpointConfig, IMvcOptionsConfig, IMvcBuildConfig
 {
     public int Order => 1;
@@ -61,9 +62,12 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
         });
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        //services.AddEndpointsApiExplorer();
-        //services.AddSwaggerGen();
 
+        if (buildContext.HostEnvironment.IsDevelopment())
+        {
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
+        }
         services.AddResponseCaching();
         services.AddResponseCompression();
 
@@ -254,21 +258,20 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
                 //    }
                 //});
             });
-
-            //piplineActions.Register("OpenApi Docs", RequestPiplineStage.BeforeRouting, app =>
-            //{
-            //    app.UseSwagger(optons =>
-            //    {
-            //        optons.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
-            //        {
-            //            swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}{BasePath}" } };
-            //        });
-            //    });
-            //    app.UseSwaggerUI(options =>
-            //    {
-
-            //    });
-            //});
+            if (buildContext.HostEnvironment.IsDevelopment())
+            {
+                piplineActions.Register("OpenApi Docs", RequestPiplineStage.BeforeRouting, app =>
+                {
+                    app.UseSwagger(optons =>
+                    {
+                        optons.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+                        {
+                            swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}{BasePath}" } };
+                        });
+                    });
+                    app.UseSwaggerUI(options => { });
+                });
+            }
         }
         //piplineActions.Register("HangfireDashboard", RequestPiplineStage.BeforeRouting, app =>
         //{
