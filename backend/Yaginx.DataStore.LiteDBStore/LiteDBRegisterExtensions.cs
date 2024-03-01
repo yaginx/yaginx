@@ -18,9 +18,10 @@ public static class LiteDBRegisterExtensions
     {
         services.TryAddSingleton(sp =>
         {
-            var connectionString = appBuildContext.Configuration.GetConnectionString("Default");
-            if (connectionString == null)
-                throw new Exception("未配置数据库连接字符串");
+            //var connectionString = appBuildContext.Configuration.GetConnectionString("Default");
+            //if (connectionString == null)
+            //    throw new Exception("未配置数据库连接字符串");
+            var connectionString = "filename=yaginx.db;password=yaginx;Mode=Exclusive";
             var dbParms = connectionString.Split(';');
 
             var newDbParms = new List<string>();

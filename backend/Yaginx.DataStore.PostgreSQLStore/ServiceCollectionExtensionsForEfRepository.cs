@@ -59,7 +59,7 @@ namespace Yaginx.DataStore.PostgreSQLStore
             // 下面分开注册的目的是:在同一个Scope确保拿到的DbContext是唯一的
             services.AddScoped<WoDbContextFactory<TDbContext>>();
             services.AddScoped<IWoDbContextFactory<TDbContext>>(sp => sp.GetRequiredService<WoDbContextFactory<TDbContext>>());
-            services.AddScoped<IWoDbContextFactory>(sp => sp.GetRequiredService<WoDbContextFactory<TDbContext>>());
+            services.AddScoped<IWoDbContextFactory>(sp => sp.GetRequiredService<IWoDbContextFactory<TDbContext>>());
             services.AddScoped(sp => sp.GetRequiredService<WoDbContextFactory<TDbContext>>().GetDbContextAsync().Result);
         }
     }
