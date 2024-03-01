@@ -2,8 +2,6 @@
 using AgileLabs.FileUpload;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Collections;
@@ -133,20 +131,5 @@ public class WebsiteController : YaginxControllerBase
         {
             throw new Exception("恢复失败", ex);
         }
-    }
-}
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-public class DisableFormValueModelBindingAttribute : Attribute, IResourceFilter
-{
-    public void OnResourceExecuting(ResourceExecutingContext context)
-    {
-        var factories = context.ValueProviderFactories;
-        factories.RemoveType<FormValueProviderFactory>();
-        factories.RemoveType<FormFileValueProviderFactory>();
-        factories.RemoveType<JQueryFormValueProviderFactory>();
-    }
-
-    public void OnResourceExecuted(ResourceExecutedContext context)
-    {
     }
 }

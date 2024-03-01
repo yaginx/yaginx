@@ -18,6 +18,14 @@ dotnet ef migrations remove
 
 直接更新db
 dotnet ef database update
+
+create role yaginx with login encrypted password '123456' connection limit -1;
+create database yaginx with owner yaginx encoding='UTF8';
+alter database laoshi set timezone to 'Asia/Shanghai';
+\c yaginx
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "ltree";
+CREATE EXTENSION IF NOT EXISTS "pg_stat_statements"; 
  */
 namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
 {

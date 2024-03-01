@@ -11,5 +11,6 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
         /// </summary>
         /// <returns></returns>
         Task<DbDataSource> GetDbDataSourceAsync();
+        Task<DbDataSource> GetDbDataSourceAsync(string connectionString);
     }
 }

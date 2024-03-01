@@ -19,6 +19,21 @@ public class Website
     public Dictionary<string, string> ProxyTransforms { get; set; }
     public SimpleResponseItem[] SimpleResponses { get; set; }
 }
+
+public class WebsiteV1 : WebsiteSpecifications
+{
+    public long? Id { get; set; }
+    public string Name { get; set; }
+
+    public string[] Hosts { get; set; }
+    public List<WebsiteProxyRuleItem> ProxyRules { get; set; }
+    public DateTime CreateTime { get; set; }
+    public DateTime UpdateTime { get; set; }
+
+    public Dictionary<string, string> ProxyTransforms { get; set; }
+    public SimpleResponseItem[] SimpleResponses { get; set; }
+}
+
 public class WebsiteSpecifications
 {
     /// <summary>
@@ -58,5 +73,5 @@ public class SimpleResponseItem
     public string ContentType { get; set; }
     public int StatusCode { get; set; }
     public string ResponseContent { get; set; }
-    public List<KeyValuePair<string, string>> ExtraHeaders { get; set; }
+    public virtual List<KeyValuePair<string, string>> ExtraHeaders { get; set; }
 }

@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Npgsql;
 using System.Data.Common;
 using System.Reflection;
@@ -13,8 +11,6 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
     {
         private readonly IConfiguration _configuration;
         private readonly IWorkContext _workContext;
-        private readonly IMemoryCache _memoryCache;
-        private readonly ILogger<DbDataSourceManager> _logger;
 
         public string Id { get; }
 
@@ -23,21 +19,21 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
         /// </summary>
         public DbDataSourceManager(
             IConfiguration configuration,
-            IWorkContext workContext,
-            IMemoryCache memoryCache,
-            ILogger<DbDataSourceManager> logger)
+            IWorkContext workContext)
         {
             Id = Guid.NewGuid().ToString("N");
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _workContext = workContext ?? throw new ArgumentNullException(nameof(workContext));
-            _memoryCache = memoryCache;
-            _logger = logger;
         }
 
         public async Task<DbDataSource> GetDbDataSourceAsync()
         {
             string connectonString = _configuration.GetConnectionString("Default");
+            return await GetDbDataSourceAsync(connectonString);
+        }
 
+        public async Task<DbDataSource> GetDbDataSourceAsync(string connectonString)
+        {
             if (string.IsNullOrEmpty(connectonString))
             {
                 throw new InvalidOperationException($"Db {nameof(connectonString)} 不能为空");
