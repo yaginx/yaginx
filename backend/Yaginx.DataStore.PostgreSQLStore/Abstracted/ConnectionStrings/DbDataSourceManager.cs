@@ -1,8 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using System.Data.Common;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using Yaginx.WorkContexts;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ConnectionStrings
@@ -11,6 +14,8 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ConnectionStrings
     {
         private readonly IConfiguration _configuration;
         private readonly IWorkContext _workContext;
+        private readonly IMemoryCache _memoryCache;
+        private readonly SHA1 _hashAlgorithm;
 
         public string Id { get; }
 
@@ -19,11 +24,13 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ConnectionStrings
         /// </summary>
         public DbDataSourceManager(
             IConfiguration configuration,
-            IWorkContext workContext)
+            IWorkContext workContext, IMemoryCache memoryCache)
         {
             Id = Guid.NewGuid().ToString("N");
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _workContext = workContext ?? throw new ArgumentNullException(nameof(workContext));
+            _memoryCache = memoryCache;
+            _hashAlgorithm = SHA1.Create();
         }
 
         public async Task<DbDataSource> GetDbDataSourceAsync()
@@ -39,12 +46,18 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ConnectionStrings
                 throw new InvalidOperationException($"Db {nameof(connectonString)} 不能为空");
             }
 
-            var dataSourceBuilder = new NpgsqlDataSourceBuilder(PopulateRuntimeParameters(connectonString));
-            dataSourceBuilder.EnableDynamicJson();
-            dataSourceBuilder.UseJsonNet();
-            var dataSource = dataSourceBuilder.Build();
+
+            var connStringHash = _hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(connectonString));
+            var connStringKey = $"{Convert.ToBase64String(connStringHash)}";
             await Task.CompletedTask;
-            return dataSource;
+            return _memoryCache.GetOrCreate(connStringKey, entry =>
+            {
+                var dataSourceBuilder = new NpgsqlDataSourceBuilder(PopulateRuntimeParameters(connectonString));
+                dataSourceBuilder.EnableDynamicJson();
+                dataSourceBuilder.UseJsonNet();
+                var dataSource = dataSourceBuilder.Build();
+                return dataSource;
+            });
         }
 
         private string PopulateRuntimeParameters(string originalConnectionString)
