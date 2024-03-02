@@ -13,6 +13,7 @@ using Yaginx.DataStore.PostgreSQLStore.Abstracted.ConnectionStrings;
 using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 using Yaginx.DataStore.PostgreSQLStore.Repositories;
 using Yaginx.DomainModels;
+using Yaginx.DomainModels.MonitorModels;
 using Yaginx.YaginxAcmeLoaders;
 
 namespace Yaginx.DataStore.PostgreSQLStore
@@ -48,6 +49,10 @@ namespace Yaginx.DataStore.PostgreSQLStore
             services.AddScoped<IWebsiteRepository, WebsiteRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IHostTrafficRepository, HostTrafficRepository>();
+
+            // 注册仓储
+            services.AddScoped<IMonitorInfoRepository, MonitorInfoRepository>();
+            services.AddScoped<IResourceReportRepository, ResourceReportRepository>();
 
             return services;
         }

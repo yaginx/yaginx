@@ -7,6 +7,7 @@ using Yaginx.DomainModels;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Repositories
 {
+
     public class HostTrafficRepository : YaginxCrudBaseRepository<HostTraffic, HostTrafficEntity>, IHostTrafficRepository
     {
         public HostTrafficRepository(IWoDbContextFactory factory, IMapper mapper, ILogger<HostTrafficRepository> logger) : base(factory, mapper, logger)

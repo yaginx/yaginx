@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Yaginx.DataStore.PostgreSQLStore.Abstracted;
@@ -14,9 +15,11 @@ using Yaginx.DomainModels.MonitorModels;
 namespace Yaginx.DataStore.PostgreSQLStore.Migrations
 {
     [DbContext(typeof(CenterDbContext))]
-    partial class CenterDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240302163348_AddTraffic")]
+    partial class AddTraffic
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

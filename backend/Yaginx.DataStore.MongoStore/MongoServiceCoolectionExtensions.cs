@@ -17,7 +17,7 @@ public static class MongoServiceCoolectionExtensions
         services.AddScoped(typeof(IAppNoSqlBaseRepository<>), typeof(YaginxNoSqlBaseRepository<>));
 
         // 注册仓储
-        services.AddScoped<IMonitorInfoRepository, MonitorInfoRepository>();
-        services.AddScoped<IResourceReportRepository, ResourceReportRepository>();
+        //services.AddScoped<IMonitorInfoRepository, MonitorInfoRepository>();
+        //services.AddScoped<IResourceReportRepository, ResourceReportRepository>();
     }
 }
