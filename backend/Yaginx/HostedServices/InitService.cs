@@ -1,5 +1,6 @@
 ﻿using AgileLabs;
 using AgileLabs.Securities;
+using Yaginx.DataStore.PostgreSQLStore.Abstracted;
 using Yaginx.DomainModels;
 
 namespace Yaginx.HostedServices
@@ -8,11 +9,13 @@ namespace Yaginx.HostedServices
     {
         private readonly IUserRepository _userRepository;
         private readonly IEncryptionService _encryptionService;
+        private readonly IDbContextCommiter _dbContextCommiter;
 
-        public InitService(IUserRepository userRepository, IEncryptionService encryptionService)
+        public InitService(IUserRepository userRepository, IEncryptionService encryptionService, IDbContextCommiter dbContextCommiter)
         {
             _userRepository = userRepository;
             _encryptionService = encryptionService;
+            _dbContextCommiter = dbContextCommiter;
         }
         internal async Task Init()
         {
@@ -28,6 +31,7 @@ namespace Yaginx.HostedServices
                 };
                 userInfo.PasswordHash = _encryptionService.CreatePasswordHash(userInfo.Password, userInfo.PasswordSalt, "SHA256");
                 await _userRepository.AddAsync(userInfo);
+                await _dbContextCommiter.CommitAsync();
                 await Task.CompletedTask;
             }
         }

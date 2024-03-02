@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
+namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories
 {
     public class DesignContextFactory : IDesignTimeDbContextFactory<CenterDbContext>
     {

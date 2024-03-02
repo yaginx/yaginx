@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
 {

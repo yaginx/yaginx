@@ -1,7 +1,8 @@
 ﻿using AgileLabs;
 using AgileLabs.WorkContexts.Extensions;
+using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
+namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.Commiters
 {
     /// <summary>
     /// DbContext提交器

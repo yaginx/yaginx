@@ -15,6 +15,22 @@ namespace Yaginx.DataStore.PostgreSQLStore.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "account",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    email = table.Column<string>(type: "text", nullable: true),
+                    password = table.Column<string>(type: "text", nullable: true),
+                    password_hash = table.Column<string>(type: "text", nullable: true),
+                    password_salt = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_account", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "host_traffic",
                 columns: table => new
                 {
@@ -32,19 +48,19 @@ namespace Yaginx.DataStore.PostgreSQLStore.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "user",
+                name: "web_domain",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    email = table.Column<string>(type: "text", nullable: true),
-                    password = table.Column<string>(type: "text", nullable: true),
-                    password_hash = table.Column<string>(type: "text", nullable: true),
-                    password_salt = table.Column<string>(type: "text", nullable: true)
+                    name = table.Column<string>(type: "text", nullable: true),
+                    is_use_free_cert = table.Column<bool>(type: "boolean", nullable: false),
+                    is_verified = table.Column<bool>(type: "boolean", nullable: false),
+                    free_cert_message = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_user", x => x.id);
+                    table.PrimaryKey("pk_web_domain", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -70,8 +86,8 @@ namespace Yaginx.DataStore.PostgreSQLStore.Migrations
                     specifications = table.Column<WebsiteSpecifications>(type: "jsonb", nullable: true),
                     hosts = table.Column<string[]>(type: "jsonb", nullable: true),
                     proxy_rules = table.Column<List<WebsiteProxyRuleItem>>(type: "jsonb", nullable: true),
-                    create_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    update_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    create_time = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    update_time = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     proxy_transforms = table.Column<Dictionary<string, string>>(type: "jsonb", nullable: true),
                     simple_responses = table.Column<SimpleResponseItem[]>(type: "jsonb", nullable: true)
                 },
@@ -85,10 +101,13 @@ namespace Yaginx.DataStore.PostgreSQLStore.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "account");
+
+            migrationBuilder.DropTable(
                 name: "host_traffic");
 
             migrationBuilder.DropTable(
-                name: "user");
+                name: "web_domain");
 
             migrationBuilder.DropTable(
                 name: "web_page");

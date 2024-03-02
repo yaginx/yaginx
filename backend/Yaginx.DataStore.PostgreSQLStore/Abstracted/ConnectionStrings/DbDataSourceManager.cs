@@ -5,7 +5,7 @@ using System.Data.Common;
 using System.Reflection;
 using Yaginx.WorkContexts;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
+namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ConnectionStrings
 {
     public class DbDataSourceManager : IDbDataSourceManager
     {

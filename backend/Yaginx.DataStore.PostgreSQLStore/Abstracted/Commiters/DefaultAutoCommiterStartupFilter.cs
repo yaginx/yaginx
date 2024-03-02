@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
+namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.Commiters
 {
     //public class BloggingContextFactory : IDesignTimeDbContextFactory<CenterDbContext>
     //{

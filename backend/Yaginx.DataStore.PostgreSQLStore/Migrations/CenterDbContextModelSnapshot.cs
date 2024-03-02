@@ -46,6 +46,37 @@ namespace Yaginx.DataStore.PostgreSQLStore.Migrations
                     b.ToTable("web_page", (string)null);
                 });
 
+            modelBuilder.Entity("Yaginx.DataStore.PostgreSQLStore.Entities.AccountEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text")
+                        .HasColumnName("email");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("text")
+                        .HasColumnName("password");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text")
+                        .HasColumnName("password_hash");
+
+                    b.Property<string>("PasswordSalt")
+                        .HasColumnType("text")
+                        .HasColumnName("password_salt");
+
+                    b.HasKey("Id")
+                        .HasName("pk_account");
+
+                    b.ToTable("account", (string)null);
+                });
+
             modelBuilder.Entity("Yaginx.DataStore.PostgreSQLStore.Entities.HostTrafficEntity", b =>
                 {
                     b.Property<long>("Id")
@@ -79,37 +110,6 @@ namespace Yaginx.DataStore.PostgreSQLStore.Migrations
                         .HasName("pk_host_traffic");
 
                     b.ToTable("host_traffic", (string)null);
-                });
-
-            modelBuilder.Entity("Yaginx.DataStore.PostgreSQLStore.Entities.UserEntity", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Email")
-                        .HasColumnType("text")
-                        .HasColumnName("email");
-
-                    b.Property<string>("Password")
-                        .HasColumnType("text")
-                        .HasColumnName("password");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("text")
-                        .HasColumnName("password_hash");
-
-                    b.Property<string>("PasswordSalt")
-                        .HasColumnType("text")
-                        .HasColumnName("password_salt");
-
-                    b.HasKey("Id")
-                        .HasName("pk_user");
-
-                    b.ToTable("user", (string)null);
                 });
 
             modelBuilder.Entity("Yaginx.DataStore.PostgreSQLStore.Entities.WebDomainEntity", b =>

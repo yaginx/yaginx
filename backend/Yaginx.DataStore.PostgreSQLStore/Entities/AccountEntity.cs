@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Entities
 {
-    public class UserEntity
+    public class AccountEntity
     {
         public long Id { get; set; }
         public string Email { get; set; }
@@ -11,11 +11,11 @@ namespace Yaginx.DataStore.PostgreSQLStore.Entities
         public string PasswordHash { get; set; }
         public string PasswordSalt { get; set; }
     }
-    public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
+    public class UserEntityTypeConfiguration : IEntityTypeConfiguration<AccountEntity>
     {
-        public void Configure(EntityTypeBuilder<UserEntity> builder)
+        public void Configure(EntityTypeBuilder<AccountEntity> builder)
         {
-            builder.ToTable(nameof(UserEntity).FormatToTableName()).HasKey(x => x.Id);
+            builder.ToTable(nameof(AccountEntity).FormatToTableName()).HasKey(x => x.Id);
         }
     }
 }

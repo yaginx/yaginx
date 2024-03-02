@@ -2,8 +2,9 @@
 using AgileLabs.Storage.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Yaginx.DataStore.PostgreSQLStore.Abstracted.ConnectionStrings;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
+namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories
 {
     public class WoDbContextFactory<T> : IWoDbContextFactory<T>
     where T : DbContext

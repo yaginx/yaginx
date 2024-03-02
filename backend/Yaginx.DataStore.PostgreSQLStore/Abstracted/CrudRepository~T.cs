@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
+using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
 {

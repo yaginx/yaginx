@@ -1,6 +1,7 @@
 ﻿using AgileLabs;
 using AgileLabs.Diagnostics;
 using AgileLabs.FileProviders;
+using AgileLabs.WorkContexts.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -144,6 +145,7 @@ namespace Yaginx
                 using var scope = AgileLabContexts.Context.CreateScopeWithWorkContext();
                 try
                 {
+                    var commiter = scope.WorkContext.Resolve<IDbContextCommiter>();
                     var trafficRepository = scope.WorkContext.ServiceProvider.GetRequiredService<IHostTrafficRepository>();
                     foreach (var item in lastPeriodData)
                     {
@@ -156,6 +158,7 @@ namespace Yaginx
                             RequestCounts = item.Value.Requests,
                         });
                     }
+                    await commiter.CommitAsync();
                 }
                 catch (Exception ex)
                 {

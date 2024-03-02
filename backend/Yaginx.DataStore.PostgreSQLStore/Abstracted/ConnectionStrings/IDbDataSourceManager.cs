@@ -1,6 +1,6 @@
 ﻿using System.Data.Common;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
+namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ConnectionStrings
 {
     public interface IDbDataSourceManager
     {

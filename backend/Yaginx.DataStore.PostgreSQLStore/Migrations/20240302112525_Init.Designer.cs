@@ -14,7 +14,7 @@ using Yaginx.DomainModels;
 namespace Yaginx.DataStore.PostgreSQLStore.Migrations
 {
     [DbContext(typeof(CenterDbContext))]
-    [Migration("20240301054304_Init")]
+    [Migration("20240302112525_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -47,6 +47,37 @@ namespace Yaginx.DataStore.PostgreSQLStore.Migrations
                         .HasName("pk_web_page");
 
                     b.ToTable("web_page", (string)null);
+                });
+
+            modelBuilder.Entity("Yaginx.DataStore.PostgreSQLStore.Entities.AccountEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text")
+                        .HasColumnName("email");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("text")
+                        .HasColumnName("password");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text")
+                        .HasColumnName("password_hash");
+
+                    b.Property<string>("PasswordSalt")
+                        .HasColumnType("text")
+                        .HasColumnName("password_salt");
+
+                    b.HasKey("Id")
+                        .HasName("pk_account");
+
+                    b.ToTable("account", (string)null);
                 });
 
             modelBuilder.Entity("Yaginx.DataStore.PostgreSQLStore.Entities.HostTrafficEntity", b =>
@@ -84,35 +115,35 @@ namespace Yaginx.DataStore.PostgreSQLStore.Migrations
                     b.ToTable("host_traffic", (string)null);
                 });
 
-            modelBuilder.Entity("Yaginx.DataStore.PostgreSQLStore.Entities.UserEntity", b =>
+            modelBuilder.Entity("Yaginx.DataStore.PostgreSQLStore.Entities.WebDomainEntity", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<long?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long?>("Id"));
 
-                    b.Property<string>("Email")
+                    b.Property<string>("FreeCertMessage")
                         .HasColumnType("text")
-                        .HasColumnName("email");
+                        .HasColumnName("free_cert_message");
 
-                    b.Property<string>("Password")
-                        .HasColumnType("text")
-                        .HasColumnName("password");
+                    b.Property<bool>("IsUseFreeCert")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_use_free_cert");
 
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("text")
-                        .HasColumnName("password_hash");
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_verified");
 
-                    b.Property<string>("PasswordSalt")
+                    b.Property<string>("Name")
                         .HasColumnType("text")
-                        .HasColumnName("password_salt");
+                        .HasColumnName("name");
 
                     b.HasKey("Id")
-                        .HasName("pk_user");
+                        .HasName("pk_web_domain");
 
-                    b.ToTable("user", (string)null);
+                    b.ToTable("web_domain", (string)null);
                 });
 
             modelBuilder.Entity("Yaginx.DataStore.PostgreSQLStore.Entities.WebsiteEntity", b =>
@@ -124,7 +155,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long?>("Id"));
 
-                    b.Property<DateTime>("CreateTime")
+                    b.Property<DateTimeOffset>("CreateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("create_time");
 
@@ -152,7 +183,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Migrations
                         .HasColumnType("jsonb")
                         .HasColumnName("specifications");
 
-                    b.Property<DateTime>("UpdateTime")
+                    b.Property<DateTimeOffset>("UpdateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("update_time");
 

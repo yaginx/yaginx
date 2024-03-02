@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 using Yaginx.DataStore.PostgreSQLStore.Abstracted;
+using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Repositories
 {

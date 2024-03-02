@@ -21,7 +21,7 @@ dotnet ef database update
 
 create role yaginx with login encrypted password '123456' connection limit -1;
 create database yaginx with owner yaginx encoding='UTF8';
-alter database laoshi set timezone to 'Asia/Shanghai';
+alter database yaginx set timezone to 'Asia/Shanghai';
 \c yaginx
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "ltree";
