@@ -4,7 +4,8 @@ using Npgsql;
 
 namespace AgileLabs.EfCore.PostgreSQL.ContextFactories
 {
-    public abstract class DesignContextFactoryAbstract : IDesignTimeDbContextFactory<CenterDbContext>
+    public abstract class DesignContextFactoryAbstract<TDbContext> : IDesignTimeDbContextFactory<TDbContext>
+        where TDbContext : AgileLabDbContext
     {
         private readonly string _connectionString;
 
@@ -12,9 +13,9 @@ namespace AgileLabs.EfCore.PostgreSQL.ContextFactories
         {
             _connectionString = connectionString;
         }
-        public CenterDbContext CreateDbContext(string[] args)
+        public TDbContext CreateDbContext(string[] args)
         {
-            var dbContext = new CenterDbContext(LoggerFactory.Create(builder => builder.AddConsole()));
+            var dbContext = (TDbContext)Activator.CreateInstance(typeof(TDbContext), LoggerFactory.Create(builder => builder.AddConsole()));
             dbContext.DbDataSource = new NpgsqlDataSourceBuilder(_connectionString).Build();
             return dbContext;
         }
