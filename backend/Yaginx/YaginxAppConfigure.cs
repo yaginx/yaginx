@@ -266,7 +266,7 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
                     {
                         optons.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
                         {
-                            swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}{BasePath}" } };
+                            swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}" } };
                         });
                     });
                     app.UseSwaggerUI(options => { });
