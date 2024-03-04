@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.Logging;
-using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 /*
  列出迁移列表
@@ -27,9 +26,9 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "ltree";
 CREATE EXTENSION IF NOT EXISTS "pg_stat_statements"; 
  */
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
+namespace AgileLabs.EfCore.PostgreSQL
 {
-    public class CenterDbContext : WoDbContext
+    public class CenterDbContext : AgileLabDbContext
     {
         public CenterDbContext(ILoggerFactory loggerFactory) : base(loggerFactory)
         {

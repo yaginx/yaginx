@@ -1,15 +1,12 @@
-﻿using AgileLabs.ComponentModels;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
-using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
+namespace AgileLabs.EfCore.PostgreSQL
 {
     public class CrudRepository<T> : CrudRepository where T : class, new()
     {
-        public CrudRepository(IWoDbContextFactory factory, ILogger logger) : base(factory, logger)
+        public CrudRepository(IAgileLabDbContextFactory factory, ILogger logger) : base(factory, logger)
         {
         }
 

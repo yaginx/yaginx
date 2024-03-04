@@ -1,7 +1,7 @@
-﻿using AutoMapper;
+﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 using Yaginx.DataStore.PostgreSQLStore.Entities;
 using Yaginx.DomainModels;
 
@@ -10,7 +10,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
 
     public class HostTrafficRepository : YaginxCrudBaseRepository<HostTraffic, HostTrafficEntity>, IHostTrafficRepository
     {
-        public HostTrafficRepository(IWoDbContextFactory factory, IMapper mapper, ILogger<HostTrafficRepository> logger) : base(factory, mapper, logger)
+        public HostTrafficRepository(IAgileLabDbContextFactory factory, IMapper mapper, ILogger<HostTrafficRepository> logger) : base(factory, mapper, logger)
         {
         }
 

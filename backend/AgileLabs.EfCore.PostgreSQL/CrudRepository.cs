@@ -1,22 +1,22 @@
-﻿using Dapper;
+﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
+namespace AgileLabs.EfCore.PostgreSQL
 {
     public class CrudRepository
     {
-        private readonly IWoDbContextFactory _dbContextFactory;
+        private readonly IAgileLabDbContextFactory _dbContextFactory;
         private readonly ILogger _logger;
         protected readonly int MaxQueryDataCount = 99999;
         public async Task<DbContext> GetDbContextAsync() => await _dbContextFactory.GetDefaultDbContextAsync();
 
-        public CrudRepository(IWoDbContextFactory dbContextFactory, ILogger logger)
+        public CrudRepository(IAgileLabDbContextFactory dbContextFactory, ILogger logger)
         {
             _dbContextFactory = dbContextFactory;
             _logger = logger;

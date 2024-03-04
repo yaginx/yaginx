@@ -1,6 +1,6 @@
-﻿using AutoMapper;
+﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
-using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 using Yaginx.DataStore.PostgreSQLStore.Entities;
 using Yaginx.DomainModels;
 
@@ -8,7 +8,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
 {
     public class UserRepository : YaginxCrudBaseRepository<User, AccountEntity>, IUserRepository
     {
-        public UserRepository(IWoDbContextFactory factory, IMapper mapper, ILogger<UserRepository> logger) : base(factory, mapper, logger)
+        public UserRepository(IAgileLabDbContextFactory factory, IMapper mapper, ILogger<UserRepository> logger) : base(factory, mapper, logger)
         {
         }
 

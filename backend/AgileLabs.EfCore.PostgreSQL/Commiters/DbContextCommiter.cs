@@ -1,8 +1,7 @@
-﻿using AgileLabs;
+﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
 using AgileLabs.WorkContexts.Extensions;
-using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.Commiters
+namespace AgileLabs.EfCore.PostgreSQL.Commiters
 {
     /// <summary>
     /// DbContext提交器
@@ -22,7 +21,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.Commiters
         {
             if (IsDbContextCreated)
             {
-                var woDbContextFactory = _workContextCore.Resolve<IWoDbContextFactory>();
+                var woDbContextFactory = _workContextCore.Resolve<IAgileLabDbContextFactory>();
                 var dbContext = await woDbContextFactory.GetDefaultDbContextAsync(false);
                 if (dbContext != null)
                     await dbContext.SaveChangesAsync();

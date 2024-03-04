@@ -1,6 +1,6 @@
-﻿using AutoMapper;
+﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
-using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 using Yaginx.DataStore.PostgreSQLStore.Entities;
 using Yaginx.DomainModels;
 
@@ -8,7 +8,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
 {
     public class WebDomainRepository : YaginxCrudBaseRepository<WebDomain, WebDomainEntity>, IWebDomainRepository
     {
-        public WebDomainRepository(IWoDbContextFactory factory, IMapper mapper, ILogger<WebDomainRepository> logger) : base(factory, mapper, logger)
+        public WebDomainRepository(IAgileLabDbContextFactory factory, IMapper mapper, ILogger<WebDomainRepository> logger) : base(factory, mapper, logger)
         {
         }
 

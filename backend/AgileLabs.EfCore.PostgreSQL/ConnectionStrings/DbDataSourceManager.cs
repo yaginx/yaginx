@@ -6,14 +6,13 @@ using System.Data.Common;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using Yaginx.WorkContexts;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ConnectionStrings
+namespace AgileLabs.EfCore.PostgreSQL.ConnectionStrings
 {
     public class DbDataSourceManager : IDbDataSourceManager
     {
         private readonly IConfiguration _configuration;
-        private readonly IWorkContext _workContext;
+        private readonly IWorkContextCore _workContext;
         private readonly IMemoryCache _memoryCache;
         private readonly SHA1 _hashAlgorithm;
 
@@ -24,7 +23,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ConnectionStrings
         /// </summary>
         public DbDataSourceManager(
             IConfiguration configuration,
-            IWorkContext workContext, IMemoryCache memoryCache)
+            IWorkContextCore workContext, IMemoryCache memoryCache)
         {
             Id = Guid.NewGuid().ToString("N");
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));

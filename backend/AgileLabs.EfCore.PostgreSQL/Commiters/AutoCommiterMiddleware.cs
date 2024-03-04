@@ -2,9 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.Commiters
+namespace AgileLabs.EfCore.PostgreSQL.Commiters
 {
-    internal class AutoCommiterMiddleware : IMiddleware
+    public class AutoCommiterMiddleware : IMiddleware
     {
         private readonly ILogger<AutoCommiterMiddleware> _logger;
 

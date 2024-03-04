@@ -1,5 +1,6 @@
 using AgileLabs;
 using AgileLabs.AspNet.WebApis.Exceptions;
+using AgileLabs.EfCore.PostgreSQL;
 using AgileLabs.Securities;
 using AutoMapper.Internal;
 using Microsoft.AspNetCore.Authorization;

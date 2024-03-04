@@ -1,8 +1,8 @@
-﻿using AutoMapper;
+﻿using AgileLabs.EfCore.PostgreSQL;
+using AgileLabs.EfCore.PostgreSQL.ContextFactories;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
-using Yaginx.DataStore.PostgreSQLStore.Abstracted;
-using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Repositories
 {
@@ -12,7 +12,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
     {
         protected readonly IMapper _mapper;
 
-        public YaginxCrudBaseRepository(IWoDbContextFactory factory, IMapper mapper, ILogger logger) : base(factory, logger)
+        public YaginxCrudBaseRepository(IAgileLabDbContextFactory factory, IMapper mapper, ILogger logger) : base(factory, logger)
         {
             _mapper = mapper;
         }

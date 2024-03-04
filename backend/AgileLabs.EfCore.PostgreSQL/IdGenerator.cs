@@ -1,6 +1,6 @@
 ﻿using Snowflake.Core;
 
-namespace Yaginx;
+namespace AgileLabs.EfCore.PostgreSQL;
 
 public class IdGenerator
 {

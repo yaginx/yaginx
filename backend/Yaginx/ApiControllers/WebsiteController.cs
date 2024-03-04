@@ -1,4 +1,5 @@
 ﻿using AgileLabs.AspNet.WebApis.Exceptions;
+using AgileLabs.EfCore.PostgreSQL;
 using AgileLabs.FileUpload;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;

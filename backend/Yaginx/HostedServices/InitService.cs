@@ -1,6 +1,6 @@
 ﻿using AgileLabs;
+using AgileLabs.EfCore.PostgreSQL;
 using AgileLabs.Securities;
-using Yaginx.DataStore.PostgreSQLStore.Abstracted;
 using Yaginx.DomainModels;
 
 namespace Yaginx.HostedServices

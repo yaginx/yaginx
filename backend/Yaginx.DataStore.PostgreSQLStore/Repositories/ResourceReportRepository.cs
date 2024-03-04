@@ -1,9 +1,9 @@
 ﻿using AgileLabs;
+using AgileLabs.EfCore.PostgreSQL;
+using AgileLabs.EfCore.PostgreSQL.ContextFactories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Yaginx.DataStore.PostgreSQLStore.Abstracted;
-using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 using Yaginx.DataStore.PostgreSQLStore.Entities;
 using Yaginx.DomainModels.MonitorModels;
 
@@ -13,7 +13,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
     {
         private readonly IMapper _mapper;
 
-        public ResourceReportRepository(IWoDbContextFactory factory, IMapper mapper, ILogger<ResourceReportRepository> logger) : base(factory, logger)
+        public ResourceReportRepository(IAgileLabDbContextFactory factory, IMapper mapper, ILogger<ResourceReportRepository> logger) : base(factory, logger)
         {
             _mapper = mapper;
         }

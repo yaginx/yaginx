@@ -6,16 +6,17 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using System.Data.Common;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
+namespace AgileLabs.EfCore.PostgreSQL
 {
-    public abstract class WoDbContext : DbContext
+
+    public abstract class AgileLabDbContext : DbContext
     {
         private readonly ILogger _logger;
         private readonly ILoggerFactory _loggerFactory;
 
-        public WoDbContext(ILoggerFactory loggerFactory)
+        public AgileLabDbContext(ILoggerFactory loggerFactory)
         {
-            _logger = loggerFactory.CreateLogger<WoDbContext>();
+            _logger = loggerFactory.CreateLogger<AgileLabDbContext>();
             _loggerFactory = loggerFactory;
         }
 

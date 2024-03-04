@@ -1,4 +1,4 @@
-﻿namespace Yaginx;
+﻿namespace AgileLabs.EfCore.PostgreSQL;
 
 public interface IDbContextCommiter
 {

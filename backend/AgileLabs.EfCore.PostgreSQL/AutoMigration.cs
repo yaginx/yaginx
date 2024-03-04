@@ -1,10 +1,9 @@
-﻿using AgileLabs;
+﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
+namespace AgileLabs.EfCore.PostgreSQL
 {
     public class AutoMigration : BackgroundService
     {
@@ -13,7 +12,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted
             using (var scope = AgileLabContexts.Context.CreateScopeWithWorkContext())
             {
                 var services = scope.WorkContext.ServiceProvider;
-                var dbContextFactory = services.GetRequiredService<IWoDbContextFactory>();
+                var dbContextFactory = services.GetRequiredService<IAgileLabDbContextFactory>();
                 var dbContext = await dbContextFactory.GetDefaultDbContextAsync();
 
                 // 运行迁移

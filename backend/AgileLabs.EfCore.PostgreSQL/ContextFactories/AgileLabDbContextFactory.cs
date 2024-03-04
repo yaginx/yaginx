@@ -1,12 +1,12 @@
 ﻿using AgileLabs;
+using AgileLabs.EfCore.PostgreSQL.ConnectionStrings;
 using AgileLabs.Storage.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Yaginx.DataStore.PostgreSQLStore.Abstracted.ConnectionStrings;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories
+namespace AgileLabs.EfCore.PostgreSQL.ContextFactories
 {
-    public class WoDbContextFactory<T> : IWoDbContextFactory<T>
+    public class AgileLabDbContextFactory<T> : IWoDbContextFactory<T>
     where T : DbContext
     {
         private readonly IServiceProvider _serviceProvider;
@@ -19,7 +19,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories
 
         public string Id { get; }
 
-        public WoDbContextFactory(
+        public AgileLabDbContextFactory(
             IServiceProvider serviceProvider,
             ILoggerFactory loggerFactory,
             IDbContextCommiter dbContextCommiter,
@@ -47,7 +47,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories
                         throw new Exception($"{nameof(GetDefaultDbContextAsync)}中创建的{nameof(_context)}对象未null");
                     }
 
-                    if (_context is WoDbContext bizDbContext)
+                    if (_context is AgileLabDbContext bizDbContext)
                     {
                         var dbDataSource = await _dbDataSourceManager.GetDbDataSourceAsync();
                         if (dbDataSource == null)

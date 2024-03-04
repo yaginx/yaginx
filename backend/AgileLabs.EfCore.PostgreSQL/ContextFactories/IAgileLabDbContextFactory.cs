@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Yaginx.DataStore.PostgreSQLStore.Abstracted.ContextFactories
+namespace AgileLabs.EfCore.PostgreSQL.ContextFactories
 {
-    public interface IWoDbContextFactory : IAsyncDisposable
+    public interface IAgileLabDbContextFactory : IAsyncDisposable
     {
         //IDbConnection DbConnection { get; }
         Task<DbContext> GetDefaultDbContextAsync(bool isCreateOnDbContextIsNull = true);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AgileLabs.EfCore.PostgreSQL;
+using Microsoft.AspNetCore.Mvc;
 using Yaginx.DomainModels;
 using Yaginx.Models.WebDomainModels;
 
