@@ -1,4 +1,7 @@
-﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
+﻿using AgileLabs;
+using AgileLabs.ComponentModels;
+using AgileLabs.EfCore.PostgreSQL.ContextFactories;
+using AgileLabs.EfCore.PostgreSQL.DynamicSearch;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -21,17 +24,22 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
             return _mapper.Map<List<HostTraffic>>(list);
         }
 
-        public async Task<IEnumerable<HostTraffic>> SearchAsync()
+        public async Task<Page<HostTraffic>> SearchAsync(SearchParameters searchParameters)
         {
-            var list = await GetByQueryAsync(x => true);
-            return _mapper.Map<List<HostTraffic>>(list);
+            if (searchParameters.PageInfo.SortField.IsNullOrEmpty())
+            {
+                searchParameters.PageInfo.SortField = nameof(HostTrafficEntity.Period);
+                searchParameters.PageInfo.SortDirection = "DESC";
+            }
+            var list = await GetByPageAsync<HostTrafficEntity>(searchParameters);
+            return _mapper.Map<Page<HostTraffic>>(list);
         }
 
         public async Task UpsertAsync(HostTraffic hostTraffic)
         {
             var currentPeriod = TimePeriod.GetCurrentPeriod(SeqNoResetPeriod.Hourly, DateTime.UtcNow);
 
-            var entity = await GetAsync<HostTrafficEntity>(x => x.HostName == hostTraffic.HostName && x.Period == currentPeriod.PeriodTs);
+            var entity = await FirstOrDefaultAsync<HostTrafficEntity>(x => x.HostName == hostTraffic.HostName && x.Period == currentPeriod.PeriodTs);
             if (entity == null)
             {
                 entity = _mapper.Map<HostTrafficEntity>(hostTraffic);

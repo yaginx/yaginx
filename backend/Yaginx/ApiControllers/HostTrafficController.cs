@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AgileLabs.ComponentModels;
+using AgileLabs.EfCore.PostgreSQL.DynamicSearch;
+using Microsoft.AspNetCore.Mvc;
 using Yaginx.DomainModels;
+using Yaginx.Infrastructure;
 using Yaginx.Models.TrafficModels;
 
 namespace Yaginx.ApiControllers;
@@ -15,9 +18,9 @@ public class HostTrafficController : YaginxControllerBase
     }
 
     [HttpGet, HttpPost, Route("search")]
-    public async Task<List<HostTrafficListItem>> Search()
+    public async Task<Page<HostTrafficListItem>> Search([FromBody, ModelBinder<AntdTableSearchParametersBinder>] SearchParameters searchParameters)
     {
-        var result = await _hostTrafficRepository.SearchAsync();
-        return _mapper.Map<List<HostTrafficListItem>>(result);
+        var result = await _hostTrafficRepository.SearchAsync(searchParameters);
+        return _mapper.Map<Page<HostTrafficListItem>>(result);
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-
-namespace AgileLabs.EfCore.PostgreSQL.ConnectionStrings
+﻿namespace AgileLabs.EfCore.PostgreSQL.ConnectionStrings
 {
     public interface IDbDataSourceManager
     {

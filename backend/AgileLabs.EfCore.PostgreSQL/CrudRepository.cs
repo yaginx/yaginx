@@ -1,11 +1,7 @@
 ﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
-using Dapper;
-using Microsoft.EntityFrameworkCore;
+using AgileLabs.EfCore.PostgreSQL.DynamicSearch;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Logging;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 
 namespace AgileLabs.EfCore.PostgreSQL
 {
@@ -53,7 +49,7 @@ namespace AgileLabs.EfCore.PostgreSQL
         /// <param name="isNoTracking">参数为true时关闭实体模型跟踪，关闭后查询的数据不能用于修改，提高性能</param>
         /// <param name="cancellationToken"></param>
         /// <returns>该表对象</returns>
-        public virtual async Task<T> GetAsync<T>(Expression<Func<T, bool>> exp, bool isNoTracking = false, CancellationToken cancellationToken = default) where T : class, new()
+        public virtual async Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> exp, bool isNoTracking = false, CancellationToken cancellationToken = default) where T : class, new()
         {
             var Context = await GetDbContextAsync();
             if (isNoTracking)
@@ -83,17 +79,6 @@ namespace AgileLabs.EfCore.PostgreSQL
         {
             var Context = await GetDbContextAsync();
             await Context.Entry(t).ReloadAsync();
-        }
-
-        /// <summary>
-        /// 获取所有数据
-        /// 警告：此方法不要使用
-        /// </summary>
-        /// <returns>表中所有结果集</returns>
-        public virtual async Task<List<T>> GetAllAsync<T>() where T : class, new()
-        {
-            var Context = await GetDbContextAsync();
-            return await Context.Set<T>().ToListAsync();
         }
 
         /// <summary>
@@ -147,19 +132,12 @@ namespace AgileLabs.EfCore.PostgreSQL
                 return Context.Set<T>().Where(exp);
         }
 
-        public virtual async Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> exp, bool isNoTracking = false) where T : class, new()
-        {
-            var Context = await GetDbContextAsync();
-            if (isNoTracking)
-                return await Context.Set<T>().AsNoTracking().Where(exp).FirstOrDefaultAsync();
-            else
-                return await Context.Set<T>().Where(exp).FirstOrDefaultAsync();
-        }
         public virtual async Task<int> CountAsync<T>(Expression<Func<T, bool>> exp, CancellationToken cancellationToken = default) where T : class, new()
         {
             var Context = await GetDbContextAsync();
             return await Context.Set<T>().Where(exp).CountAsync(cancellationToken);
         }
+
         public virtual async Task<long> LongCountAsync<T>(Expression<Func<T, bool>> exp, CancellationToken cancellationToken = default) where T : class, new()
         {
             var Context = await GetDbContextAsync();
@@ -176,7 +154,7 @@ namespace AgileLabs.EfCore.PostgreSQL
         /// 插入一个对象
         /// </summary>
         /// <param name="entity">要插入的对象</param>
-        public virtual async Task InsertAsync<T>(T entity) where T : class, new()
+        public virtual async Task AddAsync<T>(T entity) where T : class, new()
         {
             var Context = await GetDbContextAsync();
             await Context.Set<T>().AddAsync(entity);
@@ -192,7 +170,7 @@ namespace AgileLabs.EfCore.PostgreSQL
         /// 更新一个对象
         /// </summary>
         /// <param name="entity">此对象必须在当前DbContext中获取出来的对象</param>
-        public virtual async Task EntryUpdateAsync<T>(T entity) where T : class, new()
+        public virtual async Task UpdateEntryAsync<T>(T entity) where T : class, new()
         {
             var Context = await GetDbContextAsync();
             if (!Context.ChangeTracker.AutoDetectChangesEnabled)
@@ -203,7 +181,7 @@ namespace AgileLabs.EfCore.PostgreSQL
             }
         }
 
-        public virtual async Task SingleUpdateAsync<T>(T entity) where T : class, new()
+        public virtual async Task UpdateSingleAsync<T>(T entity) where T : class, new()
         {
             var Context = await GetDbContextAsync();
             await Context.Set<T>().SingleUpdateAsync(entity);
@@ -300,34 +278,9 @@ namespace AgileLabs.EfCore.PostgreSQL
             var executeSql = sql;
             await connection.ExecuteAsync(executeSql, parameter, transaction: dbTransaction);
         }
-
-        private static string NormalizeExecuteSql(string sql)
-        {
-            return sql.Replace("@", ":");
-        }
-
-
         #endregion
-        #region Utils 
-        /// <summary>
-        /// 用正则过滤出来真正的列名, 正则可能会不完整
-        /// </summary>
-        /// <param name="sqlWhereCondition"></param>
-        /// <returns></returns>
-        private string[] GetPropNameBySqlWhere(string[] sqlWhereCondition)
-        {
-            for (int i = 0; i < sqlWhereCondition.Length; i++)
-            {
-                ////找第一个单词开头
-                var matched = Regex.Match(sqlWhereCondition[i], "[A-Za-z|_]*?[/.|!|=|<|>]");
-                if (matched.Success)
-                {
-                    sqlWhereCondition[i] = matched.Value.Remove(matched.Value.Length - 1);
-                }
-            }
-            return sqlWhereCondition;
-        }
 
+        #region Utils 
         /// <summary>
         /// 处理主键数据类型
         /// 
@@ -360,6 +313,107 @@ namespace AgileLabs.EfCore.PostgreSQL
                 }
             }
             return keyValue;
+        }
+        #endregion
+
+        #region SearchParameters
+        /// <summary>
+        /// 把SearchParameters转为IQueryable
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="searchParameters"></param>
+        /// <param name="sqlwhere"></param>
+        /// <param name="isNoTracking"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<IQueryable<T>> GetSearchParameterQueryAsync<T>(SearchParameters searchParameters, string sqlwhere = "", bool isNoTracking = false, CancellationToken cancellationToken = default)
+             where T : class, new()
+        {
+            CheckSearchParameterLength(searchParameters, sqlwhere);
+            var Context = await GetDbContextAsync();
+            IQueryable<T> query;
+            if (isNoTracking)
+            {
+                query = Context.Set<T>().AsNoTracking().Where(searchParameters.QueryModel);
+            }
+            else
+            {
+                query = Context.Set<T>().Where(searchParameters.QueryModel);
+            }
+            if (!string.IsNullOrEmpty(sqlwhere))
+            {
+                query = query.Where(sqlwhere);
+            }
+            return query;
+        }
+
+        /// <summary>
+        /// searchParameter 的Condition Item 不能超过500.
+        /// sql where 的length 长度不能超过1000.
+        /// </summary>
+        /// <param name="searchParameters"></param>
+        /// <param name="sqlwhere"></param>
+        public static void CheckSearchParameterLength(SearchParameters searchParameters, string sqlwhere)
+        {
+            if (searchParameters?.QueryModel?.Items?.Count > 500)
+            {
+                //LogEx.LogError("警告: SearchParameter 长度大于500,Lamda 表达式可能会堆栈溢出:" + searchParameters.ToJson());
+            }
+            if (sqlwhere != null && sqlwhere.Length > 1000)
+            {
+                //LogEx.LogError("警告: sqlwhere 长度大于1000,Lamda 表达式可能会堆栈溢出:" + sqlwhere.Substring(0, 500));
+            }
+        }
+
+        /// <summary>
+        /// 基于SearchParameters的Page分页查询
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="searchParameters"></param>
+        /// <param name="sqlwhere"></param>
+        /// <param name="isNoTracking"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<Page<T>> GetByPageAsync<T>(SearchParameters searchParameters, string sqlwhere = "", bool isNoTracking = false, CancellationToken cancellationToken = default)
+         where T : class, new()
+        {
+            try
+            {
+                searchParameters.PageInfo.IsGetTotalCount = true;
+                var query = await GetSearchParameterQueryAsync<T>(searchParameters, sqlwhere, isNoTracking, cancellationToken);
+                var result = await GetByPageAsync(query, searchParameters.PageInfo, cancellationToken);
+                return new Page<T>
+                {
+                    Records = await result.Query.ToListAsync(),
+                    Paging = new Paging
+                    {
+                        PageIndex = searchParameters.PageInfo.CurrentPage,
+                        Total = result.Count,
+                        PageSize = searchParameters.PageInfo.PageSize
+                    }
+                };
+            }
+            catch (DbException ex)
+            {
+                _logger.LogError(ex, "GetByPageAsync DbException");
+                throw new Exception(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="query">待查询的结果集</param>
+        /// <param name="pageInfo">分页信息<see cref="PageInfo" /></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>一个待查询的结果集</returns>
+        public virtual Task<PaginationQueryWarapper<T>> GetByPageAsync<T>(
+            IQueryable<T> query,
+            PageInfo pageInfo,
+            CancellationToken cancellationToken = default) where T : class, new()
+        {
+            return query.PageListAsync(pageInfo.SkipCount > 0 ? pageInfo.SkipCount : pageInfo.GetSkipCountByPageIndex(), pageInfo.PageSize,
+                pageInfo.SortField, pageInfo.SortDirection, pageInfo.IsGetTotalCount, cancellationToken);
         }
         #endregion
     }

@@ -14,7 +14,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            var entity = await base.GetAsync(x => x.Email == email);
+            var entity = await base.FirstOrDefaultAsync(x => x.Email == email);
             return _mapper.Map<User>(entity);
         }
     }

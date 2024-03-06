@@ -1,0 +1,15 @@
+﻿global using AgileLabs.ComponentModels;
+global using AgileLabs.Infrastructure;
+global using AgileLabs.WorkContexts.Extensions;
+global using Dapper;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Logging;
+global using Newtonsoft.Json;
+global using Snowflake.Core;
+global using System.Data;
+global using System.Data.Common;
+global using System.Linq.Dynamic.Core;
+global using System.Linq.Expressions;
+global using System.Reflection;
+global using System.Text.RegularExpressions;

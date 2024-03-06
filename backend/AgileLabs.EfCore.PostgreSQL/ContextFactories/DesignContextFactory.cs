@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Logging;
 using Npgsql;
 
 namespace AgileLabs.EfCore.PostgreSQL.ContextFactories

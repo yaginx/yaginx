@@ -1,6 +1,4 @@
-﻿using Snowflake.Core;
-
-namespace AgileLabs.EfCore.PostgreSQL;
+﻿namespace AgileLabs.EfCore.PostgreSQL;
 
 public class IdGenerator
 {

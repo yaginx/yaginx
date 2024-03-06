@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using AgileLabs.EfCore.PostgreSQL;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Entities
 {

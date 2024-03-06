@@ -1,6 +1,6 @@
 using AutoMapper;
 
-namespace WoLabs.AutoMapper;
+namespace AgileLabs.EfCore.PostgreSQL;
 
 public class DateTime2DateTimeOffset : ITypeConverter<DateTime, DateTimeOffset>, ITypeConverter<DateTimeOffset, DateTime>, ITypeConverter<DateTime?, DateTimeOffset?>, ITypeConverter<DateTimeOffset?, DateTime?>
 {

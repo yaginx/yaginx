@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using Yaginx.DomainModels.MonitorModels;
+using AgileLabs.EfCore.PostgreSQL;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Entities
 {

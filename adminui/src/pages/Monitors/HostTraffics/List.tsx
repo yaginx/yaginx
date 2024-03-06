@@ -7,6 +7,7 @@ import { hostTrafficSearch, webDomainSearch, websiteSearch } from "@/api/docker"
 import TableList from "@/componets/TableList"
 import { renderTableItem } from "@/componets/ModelCrudViews/renderTableItem"
 import { LocalTime } from "@/componets/LocalTime"
+import PagedTableList from "@/componets/PagedTableList"
 
 const List: React.FC = (props) => {
   const pkFieldName = "host";
@@ -49,7 +50,7 @@ const List: React.FC = (props) => {
         {/* <Button key="create" onClick={() => navigate("../create")} >Create</Button> */}
       </Space>
     }>
-      <TableList searchAction={hostTrafficSearch} realodTableData={refreshTable}
+      <PagedTableList searchAction={hostTrafficSearch} realodTableData={refreshTable}
         initTableColumn={initTableColumn}
       // renderTableOperationMenu={renderTableOperationMenu}
       // onTableMenuClick={onTableMenuClick}

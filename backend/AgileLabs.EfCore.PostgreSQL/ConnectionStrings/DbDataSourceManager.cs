@@ -1,9 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
-using System.Data.Common;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 

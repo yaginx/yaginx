@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Yaginx.DomainModels;
 using System.Reflection.Emit;
 using AutoMapper;
+using AgileLabs.EfCore.PostgreSQL;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Entities
 {

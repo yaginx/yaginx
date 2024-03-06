@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Yaginx.DomainModels;
+﻿namespace Yaginx.DomainModels;
 
 /// <summary>
 /// 网站域名

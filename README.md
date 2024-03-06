@@ -44,3 +44,14 @@ docker run -d -it --name yaginx -p 8080:8080 -p 8443:8443 \
 ```json
 
 ```
+
+## 数据库创建
+```bash
+create role yaginx with login encrypted password '123456' connection limit -1;
+create database yaginx with owner yaginx encoding='UTF8';
+alter database yaginx set timezone to 'Asia/Shanghai';
+\c yaginx
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "ltree";
+CREATE EXTENSION IF NOT EXISTS "pg_stat_statements"; 
+```

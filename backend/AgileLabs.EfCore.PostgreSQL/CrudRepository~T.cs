@@ -1,6 +1,4 @@
 ﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
-using Microsoft.Extensions.Logging;
-using System.Linq.Expressions;
 
 namespace AgileLabs.EfCore.PostgreSQL
 {
@@ -40,19 +38,9 @@ namespace AgileLabs.EfCore.PostgreSQL
         /// <param name="isNoTracking">参数为true时关闭实体模型跟踪，关闭后查询的数据不能用于修改，提高性能</param>
         /// <param name="cancellationToken"></param>
         /// <returns>该表对象</returns>
-        public virtual async Task<T> GetAsync(Expression<Func<T, bool>> exp, bool isNoTracking = false, CancellationToken cancellationToken = default)
+        public virtual async Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> exp, bool isNoTracking = false, CancellationToken cancellationToken = default)
         {
-            return await base.GetAsync(exp, isNoTracking, cancellationToken);
-        }
-
-        /// <summary>
-        /// 获取所有数据
-        /// 警告：此方法不要使用
-        /// </summary>
-        /// <returns>表中所有结果集</returns>
-        public virtual async Task<List<T>> GetAllAsync()
-        {
-            return await base.GetAllAsync<T>();
+            return await base.FirstOrDefaultAsync(exp, isNoTracking, cancellationToken);
         }
 
         /// <summary>
@@ -92,11 +80,6 @@ namespace AgileLabs.EfCore.PostgreSQL
             return base.GetQueryAsync(exp, isNoTracking);
         }
 
-        public virtual Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> exp, bool isNoTracking = false)
-        {
-            return base.FirstOrDefaultAsync(exp, isNoTracking);
-        }
-
         public virtual Task<int> CountAsync(Expression<Func<T, bool>> exp, CancellationToken cancellationToken = default) => base.CountAsync(exp, cancellationToken);
         public virtual Task<long> LongCountAsync(Expression<Func<T, bool>> exp, CancellationToken cancellationToken = default) => base.LongCountAsync(exp, cancellationToken);
 
@@ -108,7 +91,7 @@ namespace AgileLabs.EfCore.PostgreSQL
         /// <param name="entity">要插入的对象</param>
         public virtual async Task InsertAsync(T entity)
         {
-            await base.InsertAsync(entity);
+            await base.AddAsync(entity);
         }
 
         public async Task BatchInsertAsync(T[] entites)
@@ -122,12 +105,12 @@ namespace AgileLabs.EfCore.PostgreSQL
         /// <param name="entity">此对象必须在当前DbContext中获取出来的对象</param>
         public virtual async Task EntryUpdateAsync(T entity)
         {
-            await base.EntryUpdateAsync(entity);
+            await base.UpdateEntryAsync(entity);
         }
 
         public virtual Task SingleUpdateAsync(T entity)
         {
-            return base.SingleUpdateAsync(entity);
+            return base.UpdateSingleAsync(entity);
         }
 
         /// <summary>

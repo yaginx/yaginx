@@ -14,7 +14,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
 
         public async Task<WebDomain> GetByNameAsync(string name)
         {
-            var entity = await GetAsync<WebDomainEntity>(x => x.Name == name);
+            var entity = await FirstOrDefaultAsync<WebDomainEntity>(x => x.Name == name);
             return _mapper.Map<WebDomain>(entity);
         }
 

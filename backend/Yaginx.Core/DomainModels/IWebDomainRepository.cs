@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-
-namespace Yaginx.DomainModels;
+﻿namespace Yaginx.DomainModels;
 
 public interface IWebDomainRepository
 {

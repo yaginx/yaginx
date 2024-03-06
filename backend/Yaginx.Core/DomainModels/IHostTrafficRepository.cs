@@ -1,10 +1,11 @@
-﻿using System.Linq.Expressions;
+﻿using AgileLabs.ComponentModels;
+using AgileLabs.EfCore.PostgreSQL.DynamicSearch;
 
 namespace Yaginx.DomainModels;
 
 public interface IHostTrafficRepository
 {
     Task UpsertAsync(HostTraffic hostTraffic);
-    Task<IEnumerable<HostTraffic>> SearchAsync();
+    Task<Page<HostTraffic>> SearchAsync(SearchParameters searchParameters);
     Task<IEnumerable<HostTraffic>> SearchAsync(string hostName);
 }

@@ -1,5 +1,4 @@
 ﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
-using AgileLabs.WorkContexts.Extensions;
 
 namespace AgileLabs.EfCore.PostgreSQL.Commiters
 {

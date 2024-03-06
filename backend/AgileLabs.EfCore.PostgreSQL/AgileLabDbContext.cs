@@ -1,10 +1,4 @@
-﻿using AgileLabs;
-using AgileLabs.Infrastructure;
-using AgileLabs.WorkContexts.Extensions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Npgsql;
-using System.Data.Common;
+﻿using Npgsql;
 
 namespace AgileLabs.EfCore.PostgreSQL
 {

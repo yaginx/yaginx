@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace AgileLabs.EfCore.PostgreSQL.ContextFactories
+﻿namespace AgileLabs.EfCore.PostgreSQL.ContextFactories
 {
     public interface IAgileLabDbContextFactory : IAsyncDisposable
     {

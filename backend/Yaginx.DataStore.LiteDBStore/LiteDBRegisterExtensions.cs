@@ -1,11 +1,7 @@
 ﻿using AgileLabs.WebApp.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Yaginx.DataStore.LiteDBStore;
-using Yaginx.DataStore.LiteDBStore.Repositories;
-using Yaginx.DomainModels;
-using Yaginx.YaginxAcmeLoaders;
 
 namespace Microsoft.AspNetCore.Hosting;
 

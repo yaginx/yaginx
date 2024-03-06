@@ -2,8 +2,6 @@
 using AgileLabs.EfCore.PostgreSQL.ConnectionStrings;
 using AgileLabs.EfCore.PostgreSQL.ContextFactories;
 using AgileLabs.Storage.PostgreSql;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AgileLabs.EfCore.PostgreSQL

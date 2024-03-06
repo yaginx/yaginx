@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Yaginx.DataStore.PostgreSQLStore
+﻿namespace AgileLabs.EfCore.PostgreSQL
 {
     public static class StringExtensions
     {

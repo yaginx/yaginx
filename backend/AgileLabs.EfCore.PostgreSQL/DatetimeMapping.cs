@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
-using WoLabs.AutoMapper;
 
-namespace Yaginx.DataStore.PostgreSQLStore;
+namespace AgileLabs.EfCore.PostgreSQL;
 
 public class DatetimeMapping : Profile
 {

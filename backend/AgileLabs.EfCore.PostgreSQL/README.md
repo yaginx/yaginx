@@ -17,12 +17,20 @@ public class AutoCommiterPiplineRegister : IRequestPiplineRegister
         return piplineActions;
     }
 }
+
+or
+
+piplineActions.Register("AutoCommiterMiddleware", RequestPiplineStage.BeginOfPipline, app => app.UseMiddleware<AutoCommiterMiddleware>());
 ```
 
 ## 设计时DbContextFactory
 新建一个 DesignDbContextFactory:DesignContextFactoryAbstract, 在构造函数中传入ConnectionString即可
 
 ## 如何在多租户的场景中使用?
+
+## 使用Repository
+1. 在使用上可以让Repository继承自: CrudRepository<TEntity>
+1. 可以直接注入CrudRepository或者CrudRepository<TEntity>
 
 
 ## 其他附带处理的内容

@@ -1,8 +1,5 @@
-﻿using AgileLabs;
-using AgileLabs.EfCore.PostgreSQL.ConnectionStrings;
+﻿using AgileLabs.EfCore.PostgreSQL.ConnectionStrings;
 using AgileLabs.Storage.PostgreSql;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace AgileLabs.EfCore.PostgreSQL.ContextFactories
 {
