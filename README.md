@@ -14,7 +14,14 @@ Replacement for nginx's HTTP reverse proxy, but more power feature than nginx.
 ## deploy
 
 ```bash
-
+mkdir -p /data/pgdb_data
+docker run -d --name pgdb -p 5432:5432 \
+    -e POSTGRES_PASSWORD=123456\
+    -e TZ=Asia/Shanghai \
+    -e PGDATA=/var/lib/postgresql/data/pgdata \
+    -v /data/pgdb_data:/var/lib/postgresql/data \
+    hub.feinian.net/library/postgres:16.0
+    
 mkdir -p /data/mongo/{db,backup,configdb,log}
 docker run -d --restart always --name mongodb \
 -p 127.0.0.1:27017:27017 \
