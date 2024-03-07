@@ -1,10 +1,11 @@
 ﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
+using AutoMapper;
 
 namespace AgileLabs.EfCore.PostgreSQL
 {
     public class CrudRepository<T> : CrudRepository where T : class, new()
     {
-        public CrudRepository(IAgileLabDbContextFactory factory, ILogger logger) : base(factory, logger)
+        public CrudRepository(IAgileLabDbContextFactory factory, ILogger logger, IMapper mapper) : base(factory, logger, mapper)
         {
         }
 

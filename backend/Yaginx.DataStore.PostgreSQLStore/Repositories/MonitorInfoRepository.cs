@@ -12,7 +12,8 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
         private readonly IDbContextCommiter _dbContextCommiter;
         private readonly IMapper _mapper;
 
-        public MonitorInfoRepository(IAgileLabDbContextFactory factory, IDbContextCommiter dbContextCommiter, IMapper mapper, ILogger<MonitorInfoRepository> logger) : base(factory, logger)
+        public MonitorInfoRepository(IAgileLabDbContextFactory factory, IDbContextCommiter dbContextCommiter, IMapper mapper, ILogger<MonitorInfoRepository> logger)
+            : base(factory, logger, mapper)
         {
             _dbContextCommiter = dbContextCommiter;
             _mapper = mapper;

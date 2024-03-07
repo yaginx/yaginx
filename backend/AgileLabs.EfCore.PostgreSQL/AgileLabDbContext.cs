@@ -29,7 +29,7 @@ namespace AgileLabs.EfCore.PostgreSQL
                 }
 
                 //optionsBuilder.UseLazyLoadingProxies();
-                optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                //optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
                 //optionsBuilder.UseChangeTrackingProxies(false, true);                
 
                 switch (DbDataSource)

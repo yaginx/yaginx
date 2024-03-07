@@ -13,7 +13,7 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
     {
         private readonly IMapper _mapper;
 
-        public ResourceReportRepository(IAgileLabDbContextFactory factory, IMapper mapper, ILogger<ResourceReportRepository> logger) : base(factory, logger)
+        public ResourceReportRepository(IAgileLabDbContextFactory factory, IMapper mapper, ILogger<ResourceReportRepository> logger) : base(factory, logger, mapper)
         {
             _mapper = mapper;
         }

@@ -19,6 +19,7 @@ namespace Yaginx
         public const string STATS_PATH = "/yaginx/traffic";
         private readonly IEmbeddedResourceQuery _embeddedResourceQuery;
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
+        private readonly IHostEnvironment _hostEnvironment;
         private readonly ILogger<DomainTrafficMiddleware> _logger;
 
         /// <summary>
@@ -30,11 +31,13 @@ namespace Yaginx
             RequestDelegate next,
             IEmbeddedResourceQuery embeddedResourceQuery,
             IHostApplicationLifetime hostApplicationLifetime,
+            IHostEnvironment hostEnvironment,
             ILogger<DomainTrafficMiddleware> logger)
         {
             Next = next;
             _embeddedResourceQuery = embeddedResourceQuery;
             _hostApplicationLifetime = hostApplicationLifetime;
+            _hostEnvironment = hostEnvironment;
             _logger = logger;
             Task.Factory.StartNew(FlushTask);
         }
@@ -138,7 +141,7 @@ namespace Yaginx
                 await Task.Delay(TimeSpan.FromSeconds(flushPeriodInSeconds));
                 var lastPeriodData = Interlocked.Exchange(ref _requestTraffic, new ConcurrentDictionary<string, DomainTraffic>());
 
-                if (!lastPeriodData.Any())
+                if (!lastPeriodData.Any() || !_hostEnvironment.IsProduction())
                 {
                     continue;
                 }

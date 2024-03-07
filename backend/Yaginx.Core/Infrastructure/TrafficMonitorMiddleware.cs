@@ -17,13 +17,14 @@ public class TrafficMonitorMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger _logger;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
+    private readonly IHostEnvironment _hostEnvironment;
     private readonly IMemoryBus _memoryBus;
     private ConcurrentQueue<MonitorRawInfo> _perSecondStore = new ConcurrentQueue<MonitorRawInfo>();
 
     public TrafficMonitorMiddleware(
         RequestDelegate next,
         ILoggerFactory loggerFactory,
-        IHostApplicationLifetime hostApplicationLifetime,
+        IHostApplicationLifetime hostApplicationLifetime, IHostEnvironment hostEnvironment,
         IMemoryBus memoryBus
         )
     {
@@ -36,6 +37,7 @@ public class TrafficMonitorMiddleware
 
         _logger = loggerFactory.CreateLogger("EMWS");
         _hostApplicationLifetime = hostApplicationLifetime ?? throw new ArgumentNullException(nameof(hostApplicationLifetime));
+        _hostEnvironment = hostEnvironment;
         _memoryBus = memoryBus ?? throw new ArgumentNullException(nameof(memoryBus));
 
         //Task.Factory.StartNew(async () => await CreateRemoteConnection(_hostApplicationLifetime.ApplicationStopping), hostApplicationLifetime.ApplicationStopping, TaskCreationOptions.LongRunning, TaskScheduler.Default);
@@ -50,7 +52,7 @@ public class TrafficMonitorMiddleware
     private async Task StaticitsSecondDataTask(CancellationToken applicationStopping)
     {
         _logger.LogDebug("StaticitsSecondData Task Started");
-        while (!applicationStopping.IsCancellationRequested)
+        while (!applicationStopping.IsCancellationRequested && _hostEnvironment.IsProduction())
         {
             var lastPeriodData = Interlocked.Exchange(ref _perSecondStore, new ConcurrentQueue<MonitorRawInfo>());
             //_messageStore.Enqueue(new MonitorMessage() { ts = DateTime.Now.GetEpochMilliseconds(), data = lastPeriodData.ToList() });

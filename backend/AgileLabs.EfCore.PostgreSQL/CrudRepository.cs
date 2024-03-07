@@ -1,7 +1,9 @@
 ﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
 using AgileLabs.EfCore.PostgreSQL.DynamicSearch;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
+using Polly;
 
 namespace AgileLabs.EfCore.PostgreSQL
 {
@@ -9,13 +11,15 @@ namespace AgileLabs.EfCore.PostgreSQL
     {
         private readonly IAgileLabDbContextFactory _dbContextFactory;
         private readonly ILogger _logger;
+        private readonly IMapper _mapper;
         protected readonly int MaxQueryDataCount = 99999;
         public async Task<DbContext> GetDbContextAsync() => await _dbContextFactory.GetDefaultDbContextAsync();
 
-        public CrudRepository(IAgileLabDbContextFactory dbContextFactory, ILogger logger)
+        public CrudRepository(IAgileLabDbContextFactory dbContextFactory, ILogger logger, IMapper mapper)
         {
             _dbContextFactory = dbContextFactory;
             _logger = logger;
+            _mapper = mapper;
         }
 
         #region 异步方法
@@ -173,7 +177,46 @@ namespace AgileLabs.EfCore.PostgreSQL
         public virtual async Task UpdateEntryAsync<T>(T entity) where T : class, new()
         {
             var Context = await GetDbContextAsync();
-            if (!Context.ChangeTracker.AutoDetectChangesEnabled)
+            if (Context.ChangeTracker.AutoDetectChangesEnabled)
+            {
+                // 先获取映射实体类型定义
+                IEntityType mEntityType = Context.Model.FindEntityType(typeof(T));
+                // 获取主键定义
+                IKey mPrimaryKeys = mEntityType.FindPrimaryKey();
+                // 获取主键定义的长度
+                int mKeyLen = mPrimaryKeys?.Properties?.Count ?? 0;
+                if (mKeyLen == 1)
+                {
+                    var pkProperty = mPrimaryKeys.Properties.First();
+                    var pkValue = pkProperty.PropertyInfo.GetValue(entity);
+
+                    var attachedEntity = Context.Set<T>().Find(pkValue);
+                    if (attachedEntity != null)
+                    {
+                        //_mapper.Map(entity, attachedEntity);
+
+                        Context.Entry(attachedEntity).CurrentValues.SetValues(entity);
+                        //// 遍历所有的属性，检查是否有变化
+                        //foreach (var property in Context.Entry(attachedEntity).Properties)
+                        //{
+                        //    var original = property.OriginalValue;
+                        //    var current = property.CurrentValue;
+
+                        //    // 如果原始值和当前值不同，则将该属性标记为已修改
+                        //    if (!object.Equals(original, current))
+                        //    {
+                        //        property.IsModified = true;
+                        //    }
+                        //    else
+                        //    {
+                        //        // 如果值未发生变化，确保不标记为已修改
+                        //        property.IsModified = false;
+                        //    }
+                        //}
+                    }
+                }
+            }
+            else
             {
                 //有实体跟踪,这里就不需要再Attach了, 否则就是全字段更新, 并且会更新TS,引起并发问题混乱
                 Context.Set<T>().Attach(entity);
