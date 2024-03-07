@@ -29,7 +29,8 @@ namespace Yaginx.DataStore.PostgreSQLStore
             //});
 
             services.RegisterDbContext<CenterDbContext>();
-          
+            services.AddScoped<DapperBaseRepository>();
+
             //services.AddSingleton<IStartupFilter, DefaultAutoCommiterStartupFilter>();
 
             services.AddScoped<IWebDomainRepository, WebDomainRepository>();

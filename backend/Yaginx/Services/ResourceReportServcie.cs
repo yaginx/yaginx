@@ -1,7 +1,4 @@
-﻿using MongoDB.Driver;
-using Yaginx.DataStore.MongoStore.Abstracted;
-using Yaginx.DataStore.MongoStore.Entities;
-using Yaginx.DomainModels.MonitorModels;
+﻿using Yaginx.DomainModels.MonitorModels;
 
 namespace Yaginx.Services
 {
@@ -10,16 +7,13 @@ namespace Yaginx.Services
     /// </summary>
     public class ResourceReportServcie
     {
-        private readonly IAppNoSqlBaseRepository<ResourceMonitorInfoEntity> _monitorInfoRep;
-        private readonly IAppNoSqlBaseRepository<ResourceReportEntity> _reportRep;
+        private readonly IMonitorInfoRepository _monitorInfoRepository;
+        private readonly IResourceReportRepository _resourceReportRepository;
 
-        public ResourceReportServcie(
-            IAppNoSqlBaseRepository<ResourceMonitorInfoEntity> monitorInfoRep,
-            IAppNoSqlBaseRepository<ResourceReportEntity> reportRep
-            )
+        public ResourceReportServcie(IMonitorInfoRepository monitorInfoRepository, IResourceReportRepository resourceReportRepository)
         {
-            _monitorInfoRep = monitorInfoRep;
-            _reportRep = reportRep;
+            _monitorInfoRepository = monitorInfoRepository;
+            _resourceReportRepository = resourceReportRepository;
         }
 
         public async Task MinutelyCheckAsync(DateTime nowTime)
@@ -71,13 +65,15 @@ namespace Yaginx.Services
         /// <returns></returns>
         private async Task DailyReportStatisticAsync(DateTime beginTime, DateTime endTime)
         {
-            var monitorInfoFilterBuilder = Builders<ResourceReportEntity>.Filter;
-            var monitorInfoFilter = monitorInfoFilterBuilder.Empty;
-            monitorInfoFilter &= monitorInfoFilterBuilder.Eq(x => x.CycleType, ReportCycleType.Hourly);
-            monitorInfoFilter &= monitorInfoFilterBuilder.Gte(x => x.ReportTime, beginTime);
-            monitorInfoFilter &= monitorInfoFilterBuilder.Lt(x => x.ReportTime, endTime);
+            //var monitorInfoFilterBuilder = Builders<ResourceReportEntity>.Filter;
+            //var monitorInfoFilter = monitorInfoFilterBuilder.Empty;
+            //monitorInfoFilter &= monitorInfoFilterBuilder.Eq(x => x.CycleType, ReportCycleType.Hourly);
+            //monitorInfoFilter &= monitorInfoFilterBuilder.Gte(x => x.ReportTime, beginTime);
+            //monitorInfoFilter &= monitorInfoFilterBuilder.Lt(x => x.ReportTime, endTime);
 
-            var houlyDataList = await _reportRep.SearchAsync(monitorInfoFilter);
+            //var houlyDataList = await _reportRep.SearchAsync(monitorInfoFilter);
+
+            var houlyDataList = await _resourceReportRepository.SearchAsync(ReportCycleType.Hourly, beginTime, endTime);
 
             var resourceIds = houlyDataList.GroupBy(x => x.ResourceUuid).Select(x => x.Key);
             foreach (var item in resourceIds)
@@ -88,7 +84,7 @@ namespace Yaginx.Services
                     continue;
                 }
 
-                var resourceReport = new ResourceReportEntity()
+                var resourceReport = new ResourceReportModel()
                 {
                     ResourceUuid = item,
                     CycleType = ReportCycleType.Daily,
@@ -97,28 +93,28 @@ namespace Yaginx.Services
                     CreateTime = DateTime.Now
                 };
 
-                resourceReport.Duration = AnalysisDailyDuration(currentRegionDatas.Where(x => x.Duration != null).SelectMany(x => x.Duration));
+                resourceReport.Duration = AnalysisDailyDuration(currentRegionDatas.Where(x => x.Duration != null).SelectMany(x => x.Duration)).ToKeyValuePair();
 
                 resourceReport.Spider = currentRegionDatas
                     .Where(x => x.Spider != null)
                     .SelectMany(x => x.Spider)
                     .GroupBy(x => x.Key)
-                    .Select(x => KeyValuePair.Create(x.Key, x.Sum(item => item.Value))).ToDictionary(x => x.Key, y => y.Value);
+                    .Select(x => KeyValuePair.Create(x.Key, x.Sum(item => item.Value))).ToList();
                 resourceReport.Browser = currentRegionDatas
                     .Where(x => x.Browser != null)
                     .SelectMany(x => x.Browser)
                     .GroupBy(x => x.Key)
-                    .Select(x => KeyValuePair.Create(x.Key, x.Sum(item => item.Value))).ToDictionary(x => x.Key, y => y.Value);
+                    .Select(x => KeyValuePair.Create(x.Key, x.Sum(item => item.Value))).ToList();
                 resourceReport.Os = currentRegionDatas
                     .Where(x => x.Os != null)
                     .SelectMany(x => x.Os)
                     .GroupBy(x => x.Key)
-                    .Select(x => KeyValuePair.Create(x.Key, x.Sum(item => item.Value))).ToDictionary(x => x.Key, y => y.Value);
+                    .Select(x => KeyValuePair.Create(x.Key, x.Sum(item => item.Value))).ToList();
                 resourceReport.StatusCode = currentRegionDatas
                     .Where(x => x.StatusCode != null)
                     .SelectMany(x => x.StatusCode)
                     .GroupBy(x => x.Key)
-                    .Select(x => KeyValuePair.Create(x.Key, x.Sum(item => item.Value))).ToDictionary(x => x.Key, y => y.Value);
+                    .Select(x => KeyValuePair.Create(x.Key, x.Sum(item => item.Value))).ToList();
 
                 await InsertOrUpdateResourceReport(resourceReport);
             }
@@ -154,7 +150,7 @@ namespace Yaginx.Services
                     continue;
                 }
 
-                var resourceReport = new ResourceReportEntity()
+                var resourceReport = new ResourceReportModel()
                 {
                     ResourceUuid = host,
                     CycleType = reportCycleType,
@@ -163,33 +159,35 @@ namespace Yaginx.Services
                     CreateTime = DateTime.Now
                 };
 
-                resourceReport.Duration = AnlysisHourlyDuration(currentRegionMonitorInfos);
-                resourceReport.Spider = AnlysisHourlySpider(currentRegionMonitorInfos);
-                resourceReport.Browser = AnlysisHourlyBrowser(currentRegionMonitorInfos);
-                resourceReport.Os = AnlysisHourlyOperationSystem(currentRegionMonitorInfos);
-                resourceReport.StatusCode = AnlysisHourlyStatusCode(currentRegionMonitorInfos);
+                resourceReport.Duration = AnlysisHourlyDuration(currentRegionMonitorInfos).ToKeyValuePair();
+                resourceReport.Spider = AnlysisHourlySpider(currentRegionMonitorInfos).ToKeyValuePair();
+                resourceReport.Browser = AnlysisHourlyBrowser(currentRegionMonitorInfos).ToKeyValuePair();
+                resourceReport.Os = AnlysisHourlyOperationSystem(currentRegionMonitorInfos).ToKeyValuePair();
+                resourceReport.StatusCode = AnlysisHourlyStatusCode(currentRegionMonitorInfos).ToKeyValuePair();
 
                 await InsertOrUpdateResourceReport(resourceReport);
             }
         }
 
-        private async Task InsertOrUpdateResourceReport(ResourceReportEntity resourceReport)
+        private async Task InsertOrUpdateResourceReport(ResourceReportModel resourceReport)
         {
-            var filter = Builders<ResourceReportEntity>.Filter.Where(x => x.ResourceUuid == resourceReport.ResourceUuid
-            && x.CycleType == resourceReport.CycleType
-            && x.ReportTime == resourceReport.ReportTime);
-            var update = Builders<ResourceReportEntity>.Update
-                .SetOnInsert(x => x.ResourceUuid, resourceReport.ResourceUuid)
-                .SetOnInsert(x => x.CycleType, resourceReport.CycleType)
-                .SetOnInsert(x => x.ReportTime, resourceReport.ReportTime)
-                .Set(x => x.RequestQty, resourceReport.RequestQty)
-                .Set(x => x.Duration, resourceReport.Duration)
-                .Set(x => x.Spider, resourceReport.Spider)
-                .Set(x => x.Browser, resourceReport.Browser)
-                .Set(x => x.Os, resourceReport.Os)
-                .Set(x => x.StatusCode, resourceReport.StatusCode)
-                .Set(x => x.CreateTime, resourceReport.CreateTime);
-            var result = await _reportRep.Collection.UpdateOneAsync(filter, update, new UpdateOptions() { IsUpsert = true });
+            //var filter = Builders<ResourceReportEntity>.Filter.Where(x => x.ResourceUuid == resourceReport.ResourceUuid
+            //&& x.CycleType == resourceReport.CycleType
+            //&& x.ReportTime == resourceReport.ReportTime);
+
+            //var update = Builders<ResourceReportEntity>.Update
+            //    .SetOnInsert(x => x.ResourceUuid, resourceReport.ResourceUuid)
+            //    .SetOnInsert(x => x.CycleType, resourceReport.CycleType)
+            //    .SetOnInsert(x => x.ReportTime, resourceReport.ReportTime)
+            //    .Set(x => x.RequestQty, resourceReport.RequestQty)
+            //    .Set(x => x.Duration, resourceReport.Duration)
+            //    .Set(x => x.Spider, resourceReport.Spider)
+            //    .Set(x => x.Browser, resourceReport.Browser)
+            //    .Set(x => x.Os, resourceReport.Os)
+            //    .Set(x => x.StatusCode, resourceReport.StatusCode)
+            //    .Set(x => x.CreateTime, resourceReport.CreateTime);
+            //var result = await _reportRep.Collection.UpdateOneAsync(filter, update, new UpdateOptions() { IsUpsert = true });
+            await _resourceReportRepository.UpsertAsync(resourceReport);
 
         }
 
@@ -198,7 +196,7 @@ namespace Yaginx.Services
         /// </summary>
         /// <param name="allData"></param>
         /// <returns></returns>
-        private Dictionary<string, long> AnlysisHourlySpider(IEnumerable<MonitorInfoEntity> allData)
+        private Dictionary<string, long> AnlysisHourlySpider(IEnumerable<MonitorInfo> allData)
         {
             var spiderRequestData = allData.Where(x => x.Device != null && x.Ua != null && x.Device.IsSpider);
             if (!spiderRequestData.Any())
@@ -218,7 +216,7 @@ namespace Yaginx.Services
         /// </summary>
         /// <param name="allData"></param>
         /// <returns></returns>
-        private Dictionary<string, long> AnlysisHourlyBrowser(IEnumerable<MonitorInfoEntity> allData)
+        private Dictionary<string, long> AnlysisHourlyBrowser(IEnumerable<MonitorInfo> allData)
         {
             var spiderRequestData = allData.Where(x => x.Device != null && x.Ua != null && !x.Device.IsSpider);
             if (!spiderRequestData.Any())
@@ -240,7 +238,7 @@ namespace Yaginx.Services
         /// </summary>
         /// <param name="allData"></param>
         /// <returns></returns>
-        private Dictionary<string, long> AnlysisHourlyOperationSystem(IEnumerable<MonitorInfoEntity> allData)
+        private Dictionary<string, long> AnlysisHourlyOperationSystem(IEnumerable<MonitorInfo> allData)
         {
             var osResult = allData.Where(x => x.Os != null)
                 .Select(x => $"{x.Os.Family}-{x.Os.Major}").GroupBy(x => x).Select(x => KeyValuePair.Create(x.Key, x.LongCount()));
@@ -248,14 +246,14 @@ namespace Yaginx.Services
                 return null;
             return new Dictionary<string, long>(osResult);
         }
-        private Dictionary<string, long> AnlysisHourlyStatusCode(IEnumerable<MonitorInfoEntity> allData)
+        private Dictionary<string, long> AnlysisHourlyStatusCode(IEnumerable<MonitorInfo> allData)
         {
             var spiderResult = allData.Select(x => x.StatusCode).GroupBy(x => x).Select(x => KeyValuePair.Create(x.Key.ToString(), x.LongCount()));
             if (!spiderResult.Any())
                 return null;
             return new Dictionary<string, long>(spiderResult);
         }
-        private Dictionary<string, long> AnlysisHourlyDuration(IEnumerable<MonitorInfoEntity> allData)
+        private Dictionary<string, long> AnlysisHourlyDuration(IEnumerable<MonitorInfo> allData)
         {
             if (!allData.Any())
                 return null;
@@ -270,14 +268,24 @@ namespace Yaginx.Services
             return result;
         }
 
-        private async Task<IList<ResourceMonitorInfoEntity>> ResourceMonitorInfoSearchCycleRangeRecords(DateTime beginTime, DateTime endTime)
+        private async Task<IList<ResourceMonitorInfo>> ResourceMonitorInfoSearchCycleRangeRecords(DateTime beginTime, DateTime endTime)
         {
-            var monitorInfoFilterBuilder = Builders<ResourceMonitorInfoEntity>.Filter;
-            var monitorInfoFilter = monitorInfoFilterBuilder.Empty;
-            monitorInfoFilter &= monitorInfoFilterBuilder.Gte(x => x.Timestamp, beginTime);
-            monitorInfoFilter &= monitorInfoFilterBuilder.Lt(x => x.Timestamp, endTime);
-            var monitorInfos = await _monitorInfoRep.SearchAsync(monitorInfoFilter);
-            return monitorInfos;
+            //var monitorInfoFilterBuilder = Builders<ResourceMonitorInfoEntity>.Filter;
+            //var monitorInfoFilter = monitorInfoFilterBuilder.Empty;
+            //monitorInfoFilter &= monitorInfoFilterBuilder.Gte(x => x.Timestamp, beginTime);
+            //monitorInfoFilter &= monitorInfoFilterBuilder.Lt(x => x.Timestamp, endTime);
+            //var monitorInfos = await _monitorInfoRep.SearchAsync(monitorInfoFilter);
+            //return monitorInfos;
+
+            return await _monitorInfoRepository.SearchAsync(beginTime, endTime);
+        }
+    }
+
+    public static class DicExtension
+    {
+        public static List<KeyValuePair<TKey, TValue>> ToKeyValuePair<TKey, TValue>(this Dictionary<TKey, TValue> obj)
+        {
+            return obj.Select(x => new KeyValuePair<TKey, TValue>(x.Key, x.Value)).ToList();
         }
     }
 }

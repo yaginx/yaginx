@@ -1,7 +1,5 @@
 ﻿using AgileLabs;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using Yaginx.DomainModels.MonitorModels;
 using Yaginx.Services;
 
@@ -131,7 +129,7 @@ public class ResourceReportController : YaginxControllerBase
 
         for (var i = requestData.BeginTime; i <= requestData.EndTime; i += step)
         {
-            var qty = combinedResult.FirstOrDefault(x => x.ReportTime == i)?.RequestQty ?? 0;
+            var qty = combinedResult.FirstOrDefault(x => x.ReportTime == i.FromEpochSeconds())?.RequestQty ?? 0;
             dataList.Add(new ReportItem(i.FromEpochSeconds().ToLocalTime().ToString(timeFormat), qty) { TimeTs = i });
         }
         return dataList;
@@ -170,7 +168,7 @@ public class ResourceReportController : YaginxControllerBase
         foreach (var reportTime in xAxis)
         {
             var qty = result.FirstOrDefault(x => x.ReportTime == reportTime)?.RequestQty ?? 0;
-            dataList.Add(new ReportItem(reportTime.FromEpochSeconds().ToLocalTime().ToString("HH:mm"), qty));
+            dataList.Add(new ReportItem(reportTime.ToLocalTime().ToString("HH:mm"), qty));
         }
 
         //ViewBag.Legend = JsonConvert.SerializeObject(legend);

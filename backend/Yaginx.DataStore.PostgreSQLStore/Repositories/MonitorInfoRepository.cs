@@ -25,5 +25,11 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
             await base.InsertAsync(entity);
             await _dbContextCommiter.CommitAsync();
         }
+
+        public async Task<IList<ResourceMonitorInfo>> SearchAsync(DateTime beginTime, DateTime endTime)
+        {
+            var entityList = await GetByQueryAsync(x => x.Timestamp >= beginTime && x.Timestamp < endTime);
+            return _mapper.Map<List<ResourceMonitorInfo>>(entityList);
+        }
     }
 }

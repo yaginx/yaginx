@@ -22,5 +22,10 @@ namespace Yaginx.DataStore.MongoStore.Repositories
             var entity = _mapper.Map<ResourceMonitorInfoEntity>(monitorInfoEntity);
             await base.AddAsync(entity);
         }
+
+        public Task<IList<ResourceMonitorInfo>> SearchAsync(DateTime beginTime, DateTime endTime)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -4,7 +4,8 @@ public class ResourceReportModel
 {
     public string ResourceUuid { get; set; }    
     public ReportCycleType CycleType { get; set; }
-    public long ReportTime { get; set; }
+    public DateTime ReportTime { get; set; }
+    public DateTime CreateTime { get; set; }
 
     /// <summary>
     /// 总处理请求
@@ -15,4 +16,5 @@ public class ResourceReportModel
     public List<KeyValuePair<string, long>> Browser { get; set; }
     public List<KeyValuePair<string, long>> Os { get; set; }
     public List<KeyValuePair<string, long>> Duration { get; set; }
+
 }

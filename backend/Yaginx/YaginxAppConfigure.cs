@@ -16,11 +16,11 @@ using LettuceEncrypt.YaginxAcmeLoaders;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.WebEncoders;
-using System.Globalization;
+using Microsoft.OpenApi.Models;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using Yaginx;
-using Yaginx.DataStore.MongoStore;
+using Yaginx.DataStore.PostgreSQLStore;
 using Yaginx.HostedServices;
 using Yaginx.Infrastructure;
 using Yaginx.Infrastructure.Configuration;
@@ -35,8 +35,6 @@ using Yaginx.SimpleProcessors.ConfigProviders;
 using Yaginx.WorkContexts;
 using Yaginx.YaginxAcmeLoaders;
 using Yarp.ReverseProxy.Configuration;
-using Yaginx.DataStore.PostgreSQLStore;
-using Microsoft.OpenApi.Models;
 public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegister, IEndpointConfig, IMvcOptionsConfig, IMvcBuildConfig
 {
     public int Order => 1;
@@ -203,10 +201,10 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             services.AddHostedService<ReportResourceServiceTask>();
             services.AddMemoryBus();
 
-            services.RegisterMongo(options =>
-            {
-                buildContext.Configuration.GetSection("MongoSetting:Default").Bind(options);
-            });
+            //services.RegisterMongo(options =>
+            //{
+            //    buildContext.Configuration.GetSection("MongoSetting:Default").Bind(options);
+            //});
             #endregion
         }
 

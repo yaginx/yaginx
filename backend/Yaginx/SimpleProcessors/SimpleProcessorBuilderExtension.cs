@@ -1,16 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Http.Timeouts;
-using Microsoft.AspNetCore.OutputCaching;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.Logging;
-using MongoDB.Bson.Serialization.Conventions;
-using MongoDB.Driver.Core.Clusters;
-using Yarp.ReverseProxy.Configuration;
-using Yarp.ReverseProxy.Health;
-using Yaginx.SimpleProcessors.Middlewares;
+﻿using Yaginx.SimpleProcessors.Middlewares;
 
 namespace Yaginx.SimpleProcessors;
 public static class SimpleProcessorBuilderExtension

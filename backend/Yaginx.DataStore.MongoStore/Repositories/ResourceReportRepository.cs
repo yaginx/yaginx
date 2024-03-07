@@ -31,5 +31,15 @@ namespace Yaginx.DataStore.MongoStore.Repositories
             var resultList = await SearchAsync(filter);
             return _mapper.Map<List<ResourceReportModel>>(resultList);
         }
+
+        public Task<List<ResourceReportModel>> SearchAsync(ReportCycleType hourly, DateTime beginTime, DateTime endTime)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpsertAsync(ResourceReportModel resourceReport)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
