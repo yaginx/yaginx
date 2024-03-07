@@ -28,8 +28,9 @@ namespace AgileLabs.EfCore.PostgreSQL
                     throw new Exception($"{GetType().Name}未设置{nameof(DbDataSource)}属性");
                 }
 
-                optionsBuilder.UseLazyLoadingProxies();
-                optionsBuilder.EnableSensitiveDataLogging();
+                //optionsBuilder.UseLazyLoadingProxies();
+                optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                //optionsBuilder.UseChangeTrackingProxies(false, true);                
 
                 switch (DbDataSource)
                 {

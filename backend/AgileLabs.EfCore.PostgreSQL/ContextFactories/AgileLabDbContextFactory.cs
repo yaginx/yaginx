@@ -53,6 +53,7 @@ namespace AgileLabs.EfCore.PostgreSQL.ContextFactories
                         }
 
                         bizDbContext.DbDataSource = dbDataSource;
+                        bizDbContext.ChangeTracker.AutoDetectChangesEnabled = false;
                         _dbContextCommiter.IsDbContextCreated = true;
                     }
                 }
