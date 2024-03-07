@@ -285,6 +285,9 @@ namespace Yaginx.Services
     {
         public static List<KeyValuePair<TKey, TValue>> ToKeyValuePair<TKey, TValue>(this Dictionary<TKey, TValue> obj)
         {
+            if (obj == null)
+                return null;
+
             return obj.Select(x => new KeyValuePair<TKey, TValue>(x.Key, x.Value)).ToList();
         }
     }

@@ -28,7 +28,9 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
 
         public async Task<IList<ResourceMonitorInfo>> SearchAsync(DateTime beginTime, DateTime endTime)
         {
-            var entityList = await GetByQueryAsync(x => x.Timestamp >= beginTime && x.Timestamp < endTime);
+            var beginTimeOffset = new DateTimeOffset(beginTime.ToUniversalTime());
+            var endTimeOffset = new DateTimeOffset(endTime.ToUniversalTime());
+            var entityList = await GetByQueryAsync(x => x.Timestamp >= beginTimeOffset && x.Timestamp < endTimeOffset);
             return _mapper.Map<List<ResourceMonitorInfo>>(entityList);
         }
     }

@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Yaginx.DomainModels;
 using System.Reflection.Emit;
-using AutoMapper;
 using AgileLabs.EfCore.PostgreSQL;
 
 namespace Yaginx.DataStore.PostgreSQLStore.Entities
@@ -35,17 +34,6 @@ namespace Yaginx.DataStore.PostgreSQLStore.Entities
             builder.Property(p => p.SimpleResponses).HasColumnType("jsonb");
             builder.Property(p => p.Hosts).HasColumnType("jsonb");
             builder.Property(p => p.ProxyTransforms).HasColumnType("jsonb");
-        }
-    }
-
-    public class Mapping : Profile
-    {
-        public Mapping()
-        {
-            CreateMap<WebsiteDomainModel, WebsiteEntity>().ReverseMap();
-            CreateMap<User, AccountEntity>().ReverseMap();
-            CreateMap<WebDomain, WebDomainEntity>().ReverseMap();
-            CreateMap<HostTraffic, HostTrafficEntity>().ReverseMap();
         }
     }
 }

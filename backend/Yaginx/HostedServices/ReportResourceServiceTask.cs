@@ -1,4 +1,6 @@
-﻿using Yaginx.Services;
+﻿using AgileLabs;
+using AgileLabs.WorkContexts.Extensions;
+using Yaginx.Services;
 
 namespace Yaginx.HostedServices
 {
@@ -6,13 +8,11 @@ namespace Yaginx.HostedServices
     {
         private readonly ILogger _logger;
         private readonly IHostEnvironment _hostEnvironment;
-        private readonly ResourceReportServcie _resourceReportServcie;
 
-        public ReportResourceServiceTask(ILogger<ReportResourceServiceTask> logger, IHostEnvironment hostEnvironment, ResourceReportServcie resourceReportServcie)
+        public ReportResourceServiceTask(ILogger<ReportResourceServiceTask> logger, IHostEnvironment hostEnvironment)
         {
             _logger = logger;
             _hostEnvironment = hostEnvironment;
-            _resourceReportServcie = resourceReportServcie;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -20,6 +20,8 @@ namespace Yaginx.HostedServices
             var checkTimeSpan = TimeSpan.FromSeconds(15);
             while (!stoppingToken.IsCancellationRequested)
             {
+                using var scope = AgileLabContexts.Context.CreateScopeWithWorkContext();
+                var _resourceReportService = scope.WorkContext.Resolve<ResourceReportServcie>();
                 try
                 {
                     var nowTime = DateTime.Now;
@@ -27,10 +29,10 @@ namespace Yaginx.HostedServices
                     #region 分钟级
                     if (nowTime <= nowTime.AddMinutes(-nowTime.Minute).Add(checkTimeSpan * 2))
                     {
-                        await _resourceReportServcie.HourlyCheckAsync(DateTime.Now.AddMinutes(-1));// 再次统计上一分钟的数据
+                        await _resourceReportService.HourlyCheckAsync(DateTime.Now.AddMinutes(-1));// 再次统计上一分钟的数据
                     }
 
-                    await _resourceReportServcie.MinutelyCheckAsync(DateTime.Now);
+                    await _resourceReportService.MinutelyCheckAsync(DateTime.Now);
                     #endregion
 
                     #region Houly
@@ -38,10 +40,10 @@ namespace Yaginx.HostedServices
                     {
                         if (nowTime <= nowTime.Date.AddHours(nowTime.Hour).Add(checkTimeSpan * 2))
                         {
-                            await _resourceReportServcie.HourlyCheckAsync(DateTime.Now.AddHours(-1));// 再次统计上一小时的数据
+                            await _resourceReportService.HourlyCheckAsync(DateTime.Now.AddHours(-1));// 再次统计上一小时的数据
                         }
 
-                        await _resourceReportServcie.HourlyCheckAsync(DateTime.Now);
+                        await _resourceReportService.HourlyCheckAsync(DateTime.Now);
                     }
                     #endregion
 
@@ -50,10 +52,10 @@ namespace Yaginx.HostedServices
                     {
                         if (nowTime <= nowTime.Date.Add(checkTimeSpan * 2))
                         {
-                            await _resourceReportServcie.DailyCheckAsync(DateTime.Now.Date.AddDays(-1));// 再次统计上一小时的数据
+                            await _resourceReportService.DailyCheckAsync(DateTime.Now.Date.AddDays(-1));// 再次统计上一小时的数据
                         }
 
-                        await _resourceReportServcie.DailyCheckAsync(DateTime.Now.Date);
+                        await _resourceReportService.DailyCheckAsync(DateTime.Now.Date);
                     }
                     #endregion
                 }
