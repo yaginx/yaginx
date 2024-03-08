@@ -69,25 +69,26 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
             resource_uuid | cycle_type | report_time | request_qty | status_code | spider | browser | os | duration | create_time
              */
             var upsertSql = @"INSERT INTO resource_report (resource_uuid, cycle_type, report_time, request_qty, duration, spider, browser, os, status_code, create_time)
-VALUES (@ResourceUuid,@CycleType,@ReportTime,@RequestQty,@Duration,@Spider,@Browser,@Os,@StatusCode,@CreateTime)
+VALUES (@ResourceUuid,@CycleType,@ReportTime,@RequestQty,@Duration::jsonb,@Spider::jsonb,@Browser::jsonb,@Os::jsonb,@StatusCode::jsonb,@CreateTime)
 ON CONFLICT(resource_uuid, cycle_type, report_time) 
 DO UPDATE SET
   request_qty=@RequestQty,duration=@Duration::jsonb,spider=@Spider::jsonb, browser=@Browser::jsonb, os=@Os::jsonb, status_code=@StatusCode::jsonb, create_time=@CreateTime";
 
             var entity = _mapper.Map<ResourceReportEntity>(resourceReport);
-            await _dapperBaseRepository.ExecuteNoQueryAsync(upsertSql, new
+            var insertModel = new
             {
                 entity.ResourceUuid,
                 entity.CycleType,
                 entity.ReportTime,
                 entity.RequestQty,
                 entity.CreateTime,
-                Duration = JsonConvert.SerializeObject(entity.Duration),
-                Spider = JsonConvert.SerializeObject(entity.Spider),
-                Browser = JsonConvert.SerializeObject(entity.Browser),
-                Os = JsonConvert.SerializeObject(entity.Os),
-                StatusCode = JsonConvert.SerializeObject(entity.StatusCode)
-            });
+                Duration = JsonConvert.SerializeObject(entity.Duration, Formatting.Indented),
+                Spider = JsonConvert.SerializeObject(entity.Spider, Formatting.Indented),
+                Browser = JsonConvert.SerializeObject(entity.Browser, Formatting.Indented),
+                Os = JsonConvert.SerializeObject(entity.Os, Formatting.Indented),
+                StatusCode = JsonConvert.SerializeObject(entity.StatusCode, Formatting.Indented)
+            };
+            await _dapperBaseRepository.ExecuteNoQueryAsync(upsertSql, insertModel);
         }
     }
 }
