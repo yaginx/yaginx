@@ -54,7 +54,7 @@ public class ResourceReportController : YaginxControllerBase
     //}
 
     [HttpGet, Route("all_report_data")]
-    public async Task<dynamic> HourlyReport(ReportCycleType cycleType)
+    public async Task<dynamic> HourlyReport(ReportCycleType cycleType, int period = 60)
     {
         if (!Enum.IsDefined<ReportCycleType>(cycleType))
         {
@@ -69,7 +69,9 @@ public class ResourceReportController : YaginxControllerBase
         var nowTime = DateTime.Now;
 
 
-        int period = 60;
+        if (period > 200)
+            period = 200;
+
         switch (cycleType)
         {
             case ReportCycleType.Minutely:
@@ -129,8 +131,9 @@ public class ResourceReportController : YaginxControllerBase
 
         for (var i = requestData.BeginTime; i <= requestData.EndTime; i += step)
         {
-            var qty = combinedResult.FirstOrDefault(x => x.ReportTime == i.FromEpochSeconds())?.RequestQty ?? 0;
-            dataList.Add(new ReportItem(i.FromEpochSeconds().ToLocalTime().ToString(timeFormat), qty) { TimeTs = i });
+            var currentTime = i.FromEpochSeconds().ToLocalTime();
+            var qty = combinedResult.FirstOrDefault(x => x.ReportTime == currentTime)?.RequestQty ?? 0;
+            dataList.Add(new ReportItem(currentTime.ToLocalTime().ToString(timeFormat), qty) { TimeTs = i });
         }
         return dataList;
     }
