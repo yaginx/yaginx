@@ -1,15 +1,13 @@
 ﻿using Microsoft.AspNetCore.Routing.Patterns;
 using System.Collections.Immutable;
 using Yaginx.DomainModels;
-using Yaginx.SimpleProcessors.ConfigProviders;
 using Yaginx.SimpleProcessors.Metadatas.Http2HttpsMetadatas;
-using Yaginx.SimpleProcessors.Metadatas.WebsitePreProcessMetadatas;
 
-namespace Yaginx.SimpleProcessors;
+namespace Yaginx.SimpleProcessors.Metadatas.WebsitePreProcessMetadatas;
 
 public sealed class WebsitePreProcessEndpointFactory
 {
-    private RequestDelegate? _pipeline;
+    private RequestDelegate _pipeline;
     public Endpoint CreateEndpoint(string name, WebsitePreProcessMetadataModel model, WebsiteDomainModel website, int order = 0, IReadOnlyList<Action<EndpointBuilder>> conventions = null)
     {
         //var config = route.Config;

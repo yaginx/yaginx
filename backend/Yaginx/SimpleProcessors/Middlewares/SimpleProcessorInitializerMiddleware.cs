@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.Timeouts;
 using System.Diagnostics;
 using Yaginx.DomainModels;
-using Yaginx.SimpleProcessors.ConfigProviders;
+using Yaginx.SimpleProcessors.Metadatas.Http2HttpsMetadatas;
 using Yarp.ReverseProxy.Model;
 namespace Yaginx.SimpleProcessors.Middlewares;
 
