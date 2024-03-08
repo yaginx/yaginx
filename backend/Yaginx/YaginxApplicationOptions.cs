@@ -41,40 +41,22 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
                 var path = string.Format(ConfigurationDefaults.AppSettingsEnvironmentFilePath, builder.Environment.EnvironmentName);
                 builder.Configuration.AddJsonFile(AppData.GetPath(path), true, true);
             }
-
-            var defaultRuleConfigFile = AppData.GetPath($"ReverseProxyConfig.json");
-            if (!File.Exists(defaultRuleConfigFile))
-            {
-                using var fileStream = File.Create(defaultRuleConfigFile);
-                using var stringWriter = new StreamWriter(fileStream);
-                stringWriter.Write(@"{
-  ""ReverseProxy"": {
-    ""Routes"": {},
-    ""Clusters"": {}
-  }
-}");
-            }
-
-            builder.Configuration.AddJsonFile(AppData.GetPath($"ReverseProxyConfig.json"), optional: true, reloadOnChange: true);
-
-            if (!string.IsNullOrEmpty(builder.Environment?.EnvironmentName))
-            {
-                builder.Configuration.AddJsonFile(AppData.GetPath($"ReverseProxyConfig.{builder.Environment.EnvironmentName}.json"), optional: true, reloadOnChange: true);
-            }
         };
 
         ConfigureWebHostBuilder += (IWebHostBuilder webHostBuilder, AppBuildContext buildContext) =>
         {
             webHostBuilder.ConfigureKestrel(serverOptions =>
             {
-                //serverOptions.Limits.MaxRequestBodySize = 500 * 1024 * 1024;//500M
                 serverOptions.Limits.MaxRequestBodySize = null;
                 serverOptions.Limits.MaxRequestBufferSize = 5 * 1024 * 1024;//5M
 
-                serverOptions.ListenAnyIP(8080, listenOptions =>
+                if (!buildContext.HostEnvironment.IsProduction())
                 {
-                    listenOptions.Protocols = HttpProtocols.Http1;
-                });
+                    serverOptions.ListenAnyIP(8080, listenOptions =>
+                    {
+                        listenOptions.Protocols = HttpProtocols.Http1;
+                    });
+                }
 
                 if (((RunningModes.RunningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode))
                 {
@@ -87,15 +69,6 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
                         });
                     });
                 }
-                serverOptions.ConfigureEndpointDefaults(listenOptions =>
-                {
-
-                });
-                //serverOptions.ConfigureHttpsDefaults(httpConnectionAdapterOptions =>
-                //{
-                //	//httpConnectionAdapterOptions.ClientCertificateMode = Microsoft.AspNetCore.Server.Kestrel.Https.ClientCertificateMode.RequireCertificate;
-                //	httpConnectionAdapterOptions.UseYaginxLettuceEncrypt(serverOptions.ApplicationServices);
-                //});
             });
         };
     }

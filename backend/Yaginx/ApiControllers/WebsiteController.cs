@@ -1,13 +1,10 @@
-﻿using AgileLabs.AspNet.WebApis.Exceptions;
-using AgileLabs.EfCore.PostgreSQL;
+﻿using AgileLabs.EfCore.PostgreSQL;
 using AgileLabs.FileUpload;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Collections;
 using System.Text;
-using Yaginx.DataStore.LiteDBStore.Repositories;
 using Yaginx.DomainModels;
 using Yaginx.Infrastructure;
 using Yaginx.Models.WebsiteModels;

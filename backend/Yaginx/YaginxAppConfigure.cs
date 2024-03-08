@@ -57,12 +57,11 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
         {
             // https://stackoverflow.com/questions/55289631/inconsistent-behaviour-with-modelstate-validation-asp-net-core-api
             options.SuppressModelStateInvalidFilter = true;
-        });
-
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        });        
 
         if (buildContext.HostEnvironment.IsDevelopment())
         {
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
         }
@@ -74,7 +73,6 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
         var runningMode = RunningModes.RunningMode;
         if ((runningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
         {
-            // Add the reverse proxy capability to the server
             #region ReverseProxy
             services.AddScoped<ProxyRuleRedisStorageService>();
             services.AddSingleton<ProxyRuleChangeNotifyService>();
@@ -83,21 +81,6 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             services.AddSingleton<IProxyConfigProvider, FileProxyConfigProvider>();
             services.AddHttpForwarder();
             services.AddReverseProxy();
-            //.LoadFromConfig(buildContext.Configuration.GetSection("ReverseProxy"))
-            //.AddTransforms(builderContext =>
-            //{
-            //    /*
-            //     Append: 在上游的基础上带上当前节点信息传给下游
-            //     Set: 忽略上游信息, 使用当前节点信息往下传
-            //     Off:直接把上游信息传给下游,忽略当前节点
-            //     Remove: 不往下传该信息
-            //     */
-            //    builderContext.AddXForwardedFor(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
-            //    builderContext.AddXForwardedHost(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
-            //    builderContext.AddXForwardedProto(action: ForwardedTransformActions.Append);// 在上游的基础上,增加当前节点信息传给下游
-            //    builderContext.AddXForwardedPrefix(action: ForwardedTransformActions.Append);
-            //})
-            //.AddTransforms(DefaultRouteTransform);
             #endregion
         }
         #region DockerEgnine
@@ -128,25 +111,6 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
         var appSettings = AppSettingsHelper.SaveAppSettings(configurations, CommonHelper.DefaultFileProvider, false);
         services.AddSingleton(appSettings);
         #endregion
-
-        //#region Hangfire
-        //// Add Hangfire services.
-        //services.AddHangfire((provider, configuration) =>
-        //{
-        //    configuration
-        //       .UseSimpleAssemblyNameTypeSerializer()
-        //       .UseRecommendedSerializerSettings()
-        //       .UseSerilogLogProvider()
-        //       .UseConsole()
-        //       .UseMemoryStorage();
-        //});
-
-        //// Add the processing server as IHostedService
-        //services.AddSingleton<HangfireJobActivator>();
-        //services.AddSingleton<JobActivator>(serficeProvider => serficeProvider.GetRequiredService<HangfireJobActivator>());
-        //services.AddHangfireServer();
-
-        //#endregion
 
         if ((runningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode)
         {
@@ -184,7 +148,7 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             services.AddHostedService<YaginxAcmeCertificateLoader>();
             #endregion
 
-            services.UseLiteDBDataStore(buildContext);
+            //services.UseLiteDBDataStore(buildContext);
             services.AddedPostgreSQLStore(buildContext);
 
             services.AddSingleton<ICertificateDomainRepsitory, CertificateDomainSingletonService>();
@@ -200,11 +164,6 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             services.AddScoped<TrafficMonitorInfoEventSubscriber>();
             services.AddHostedService<ReportResourceServiceTask>();
             services.AddMemoryBus();
-
-            //services.RegisterMongo(options =>
-            //{
-            //    buildContext.Configuration.GetSection("MongoSetting:Default").Bind(options);
-            //});
             #endregion
         }
 
@@ -223,38 +182,10 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             piplineActions.Register("TrafficMonitorMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<TrafficMonitorMiddleware>());
             piplineActions.Register("DomainTrafficMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<DomainTrafficMiddleware>());
             piplineActions.Register("ProcessDurationMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<TraceInfoHeaderOutputMiddleware>());
-            //piplineActions.Register("RequestStatisticsMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<RequestStatisticsMiddleware>());
-            //piplineActions.Register("MapDiagnositicRequest", RequestPiplineStage.BeforeRouting, app => app.MapDiagnositicRequest());
-            //piplineActions.Register("DiagnositicMiddleware", RequestPiplineStage.BeforeRouting, app => app.UseMiddleware<DiagnositicMiddleware>());
-
-            //piplineActions.Register("AutoRedirect", RequestPiplineStage.BeforeRouting, app =>
-            //{
-
-            //});
-
 
             piplineActions.Register("Static Resource", RequestPiplineStage.BeforeRouting, app =>
             {
-                app.UseDeveloperExceptionPage();
-
-                if (!buildContext.HostEnvironment.IsDevelopment())
-                {
-                    app.UseResponseCompression();
-                }
-
-                app.UseResponseCaching();
-
                 app.UseClientApp();
-
-                //app.UseStaticFiles(new StaticFileOptions
-                //{
-                //    OnPrepareResponse = ctx =>
-                //    {
-                //        // Cache static files for 12 hours
-                //        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=31536000, immutable");
-                //        ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddHours(12).ToString("R", CultureInfo.InvariantCulture));
-                //    }
-                //});
             });
             if (buildContext.HostEnvironment.IsDevelopment())
             {
@@ -271,49 +202,6 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
                 });
             }
         }
-        //piplineActions.Register("HangfireDashboard", RequestPiplineStage.BeforeRouting, app =>
-        //{
-        //    app.UseHangfireDashboard(options: new DashboardOptions()
-        //    {
-        //        DashboardTitle = "Jobs",
-        //        Authorization = new[] { new HangfireAuthorizationFilter() }
-        //    });
-        //});
-
-        //piplineActions.Register("Test", RequestPiplineStage.BeforeEndpointConfig, app =>
-        //{
-        //    //app.Map("/test/{**catch-all}", async (HttpContext httpContext, IHttpForwarder forwarder) =>
-        //    //{
-        //    //    var error = await forwarder.SendAsync(httpContext, "https://localhost:10000/",
-        //    //        httpClient, requestConfig, transformer);
-        //    //    // Check if the operation was successful
-        //    //    if (error != ForwarderError.None)
-        //    //    {
-        //    //        var errorFeature = httpContext.GetForwarderErrorFeature();
-        //    //        var exception = errorFeature.Exception;
-        //    //    }
-        //    //});
-
-        //    app.MapWhen(httpContext => httpContext.Request.Host.Value.Contains("openai"), childApp =>
-        //    {
-        //        //var transformer = new CustomTransformer(); // or HttpTransformer.Default;
-        //        //var requestConfig = new ForwarderRequestConfig { ActivityTimeout = TimeSpan.FromSeconds(100) };
-
-        //        // When using IHttpForwarder for direct forwarding you are responsible for routing, destination discovery, load balancing, affinity, etc..
-        //        // For an alternate example that includes those features see BasicYarpSample.
-        //        //childApp.Map("/{**catch-all}", async (HttpContext httpContext, IHttpForwarder forwarder) =>
-        //        //{
-        //        //    var error = await forwarder.SendAsync(httpContext, "https://localhost:10000/",
-        //        //        httpClient, requestConfig, transformer);
-        //        //    // Check if the operation was successful
-        //        //    if (error != ForwarderError.None)
-        //        //    {
-        //        //        var errorFeature = httpContext.GetForwarderErrorFeature();
-        //        //        var exception = errorFeature.Exception;
-        //        //    }
-        //        //});
-        //    });
-        //});
 
         piplineActions.Register("Security", RequestPiplineStage.BeforeEndpointConfig, app =>
         {
@@ -340,10 +228,7 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             }
 
         }
-        //endpoints.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}"); 
-
         endpoints.MapDefaultControllerRoute();
-        //endpoints.MapFallbackToFile(DefaultIndexFileName);
     }
 
     public void ConfigureMvcOptions(MvcOptions mvcOptions, AppBuildContext appBuildContext)
