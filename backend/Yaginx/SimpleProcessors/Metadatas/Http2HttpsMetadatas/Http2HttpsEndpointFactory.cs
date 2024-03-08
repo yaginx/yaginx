@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.FileSystemGlobbing;
 using System.Text.RegularExpressions;
-using Yaginx.SimpleProcessors.ConfigProviders;
 using Yaginx.SimpleProcessors.Metadatas.Http2HttpsMetadatas;
 using Yarp.ReverseProxy.Model;
 

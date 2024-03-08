@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Yaginx.DomainModels;
 using Yaginx.SimpleProcessors.ConfigProviders;
+using Yaginx.SimpleProcessors.Metadatas.Http2HttpsMetadatas;
+using Yaginx.SimpleProcessors.Metadatas.WebsitePreProcessMetadatas;
 using Yarp.ReverseProxy.Configuration;
 
 namespace Yaginx.SimpleProcessors;
