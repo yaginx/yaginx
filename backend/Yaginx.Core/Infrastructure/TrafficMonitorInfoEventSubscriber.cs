@@ -27,6 +27,7 @@ public class TrafficMonitorInfoEventSubscriber : IEventSubscriber<MonitorMessage
 
         var monitorInfoEntity = new ResourceMonitorInfo()
         {
+            ResourceUuid = "yaginx",
             Timestamp = message.ts.FromEpochSeconds(),
             Data = dataInfo
         };
