@@ -46,7 +46,9 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
 
         public async Task<List<ResourceReportModel>> SearchAsync(ReportCycleType cycleType, DateTime beginTime, DateTime endTime)
         {
-            var entityList = await GetByQueryAsync(x => x.CycleType == cycleType && x.ReportTime >= beginTime && x.ReportTime < endTime);
+            var beginUtcTime = beginTime.ToUniversalTime();
+            var endUtcTime = endTime.ToUniversalTime();
+            var entityList = await GetByQueryAsync(x => x.CycleType == cycleType && x.ReportTime >= beginUtcTime && x.ReportTime < endUtcTime);
             return _mapper.Map<List<ResourceReportModel>>(entityList);
         }
 

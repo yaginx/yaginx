@@ -66,11 +66,117 @@ public class ResourceReportController : YaginxControllerBase
             CycleType = cycleType
         };
 
-        var nowTime = DateTime.Now;
+        List<ResourceReportModel> combinedResult = await GetResult(cycleType, period, requestData);
 
+        var xAxis = new List<long>();// combinedResult.Select(x => x.ReportTime).OrderBy(x => x).ToList();
+        long step = 60;
+        string timeFormat = "HH:mm";
+        switch (cycleType)
+        {
+            case ReportCycleType.Minutely:
+                step = 60;
+                timeFormat = "HH:mm";
+                break;
+            case ReportCycleType.Hourly:
+                step = 3600;
+                timeFormat = "dd-HH";
+                break;
+            case ReportCycleType.Daily:
+                step = 3600 * 24;
+                timeFormat = "MM-dd";
+                break;
+            case ReportCycleType.Weekly:
+                step = 3600 * 24 * 7;
+                timeFormat = "MM-dd";
+                break;
+            default:
+                break;
+        }
+        var dataList = new List<ReportItem>();
 
+        for (var i = requestData.BeginTime; i <= requestData.EndTime; i += step)
+        {
+            var currentTime = i.FromEpochSeconds().ToLocalTime();
+            var qty = combinedResult.FirstOrDefault(x => x.ReportTime == currentTime)?.RequestQty ?? 0;
+            dataList.Add(new ReportItem(currentTime.ToString(timeFormat), qty) { TimeTs = i });
+        }
+        return dataList;
+    }
+
+    [HttpGet, Route("type_report_data")]
+    public async Task<dynamic> DurationReport(ReportCycleType cycleType, string type, int period = 60)
+    {
+        if (!Enum.IsDefined<ReportCycleType>(cycleType))
+        {
+            throw new Exception($"无效的{nameof(cycleType)}, 可用的值{Enum.GetValues<ReportCycleType>().JoinStrings(",")}");
+        }
+
+        var requestData = new ReportSearchRequest
+        {
+            CycleType = cycleType
+        };
+
+        List<ResourceReportModel> combinedResult = await GetResult(cycleType, period, requestData);
+
+        var xAxis = new List<long>();// combinedResult.Select(x => x.ReportTime).OrderBy(x => x).ToList();
+        long step = 60;
+        string timeFormat = "HH:mm";
+        switch (cycleType)
+        {
+            case ReportCycleType.Minutely:
+                step = 60;
+                timeFormat = "HH:mm";
+                break;
+            case ReportCycleType.Hourly:
+                step = 3600;
+                timeFormat = "HH:mm";
+                break;
+            case ReportCycleType.Daily:
+                step = 3600 * 24;
+                timeFormat = "MM-dd";
+                break;
+            case ReportCycleType.Weekly:
+                step = 3600 * 24 * 7;
+                timeFormat = "MM-dd";
+                break;
+            default:
+                break;
+        }
+        var dataList = new List<DurationReportItem>();
+        var dataTypeProperty = typeof(ResourceReportModel).GetProperty(type);
+        for (var i = requestData.BeginTime; i <= requestData.EndTime; i += step)
+        {
+            var currentTime = i.FromEpochSeconds().ToLocalTime();
+            var typeDataItem = combinedResult.FirstOrDefault(x => x.ReportTime == currentTime);
+            if (typeDataItem != null)
+            {
+                var typeDataList = dataTypeProperty.GetValue(typeDataItem, null) as List<KeyValuePair<string, long>>;
+                if (typeDataList.Any())
+                {
+                    foreach (var item in typeDataList)
+                    {
+                        dataList.Add(new DurationReportItem { Time = currentTime.ToString(timeFormat), Value = item.Value, Type = item.Key });
+                    }
+                }
+                else
+                {
+                    dataList.Add(new DurationReportItem { Time = currentTime.ToString(timeFormat), Value = 0, Type = "default" });
+                }
+            }
+            else
+            {
+                dataList.Add(new DurationReportItem { Time = currentTime.ToString(timeFormat), Value = 0, Type = "default" });
+            }
+        }
+        return dataList;
+    }
+
+    private async Task<List<ResourceReportModel>> GetResult(ReportCycleType cycleType, int period, ReportSearchRequest requestData)
+    {
         if (period > 200)
             period = 200;
+
+        var nowTime = DateTime.Now;
 
         switch (cycleType)
         {
@@ -107,40 +213,7 @@ public class ResourceReportController : YaginxControllerBase
             Os = n.Where(x => x.Os != null).SelectMany(x => x.Os).GroupBy(x => x.Key).Select(x => KeyValuePair.Create(x.Key, x.Sum(item => item.Value))).ToList(),
             StatusCode = n.Where(x => x.StatusCode != null).SelectMany(x => x.StatusCode).GroupBy(x => x.Key).Select(x => KeyValuePair.Create(x.Key, x.Sum(item => item.Value))).ToList()
         }).ToList();
-
-        var xAxis = new List<long>();// combinedResult.Select(x => x.ReportTime).OrderBy(x => x).ToList();
-        long step = 60;
-        string timeFormat = "HH:mm";
-        switch (cycleType)
-        {
-            case ReportCycleType.Minutely:
-                step = 60;
-                timeFormat = "HH:mm";
-                break;
-            case ReportCycleType.Hourly:
-                step = 3600;
-                timeFormat = "dd-HH";
-                break;
-            case ReportCycleType.Daily:
-                step = 3600 * 24;
-                timeFormat = "MM-dd";
-                break;
-            case ReportCycleType.Weekly:
-                step = 3600 * 24 * 7;
-                timeFormat = "MM-dd";
-                break;
-            default:
-                break;
-        }
-        var dataList = new List<ReportItem>();
-
-        for (var i = requestData.BeginTime; i <= requestData.EndTime; i += step)
-        {
-            var currentTime = i.FromEpochSeconds().ToLocalTime();
-            var qty = combinedResult.FirstOrDefault(x => x.ReportTime == currentTime)?.RequestQty ?? 0;
-            dataList.Add(new ReportItem(currentTime.ToString(timeFormat), qty) { TimeTs = i });
-        }
-        return dataList;
+        return combinedResult;
     }
 
     [HttpGet, Route("resource_report_data")]
@@ -206,6 +279,12 @@ public class ResourceReportController : YaginxControllerBase
         public long TimeTs { get; set; }
         public string Time { get; set; }
         public long Scales { get; set; }
+    }
 
+    public class DurationReportItem
+    {
+        public string Time { get; set; }
+        public long Value { get; set; }
+        public string Type { get; set; }
     }
 }

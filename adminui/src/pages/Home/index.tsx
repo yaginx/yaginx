@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Col, Row } from 'antd';
 import { RequestQtyDiagram } from './RequestQty';
 import { ParentModel } from './ParentModel';
+import { TypeDataReport } from './TypeDataReport';
 
 const Home: React.FC = () => {
   const tabRequestQtyDiagramList = [
@@ -76,7 +77,18 @@ const Home: React.FC = () => {
             tabList={tabRequestQtyDiagramList}
             defaultActiveTabKey='minutly'
             onTabChange={onTabRequestQtyTabChange}>
+            <h2>请求量</h2>
             <RequestQtyDiagram cycleType={requsetQtyDiagramCycleType} />
+            <h2>Duration指标</h2>
+            <TypeDataReport cycleType={requsetQtyDiagramCycleType} typeName='Duration' />
+            <h2>Spider指标</h2>
+            <TypeDataReport cycleType={requsetQtyDiagramCycleType} typeName='Spider' />
+            <h2>Browser指标</h2>
+            <TypeDataReport cycleType={requsetQtyDiagramCycleType} typeName='Browser' />
+            <h2>Os指标</h2>
+            <TypeDataReport cycleType={requsetQtyDiagramCycleType} typeName='Os' />
+            <h2>StatusCode指标</h2>
+            <TypeDataReport cycleType={requsetQtyDiagramCycleType} typeName='StatusCode' />
           </Card>
         </Col>
       </Row>
