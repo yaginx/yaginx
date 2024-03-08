@@ -86,6 +86,10 @@ public class ResourceReportController : YaginxControllerBase
                 nowTime = nowTime.Date;
                 requestData.BeginTime = nowTime.AddDays(-period).GetEpochSeconds();
                 break;
+            case ReportCycleType.Weekly:
+                nowTime = nowTime.Date;
+                requestData.BeginTime = nowTime.AddDays(-period * 7).GetEpochSeconds();
+                break;
             default:
                 break;
         }
@@ -123,6 +127,7 @@ public class ResourceReportController : YaginxControllerBase
                 break;
             case ReportCycleType.Weekly:
                 step = 3600 * 24 * 7;
+                timeFormat = "MM-dd";
                 break;
             default:
                 break;
@@ -133,7 +138,7 @@ public class ResourceReportController : YaginxControllerBase
         {
             var currentTime = i.FromEpochSeconds().ToLocalTime();
             var qty = combinedResult.FirstOrDefault(x => x.ReportTime == currentTime)?.RequestQty ?? 0;
-            dataList.Add(new ReportItem(currentTime.ToLocalTime().ToString(timeFormat), qty) { TimeTs = i });
+            dataList.Add(new ReportItem(currentTime.ToString(timeFormat), qty) { TimeTs = i });
         }
         return dataList;
     }

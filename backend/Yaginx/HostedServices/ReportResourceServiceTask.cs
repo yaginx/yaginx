@@ -41,20 +41,10 @@ namespace Yaginx.HostedServices
                         if (nowTime <= nowTime.Date.AddHours(nowTime.Hour).Add(checkTimeSpan * 2))
                         {
                             await _resourceReportService.HourlyCheckAsync(DateTime.Now.AddHours(-1));// 再次统计上一小时的数据
-                        }
-
-                        await _resourceReportService.HourlyCheckAsync(DateTime.Now);
-                    }
-                    #endregion
-
-                    #region Daily
-                    if (nowTime.Hour % 2 == 0 && nowTime.Minute % 30 == 0)
-                    {
-                        if (nowTime <= nowTime.Date.Add(checkTimeSpan * 2))
-                        {
                             await _resourceReportService.DailyCheckAsync(DateTime.Now.Date.AddDays(-1));// 再次统计上一小时的数据
                         }
 
+                        await _resourceReportService.HourlyCheckAsync(DateTime.Now);
                         await _resourceReportService.DailyCheckAsync(DateTime.Now.Date);
                     }
                     #endregion

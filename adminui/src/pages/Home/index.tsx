@@ -15,6 +15,10 @@ const Home: React.FC = () => {
       key: 'hourly',
       tab: '小时图',
     },
+    {
+      key: 'daily',
+      tab: '日线图',
+    }
   ];
   const [requsetQtyDiagramCycleType, setRequestQtyDiagramCycleType] = useState(5);
   const onTabRequestQtyTabChange = (key: string) => {
@@ -24,6 +28,9 @@ const Home: React.FC = () => {
         break;
       case "hourly":
         setRequestQtyDiagramCycleType(10);
+        break;
+      case "daily":
+        setRequestQtyDiagramCycleType(20);
         break;
       default:
         break;
@@ -35,9 +42,7 @@ const Home: React.FC = () => {
       <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
         <Col span={6}>
           <Card title="Default size card" extra={<a href="#">More</a>}
-            actions={[
-              <>日销售额￥12,423</>
-            ]}>
+            actions={[<>Card content</>]}>
             Card content
           </Card>
         </Col>
