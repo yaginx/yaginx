@@ -152,7 +152,69 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                     }
                 }
 
-                if (!website.ProxyRules.IsNullOrEmpty())
+                if (website.ProxyRules.IsNullOrEmpty())
+                {
+                    // 加载默认的配置
+                    var routeId = $"router_{websiteId}";
+                    var clusterId = $"cluster_{websiteId}";
+                    RouteConfig routeConfig = new RouteConfig()
+                    {
+                        RouteId = routeId,
+                        ClusterId = clusterId,
+                        Match = new RouteMatch
+                        {
+                            Hosts = hosts
+                        }
+                    }
+                    .WithTransformUseOriginalHostHeader(useOriginal: spec.IsWithOriginalHostHeader);
+
+                    routeConfig.WithTransformXForwarded(xFor: ForwardedTransformActions.Append);
+
+                    if (spec.DefaultDestinationHost.IsNotNullOrWhitespace())
+                    {
+                        routeConfig = routeConfig.WithTransformRequestHeader("Host", spec.DefaultDestinationHost, false);
+                    }
+
+                    if (!website.ProxyTransforms.IsNullOrEmpty())
+                    {
+                        routeConfig = routeConfig.WithTransform((dic) =>
+                        {
+                            foreach (var item in website.ProxyTransforms)
+                            {
+                                if (!dic.TryAdd(item.Key, item.Value))
+                                {
+                                    _Logger.LogWarning($"{website.Name} ProxyTransform item {item} add fail with value [{item.Value}]");
+                                }
+                            }
+                        });
+                    }
+
+                    Dictionary<string, DestinationConfig> mDestinationConfigs = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        { "default", new DestinationConfig { Address = spec.DefaultDestination } }
+                    };
+
+                    Uri webProxyAddress = null;
+                    if (spec.WebProxy.IsNotNullOrWhitespace())
+                    {
+                        webProxyAddress = new Uri(spec.WebProxy);
+                    }
+
+                    var clusterConfig = new ClusterConfig()
+                    {
+                        ClusterId = clusterId,
+                        LoadBalancingPolicy = "PowerOfTwoChoices",
+                        HttpRequest = new Yarp.ReverseProxy.Forwarder.ForwarderRequestConfig { ActivityTimeout = new TimeSpan(0, 0, 15, 0, 0) },
+                        Destinations = mDestinationConfigs,
+                        HttpClient = new HttpClientConfig
+                        {
+                            WebProxy = new WebProxyConfig() { Address = webProxyAddress },
+                            DangerousAcceptAnyServerCertificate = spec.IsAllowUnsafeSslCertificate,
+                        }
+                    };
+                    yield return (routeConfig, clusterConfig);
+                }
+                else
                 {
                     // 加载自定义的Rules
                     foreach (var proxyRule in website.ProxyRules)
@@ -200,66 +262,6 @@ namespace Yaginx.Infrastructure.ProxyConfigProviders
                         };
                         yield return (routeConfig, clusterConfig);
                     }
-                }
-                else
-                {
-                    // 加载默认的配置
-                    var routeId = $"router_{websiteId}";
-                    var clusterId = $"cluster_{websiteId}";
-                    RouteConfig routeConfig = new RouteConfig()
-                    {
-                        RouteId = routeId,
-                        ClusterId = clusterId,
-                        Match = new RouteMatch
-                        {
-                            Hosts = hosts
-                        }
-                    }
-                    .WithTransformUseOriginalHostHeader(useOriginal: spec.IsWithOriginalHostHeader);
-
-                    if (spec.DefaultDestinationHost.IsNotNullOrWhitespace())
-                    {
-                        routeConfig = routeConfig.WithTransformRequestHeader("Host", spec.DefaultDestinationHost, false);
-                    }
-
-                    if (!website.ProxyTransforms.IsNullOrEmpty())
-                    {
-                        routeConfig = routeConfig.WithTransform((dic) =>
-                        {
-                            foreach (var item in website.ProxyTransforms)
-                            {
-                                if (!dic.TryAdd(item.Key, item.Value))
-                                {
-                                    _Logger.LogWarning($"{website.Name} ProxyTransform item {item} add fail with value [{item.Value}]");
-                                }
-                            }
-                        });
-                    }
-     
-                    Dictionary<string, DestinationConfig> mDestinationConfigs = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase)
-                    {
-                        { "default", new DestinationConfig { Address = spec.DefaultDestination } }
-                    };
-
-                    Uri webProxyAddress = null;
-                    if (spec.WebProxy.IsNotNullOrWhitespace())
-                    {
-                        webProxyAddress = new Uri(spec.WebProxy);
-                    }
-
-                    var clusterConfig = new ClusterConfig()
-                    {
-                        ClusterId = clusterId,
-                        LoadBalancingPolicy = "PowerOfTwoChoices",
-                        HttpRequest = new Yarp.ReverseProxy.Forwarder.ForwarderRequestConfig { ActivityTimeout = new TimeSpan(0, 0, 15, 0, 0) },
-                        Destinations = mDestinationConfigs,
-                        HttpClient = new HttpClientConfig
-                        {
-                            WebProxy = new WebProxyConfig() { Address = webProxyAddress },
-                            DangerousAcceptAnyServerCertificate = spec.IsAllowUnsafeSslCertificate,
-                        }
-                    };
-                    yield return (routeConfig, clusterConfig);
                 }
             }
         }

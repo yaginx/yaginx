@@ -11,6 +11,9 @@ Replacement for nginx's HTTP reverse proxy, but more power feature than nginx.
 * 多节点负载均衡支持
 * 可视化监控
 
+## 转发的问题
+目前是使用Docker部署的, 使用的是docker的nat网络, 最终收到的ip都是docker的ip
+
 ## deploy
 
 ```bash
@@ -22,16 +25,6 @@ docker run -d --name pgdb -p 5432:5432 \
     -v /data/pgdb_data:/var/lib/postgresql/data \
     hub.feinian.net/library/postgres:16.0
     
-mkdir -p /data/mongo/{db,backup,configdb,log}
-docker run -d --restart always --name mongodb \
--p 127.0.0.1:27017:27017 \
---memory="500m" --memory-reservation="200m" \
---volume=/data/mongo/db:/data/db \
---volume=/data/mongo/backup:/data/backup \
---volume=/data/mongo/configdb:/data/configdb  \
---volume=/data/mongo/log:/var/log  \
-mongo:latest
-
 mkdir -p /data/redis_data
 docker run -d --name redis -p 127.0.0.1:6379:6379 -e TZ=Asia/Shanghai \
     -v /data/redis_data:/data \

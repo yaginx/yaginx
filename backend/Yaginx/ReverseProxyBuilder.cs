@@ -1,8 +1,9 @@
 ﻿using AgileLabs;
+using AgileLabs.Sessions;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 public static class ReverseProxyBuilder
@@ -22,6 +23,11 @@ public static class ReverseProxyBuilder
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         var logger = loggerFactory.CreateLogger("Yaginx.ProxyForwarder");
         var moinitorInterfacePattern = serviceProvider.GetService<IOptions<MonitorInterafceOption>>()?.Value;
+        var requestSession = serviceProvider.GetRequiredService<IRequestSession>();
+        
+        Stopwatch stopwatch = Stopwatch.StartNew();
+
+        logger.LogInformation($"Received Request: {requestSession.HostWithScheme}/{requestSession.ClientIp}/{requestSession.UpstreamIp}");
         try
         {
             var requestPath = context.Request.Path.Value;
@@ -63,7 +69,7 @@ public static class ReverseProxyBuilder
             var errorFeature = context.GetForwarderErrorFeature();
             if (errorFeature is not null)
             {
-                logger.LogError(0, errorFeature.Exception, $"转发异常-{errorFeature.Error}");
+                logger.LogError(0, errorFeature.Exception, $"转发异常, URL:{context.Request.GetDisplayUrl()} 耗时:{stopwatch.ElapsedMilliseconds} - {errorFeature.Error}");
             }
         }
         catch (Exception ex)
