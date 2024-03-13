@@ -65,7 +65,7 @@ steps:
       - echo $$HUB_PASSWORD
 
       - echo "开始构建docker镜像"
-      - docker login --username $$HUB_USERNAME --password $$HUB_PASSWORD $$HUB_HOST
       - docker build -t $HUB_HOST/yaginx/yaginx:latest -t $HUB_HOST/yaginx/yaginx:$IMAGE_VERSION --file `pwd`/backend/Yaginx/Dockerfile `pwd`/publish
+      - docker login --username $$HUB_USERNAME --password $$HUB_PASSWORD $$HUB_HOST
       - docker push $HUB_HOST/yaginx/yaginx:$IMAGE_VERSION
       - docker push $HUB_HOST/yaginx/yaginx:latest
