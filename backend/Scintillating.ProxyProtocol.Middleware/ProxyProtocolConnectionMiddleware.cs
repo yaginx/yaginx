@@ -80,12 +80,14 @@ internal class ProxyProtocolConnectionMiddleware
             }
             catch (SocketException ex)
             {
+                context.Abort(new ConnectionAbortedException("PROXY V1/V2: Socket Error when reading PROXY protocol header.", ex));
                 _logger.LogError(0, ex, $"SocketException, Address Info:[{remoteEndPointInfo}]=>[{localEndPointInfo}]");
                 return;
             }
             catch (Exception ex)
             {
-                _logger.LogError(0, ex, $"ProxyProtocalHeader Read Exception, Address Info:[{remoteEndPointInfo}]=>[{localEndPointInfo}]");
+                context.Abort(new ConnectionAbortedException("PROXY V1/V2: protocol header reading failed.", ex));
+                _logger.LogError(0, ex, $"ProxyProtocolHeader Read Exception, Address Info:[{remoteEndPointInfo}]=>[{localEndPointInfo}]");
                 return;
             }
 
@@ -145,11 +147,11 @@ internal class ProxyProtocolConnectionMiddleware
             context.Abort(new ConnectionAbortedException("PROXY V1/V2: Timeout when reading PROXY protocol header.", ex));
             return;
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(0, ex, $"ProxyProtocal OnConnect Exception, Address Info:[{remoteEndPointInfo}]=>[{localEndPointInfo}]");
-            return;
-        }
+        //catch (Exception ex)
+        //{
+        //    _logger.LogError(0, ex, $"ProxyProtocol OnConnect Exception, Address Info:[{remoteEndPointInfo}]=>[{localEndPointInfo}]");
+        //    return;
+        //}
         finally
         {
             cancellationTokenSource?.Dispose();

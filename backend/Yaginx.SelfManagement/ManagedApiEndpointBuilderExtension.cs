@@ -4,9 +4,13 @@ using AgileLabs.Diagnostics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text;
+using System.Text.RegularExpressions;
 using Yaginx.SelfManagement.CustomEndpoints;
 using Yaginx.SelfManagement.CustomEndpoints.ManagedApiMetadatas;
 using Yaginx.SelfManagement.Middlewares;
+using Microsoft.AspNetCore.Builder;
+using Scintillating.ProxyProtocol.Middleware;
 
 namespace Yaginx.SelfManagement
 {
@@ -32,6 +36,26 @@ namespace Yaginx.SelfManagement
             //proxyAppBuilder.UseMiddleware<RequestStatisticsMiddleware>();
             proxyAppBuilder.UseMiddleware<DiagnositicMiddleware>();
             proxyAppBuilder.MapDiagnositicRequest();
+            proxyAppBuilder.MapWhen(context => Regex.IsMatch(context.Request.Path, "/ip", RegexOptions.IgnoreCase),
+                config => config.Run(async context =>
+                {
+                    var feature = context.Features.Get<IProxyProtocolFeature>();
+                    if (feature != null)
+                    {
+                        context.Response.Headers["X-Connection-Orignal-Remote-EndPoint"] = feature.OriginalRemoteEndPoint?.ToString();
+                        context.Response.Headers["X-Connection-Orignal-Local-EndPoint"] = feature.OriginalLocalEndPoint?.ToString();
+                    }
+
+                    context.Response.Headers["X-Request-Protocol"] = context.Request.Protocol;
+                    context.Response.Headers["X-Connection-Remote-IP"] = context.Connection.RemoteIpAddress?.ToString();
+                    context.Response.Headers["X-Connection-Remote-Port"] = context.Connection.RemotePort.ToString();
+                    context.Response.Headers["X-Connection-Local-IP"] = context.Connection.LocalIpAddress?.ToString();
+                    context.Response.Headers["X-Connection-Local-Port"] = context.Connection.LocalPort.ToString();
+
+                    context.Response.Headers["X-Request-IsHttps"] = context.Request.IsHttps.ToString();
+                    var rspObject = new { ProxyProtocol = feature?.ToString() };
+                    await context.Response.WriteAsync(JsonConvert.SerializeObject(rspObject));
+                }));
 
             // Final Process Middleware
             proxyAppBuilder.UseMiddleware<ManagedApiProcessMiddleware>();
@@ -57,6 +81,15 @@ namespace Yaginx.SelfManagement
             }
 
             return dataSource;
+        }
+
+        static void MapGet(this IApplicationBuilder app, string pattern, RequestDelegate requestDelegate)
+        {
+            app.MapWhen(context => Regex.IsMatch(context.Request.Path, pattern, RegexOptions.IgnoreCase),
+               config => config.Run(async context =>
+               {
+                   await requestDelegate(context);
+               }));
         }
     }
 }
