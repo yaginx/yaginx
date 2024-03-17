@@ -67,11 +67,11 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
                     listenOptions.Protocols = HttpProtocols.Http1;
                 });
 
-                // enables PROXY protocol for all endpoints
-                serverOptions.ConfigureEndpointDefaults(listenOptions =>
-                {
-                    listenOptions.UseProxyProtocol();
-                });
+                //// enables PROXY protocol for all endpoints
+                //serverOptions.ConfigureEndpointDefaults(listenOptions =>
+                //{
+                //    listenOptions.UseProxyProtocol();
+                //});
 
                 if (((RunningModes.RunningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode))
                 {
