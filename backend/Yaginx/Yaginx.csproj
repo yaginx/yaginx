@@ -29,6 +29,7 @@
 		<ProjectReference Include="..\Scintillating.ProxyProtocol.Middleware\Scintillating.ProxyProtocol.Middleware.csproj" />
 		<ProjectReference Include="..\Yaginx.Core\Yaginx.Core.csproj" />
 		<ProjectReference Include="..\Yaginx.DataStore.PostgreSQLStore\Yaginx.DataStore.PostgreSQLStore.csproj" />
+		<ProjectReference Include="..\Yaginx.SelfManagement\Yaginx.SelfManagement.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
