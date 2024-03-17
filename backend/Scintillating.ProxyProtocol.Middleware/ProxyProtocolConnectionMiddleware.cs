@@ -84,6 +84,12 @@ internal class ProxyProtocolConnectionMiddleware
                 _logger.LogError(0, ex, $"SocketException, Address Info:[{remoteEndPointInfo}]=>[{localEndPointInfo}]");
                 return;
             }
+            catch(OperationCanceledException ex) when (ex.CancellationToken == cancellationToken && cancellationToken.IsCancellationRequested)
+            {
+                ProxyMiddlewareLogger.ConnectionTimeout(_logger, connectionId, ex);
+                context.Abort(new ConnectionAbortedException("PROXY V1/V2: operation canceled when reading PROXY protocol header.", ex));
+                return;
+            }
             catch (Exception ex)
             {
                 context.Abort(new ConnectionAbortedException("PROXY V1/V2: protocol header reading failed.", ex));
