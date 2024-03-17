@@ -7,7 +7,9 @@ using Scintillating.ProxyProtocol.Parser.Tlv;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipelines;
+using System.Net;
 using System.Net.Security;
+using System.Net.Sockets;
 namespace Scintillating.ProxyProtocol.Middleware;
 
 internal class ProxyProtocolConnectionMiddleware
@@ -51,15 +53,36 @@ internal class ProxyProtocolConnectionMiddleware
             ProxyProtocolHeader proxyProtocolHeader = null!;
             SslApplicationProtocol applicationProtocol = default;
 
+            var remoteEndPointInfo = string.Empty;
+            if (context.RemoteEndPoint is IPEndPoint remoteEndPoint)
+            {
+                remoteEndPointInfo = $"{remoteEndPoint.Address}:{remoteEndPoint.Port}";
+            }
+
+            var localEndPointInfo = string.Empty;
+            if (context.LocalEndPoint is IPEndPoint localEndPoint)
+            {
+                localEndPointInfo = $"{localEndPoint.Address}:{localEndPoint.Port}";
+            }
+
             var pipeReader = context.Transport.Input;
             ReadResult readResult;
-            do
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                readResult = await pipeReader.ReadAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                do
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    readResult = await pipeReader.ReadAsync(cancellationToken)
+                        .ConfigureAwait(false);
+                }
+                while (!TryParse(connectionId, pipeReader, in readResult, ref parser, ref applicationProtocol, ref proxyProtocolHeader));
             }
-            while (!TryParse(connectionId, pipeReader, in readResult, ref parser, ref applicationProtocol, ref proxyProtocolHeader));
+            catch (SocketException ex)
+            {
+                _logger.LogError(0, ex, $"SocketException-[{remoteEndPointInfo}]=>[{localEndPointInfo}]");
+                return;
+            }
+
 
             IProxyProtocolFeature proxyProtocolFeature = new ProxyProtocolFeature(
                 context,
@@ -80,7 +103,7 @@ internal class ProxyProtocolConnectionMiddleware
                 context.Features.Set<IHttpConnectionFeature>(proxyProtocolFeature);
 
                 bool hasApplicationProtocol = !applicationProtocol.Protocol.IsEmpty;
-                
+
                 var sslDetails = GetSslDetails(connectionId, proxyProtocolHeader);
                 // TODO: Add method to lookup client certificate by CN (if configured to do so)
                 // Requires to choose a certificate store, and specify required flags
