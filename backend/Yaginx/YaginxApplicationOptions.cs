@@ -2,6 +2,8 @@ using AgileLabs;
 using AgileLabs.WebApp;
 using AgileLabs.WebApp.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Options;
+using Scintillating.ProxyProtocol.Middleware;
 using Yaginx;
 using Yaginx.Configures;
 public class YaginxApplicationOptions : DefaultMvcApplicationOptions
@@ -45,7 +47,7 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
 
         ConfigureWebHostBuilder += (IWebHostBuilder webHostBuilder, AppBuildContext buildContext) =>
         {
-            webHostBuilder.ConfigureKestrel(serverOptions =>
+            webHostBuilder.ConfigureKestrel((context, serverOptions) =>
             {
                 serverOptions.Limits.MaxRequestBodySize = null;
                 serverOptions.Limits.MaxRequestBufferSize = 5 * 1024 * 1024;//5M
@@ -55,10 +57,40 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
                     listenOptions.Protocols = HttpProtocols.Http1;
                 });
 
+                // With Proxy Protocol
+                serverOptions.ListenAnyIP(9080, listenOptions =>
+                {
+                    listenOptions.UseProxyProtocol(proxyProtocolOptions =>
+                    {
+                        context.Configuration.GetSection("ProxyProtocol").Bind(proxyProtocolOptions);
+                    });
+                    listenOptions.Protocols = HttpProtocols.Http1;
+                });
+
+                // enables PROXY protocol for all endpoints
+                serverOptions.ConfigureEndpointDefaults(listenOptions =>
+                {
+                    listenOptions.UseProxyProtocol();
+                });
+
                 if (((RunningModes.RunningMode & RunningMode.GatewayMode) == RunningMode.GatewayMode))
                 {
                     serverOptions.ListenAnyIP(8443, listenOptions =>
                     {
+                        listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+                        listenOptions.UseHttps(httpsOptions =>
+                        {
+                            httpsOptions.UseYaginxLettuceEncrypt(serverOptions.ApplicationServices);
+                        });
+                    });
+
+                    // With Proxy Protocol
+                    serverOptions.ListenAnyIP(4443, listenOptions =>
+                    {
+                        listenOptions.UseProxyProtocol(proxyProtocolOptions =>
+                        {
+                            context.Configuration.GetSection("ProxyProtocol").Bind(proxyProtocolOptions);
+                        });
                         listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
                         listenOptions.UseHttps(httpsOptions =>
                         {

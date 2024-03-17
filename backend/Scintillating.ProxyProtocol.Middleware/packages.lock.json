@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net8.0": {
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "Direct",
+        "requested": "[8.0.1, )",
+        "resolved": "8.0.1",
+        "contentHash": "RIFgaqoaINxkM2KTOw72dmilDmTrYA0ns2KW4lDz4gZ2+o6IQ894CzmdL3StM2oh7QQq44nCWiqKqc4qUI9Jmg==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.1"
+        }
+      },
+      "Microsoft.NET.ILLink.Tasks": {
+        "type": "Direct",
+        "requested": "[8.0.1, )",
+        "resolved": "8.0.1",
+        "contentHash": "ADdJXuKNjwZDfBmybMnpvwd5CK3gp92WkWqqeQhW4W+q4MO3Qaa9QyW2DcFLAvCDMcCWxT5hRXqGdv13oon7nA=="
+      },
+      "Scintillating.ProxyProtocol.Parser": {
+        "type": "Direct",
+        "requested": "[0.6.0, )",
+        "resolved": "0.6.0",
+        "contentHash": "BOPcjZcas8F86zt6fy0vbKssdUA1igX3B3tF8ZabBp6ChO/jRyLf91cb434evbvqsJuQALgM6Cl3HXVkJli/PQ=="
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "8.0.1",
+        "contentHash": "fGLiCRLMYd00JYpClraLjJTNKLmMJPnqxMaiRzEBIIvevlzxz33mXy39Lkd48hu1G+N21S7QpaO5ZzKsI6FRuA=="
+      }
+    }
+  }
+}

@@ -20,13 +20,13 @@
 		<PackageReference Include="Docker.DotNet" Version="3.125.15" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.2" />
-		<PackageReference Include="Scintillating.ProxyProtocol.Middleware" Version="0.6.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\LettuceEncrypt\LettuceEncrypt.csproj" />
 		<ProjectReference Include="..\ReverseProxy\Yarp.ReverseProxy.csproj" />
+		<ProjectReference Include="..\Scintillating.ProxyProtocol.Middleware\Scintillating.ProxyProtocol.Middleware.csproj" />
 		<ProjectReference Include="..\Yaginx.Core\Yaginx.Core.csproj" />
 		<ProjectReference Include="..\Yaginx.DataStore.PostgreSQLStore\Yaginx.DataStore.PostgreSQLStore.csproj" />
 	</ItemGroup>
