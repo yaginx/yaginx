@@ -35,6 +35,19 @@ internal class ProxyProtocolConnectionMiddleware
 
         CancellationTokenSource? cancellationTokenSource = null;
         string connectionId = context.ConnectionId;
+
+        var remoteEndPointInfo = string.Empty;
+        if (context.RemoteEndPoint is IPEndPoint remoteEndPoint)
+        {
+            remoteEndPointInfo = $"{remoteEndPoint.Address}:{remoteEndPoint.Port}";
+        }
+
+        var localEndPointInfo = string.Empty;
+        if (context.LocalEndPoint is IPEndPoint localEndPoint)
+        {
+            localEndPointInfo = $"{localEndPoint.Address}:{localEndPoint.Port}";
+        }
+
         try
         {
             if (_options.ConnectTimeout is TimeSpan connectTimeout)
@@ -51,35 +64,28 @@ internal class ProxyProtocolConnectionMiddleware
 
             var parser = new ProxyProtocolParser();
             ProxyProtocolHeader proxyProtocolHeader = null!;
-            SslApplicationProtocol applicationProtocol = default;
+            SslApplicationProtocol applicationProtocol = default;           
 
-            var remoteEndPointInfo = string.Empty;
-            if (context.RemoteEndPoint is IPEndPoint remoteEndPoint)
-            {
-                remoteEndPointInfo = $"{remoteEndPoint.Address}:{remoteEndPoint.Port}";
-            }
-
-            var localEndPointInfo = string.Empty;
-            if (context.LocalEndPoint is IPEndPoint localEndPoint)
-            {
-                localEndPointInfo = $"{localEndPoint.Address}:{localEndPoint.Port}";
-            }
-
-            var pipeReader = context.Transport.Input;
-            ReadResult readResult;
             try
             {
+                var pipeReader = context.Transport.Input;
+                ReadResult readResult;
+
                 do
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    readResult = await pipeReader.ReadAsync(cancellationToken)
-                        .ConfigureAwait(false);
+                    readResult = await pipeReader.ReadAsync(cancellationToken).ConfigureAwait(false);
                 }
                 while (!TryParse(connectionId, pipeReader, in readResult, ref parser, ref applicationProtocol, ref proxyProtocolHeader));
             }
             catch (SocketException ex)
             {
-                _logger.LogError(0, ex, $"SocketException-[{remoteEndPointInfo}]=>[{localEndPointInfo}]");
+                _logger.LogError(0, ex, $"SocketException, Address Info:[{remoteEndPointInfo}]=>[{localEndPointInfo}]");
+                return;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(0, ex, $"ProxyProtocalHeader Read Exception, Address Info:[{remoteEndPointInfo}]=>[{localEndPointInfo}]");
                 return;
             }
 
@@ -137,6 +143,11 @@ internal class ProxyProtocolConnectionMiddleware
         {
             ProxyMiddlewareLogger.ConnectionTimeout(_logger, connectionId, ex);
             context.Abort(new ConnectionAbortedException("PROXY V1/V2: Timeout when reading PROXY protocol header.", ex));
+            return;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(0, ex, $"ProxyProtocal OnConnect Exception, Address Info:[{remoteEndPointInfo}]=>[{localEndPointInfo}]");
             return;
         }
         finally
