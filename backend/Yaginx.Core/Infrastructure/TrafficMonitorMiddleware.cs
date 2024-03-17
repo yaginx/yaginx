@@ -1,10 +1,10 @@
 ﻿using AgileLabs;
+using AgileLabs.MemoryBuses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using Yaginx.MemoryBuses;
 
 namespace Yaginx.Infrastructure;
 

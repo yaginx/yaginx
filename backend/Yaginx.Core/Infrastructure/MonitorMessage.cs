@@ -1,5 +1,5 @@
-﻿using System.Runtime.Serialization;
-using Yaginx.MemoryBuses.Events;
+﻿using AgileLabs.MemoryBuses.Events;
+using System.Runtime.Serialization;
 
 namespace Yaginx.Infrastructure;
 

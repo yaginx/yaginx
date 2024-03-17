@@ -6,7 +6,7 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AgileLabs.WebApp" Version="8.1.101" />
+		<PackageReference Include="AgileLabs.WebApp" Version="8.1.109" />
 		<PackageReference Include="AgileLabs.Storage.PostgreSql" Version="8.1.38" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
 		<PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />

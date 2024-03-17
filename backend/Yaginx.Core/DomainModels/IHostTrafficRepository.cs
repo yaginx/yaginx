@@ -1,5 +1,5 @@
 ﻿using AgileLabs.ComponentModels;
-using AgileLabs.EfCore.PostgreSQL.DynamicSearch;
+using AgileLabs.DynamicSearch;
 
 namespace Yaginx.DomainModels;
 

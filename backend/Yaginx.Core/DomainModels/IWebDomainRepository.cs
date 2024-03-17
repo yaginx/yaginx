@@ -2,7 +2,7 @@
 
 public interface IWebDomainRepository
 {
-    Task<IEnumerable<WebDomain>> SearchAsync(bool useFreeCert = false);
+    Task<IEnumerable<WebDomain>> SearchAsync(bool? useFreeCert = null);
     Task AddAsync(WebDomain webDomain);
     Task UpdateAsync(WebDomain webDomain);
     Task DeleteAsync(long id);

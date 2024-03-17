@@ -44,8 +44,7 @@ public class WebDomainController : YaginxControllerBase
     [HttpGet, HttpPost, Route("search")]
     public async Task<List<WebDomainListItem>> Search()
     {
-        await Task.CompletedTask;
-        IEnumerable<WebDomain> source = await _webDomainRepository.SearchAsync();
+        var source = await _webDomainRepository.SearchAsync();
         return _mapper.Map<List<WebDomainListItem>>(source.ToList());
     }
 

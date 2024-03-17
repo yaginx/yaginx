@@ -1,7 +1,7 @@
 ﻿using AgileLabs;
+using AgileLabs.MemoryBuses;
 using AutoMapper;
 using Yaginx.DomainModels.MonitorModels;
-using Yaginx.MemoryBuses;
 
 namespace Yaginx.Infrastructure;
 

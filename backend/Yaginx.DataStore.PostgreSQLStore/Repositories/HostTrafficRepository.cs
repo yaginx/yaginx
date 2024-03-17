@@ -1,7 +1,7 @@
 ﻿using AgileLabs;
 using AgileLabs.ComponentModels;
+using AgileLabs.DynamicSearch;
 using AgileLabs.EfCore.PostgreSQL.ContextFactories;
-using AgileLabs.EfCore.PostgreSQL.DynamicSearch;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

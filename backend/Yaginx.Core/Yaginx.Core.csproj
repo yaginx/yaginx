@@ -10,7 +10,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="AgileLabs" Version="8.1.38" />
-		<PackageReference Include="AgileLabs.WebApp" Version="8.1.101" />
+		<PackageReference Include="AgileLabs.EfCore.PostgreSQL" Version="8.1.109" />
+		<PackageReference Include="AgileLabs.WebApp" Version="8.1.109" />
 		<PackageReference Include="LiteDB" Version="5.0.19" />
 		<PackageReference Include="LiteDB.Async" Version="0.1.7" />
 		<PackageReference Include="Snowflake.Core" Version="2.0.0" />
@@ -28,7 +29,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\AgileLabs.EfCore.PostgreSQL\AgileLabs.EfCore.PostgreSQL.csproj" />
 	  <ProjectReference Include="..\LettuceEncrypt\LettuceEncrypt.csproj" />
 	</ItemGroup>
 

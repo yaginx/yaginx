@@ -1,5 +1,5 @@
 ﻿using AgileLabs.ComponentModels;
-using AgileLabs.EfCore.PostgreSQL.DynamicSearch;
+using AgileLabs.DynamicSearch;
 using Microsoft.AspNetCore.Mvc;
 using Yaginx.DomainModels;
 using Yaginx.Infrastructure;

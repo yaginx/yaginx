@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "yaginx-Development": {
+    "dev": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "http://localhost:80/swagger",
@@ -10,7 +10,7 @@
       },
       "dotnetRunMessages": true
     },
-    "yaginx-Production": {
+    "prd": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "http://localhost:8080/swagger",

@@ -12,7 +12,8 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
     {
         protected readonly IMapper _mapper;
 
-        public YaginxCrudBaseRepository(IAgileLabDbContextFactory factory, IMapper mapper, ILogger logger) : base(factory, logger, mapper)
+        public YaginxCrudBaseRepository(IAgileLabDbContextFactory factory, IMapper mapper, ILogger<YaginxCrudBaseRepository<TDomainModel, TEntity>> logger) 
+            : base(factory, logger, mapper)
         {
             _mapper = mapper;
         }

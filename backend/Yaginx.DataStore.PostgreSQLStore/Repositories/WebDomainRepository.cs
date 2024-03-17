@@ -1,5 +1,6 @@
 ﻿using AgileLabs.EfCore.PostgreSQL.ContextFactories;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Yaginx.DataStore.PostgreSQLStore.Entities;
 using Yaginx.DomainModels;
@@ -23,9 +24,15 @@ namespace Yaginx.DataStore.PostgreSQLStore.Repositories
             return base.SearchAsync();
         }
 
-        public Task<IEnumerable<WebDomain>> SearchAsync(bool useFreeCert = false)
+        public async Task<IEnumerable<WebDomain>> SearchAsync(bool? useFreeCert = null)
         {
-            return base.SearchAsync(x => x.IsUseFreeCert);
+            var query = await GetQueryAsync();
+            if (useFreeCert.HasValue)
+            {
+                query = query.Where(x => x.IsUseFreeCert == useFreeCert);
+            }
+            var entityList = await query.ToListAsync();
+            return _mapper.Map<List<WebDomain>>(entityList);
         }
 
         //public async Task UnFreeDomainAsync(string domain, string message)

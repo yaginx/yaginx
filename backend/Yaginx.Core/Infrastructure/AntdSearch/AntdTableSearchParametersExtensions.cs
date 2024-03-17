@@ -1,5 +1,5 @@
-﻿using AgileLabs.EfCore.PostgreSQL.DynamicSearch;
-using AgileLabs.EfCore.PostgreSQL.DynamicSearch.Model;
+﻿using AgileLabs.DynamicSearch;
+using AgileLabs.DynamicSearch.Model;
 
 namespace Yaginx.Infrastructure
 {
