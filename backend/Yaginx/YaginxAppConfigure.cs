@@ -11,6 +11,7 @@ using AgileLabs.Securities;
 using AgileLabs.WebApp.Hosting;
 using AgileLabs.WorkContexts;
 using Docker.DotNet;
+using Google.Protobuf.WellKnownTypes;
 using LettuceEncrypt;
 using LettuceEncrypt.Internal;
 using LettuceEncrypt.YaginxAcmeLoaders;
@@ -18,6 +19,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.OpenApi.Models;
+using Scintillating.ProxyProtocol.Middleware;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using Yaginx;
@@ -228,6 +230,24 @@ public partial class YaginxAppConfigure : IServiceRegister, IRequestPiplineRegis
             }
 
         }
+        endpoints.MapGet("/yaginx/ip", (HttpContext context) =>
+        {
+            var feature = context.Features.Get<IProxyProtocolFeature>();
+            if (feature != null)
+            {
+                context.Response.Headers["X-Connection-Orignal-Remote-EndPoint"] = feature.OriginalRemoteEndPoint?.ToString();
+                context.Response.Headers["X-Connection-Orignal-Local-EndPoint"] = feature.OriginalLocalEndPoint?.ToString();
+            }
+
+            context.Response.Headers["X-Request-Protocol"] = context.Request.Protocol;
+            context.Response.Headers["X-Connection-Remote-IP"] = context.Connection.RemoteIpAddress?.ToString();
+            context.Response.Headers["X-Connection-Remote-Port"] = context.Connection.RemotePort.ToString();
+            context.Response.Headers["X-Connection-Local-IP"] = context.Connection.LocalIpAddress?.ToString();
+            context.Response.Headers["X-Connection-Local-Port"] = context.Connection.LocalPort.ToString();
+
+            context.Response.Headers["X-Request-IsHttps"] = context.Request.IsHttps.ToString();
+            return new { ProxyProtocol = feature?.ToString() };
+        });
         endpoints.MapDefaultControllerRoute();
     }
 
