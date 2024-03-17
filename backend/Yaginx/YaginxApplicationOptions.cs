@@ -85,7 +85,7 @@ public class YaginxApplicationOptions : DefaultMvcApplicationOptions
                     });
 
                     // With Proxy Protocol
-                    serverOptions.ListenAnyIP(4443, listenOptions =>
+                    serverOptions.ListenAnyIP(9443, listenOptions =>
                     {
                         listenOptions.UseProxyProtocol(proxyProtocolOptions =>
                         {
